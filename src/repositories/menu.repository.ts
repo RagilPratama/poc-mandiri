@@ -21,7 +21,16 @@ export class MenuRepository {
       console.warn("Cache Gagal konek langsung ke database:", error);
     }
 
-    const query = db.select().from(menus).orderBy(asc(menus.id));
+    const query = db.select({
+      id: menus.id,
+      icon: menus.icon,
+      iconColor: menus.icon_color,
+      bgColor: menus.bg_color,
+      route: menus.route,
+    })
+    .from(menus)
+    .orderBy(asc(menus.id));
+    
     // const sqlQuery = query.toSQL();
     // dumpQuery(sqlQuery);
     const result = await query;
