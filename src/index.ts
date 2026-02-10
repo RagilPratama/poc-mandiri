@@ -1,9 +1,13 @@
 import { Elysia } from "elysia";
 import { pool } from "./db";
+import { connectRedis, disconnectRedis } from "./redis";
 import { menuHandlers } from "./handlers/menu.handler";
 import { featureHandlers } from "./handlers/feature.handler";
 
 const port = process.env.PORT || 3000;
+
+// Connect to Redis on startup
+await connectRedis();
 
 const app = new Elysia()
 
@@ -30,7 +34,15 @@ console.log(
 
 // Graceful shutdown
 process.on("SIGTERM", async () => {
-  console.log("Closing database connection pool...");
+  console.log("Closing database connection pool and Redis...");
+  await disconnectRedis();
+  await pool.end();
+  process.exit(0);
+});
+
+process.on("SIGINT", async () => {
+  console.log("Closing database connection pool and Redis...");
+  await disconnectRedis();
   await pool.end();
   process.exit(0);
 });
