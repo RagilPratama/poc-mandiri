@@ -7,8 +7,10 @@ export const productHandlers = {
     try {
         const page = query.page || 1;
         const limit = query.limit || 10;
-        const products = await productRepo.getProduct(page, limit);
-        const total = await productRepo.countProducts();
+        const [products, total] = await Promise.all([
+            productRepo.getProduct(page, limit),
+            productRepo.countProducts(),
+        ]);
         
         return {
         success: true,

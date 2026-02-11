@@ -86,6 +86,6 @@ export class ProductRepository {
 
     async countProducts(): Promise<number> {
         const result = await db.select({ count: count() }).from(products);
-        return result[0].count;
+        return Number(result[0].count);
     }
 }
