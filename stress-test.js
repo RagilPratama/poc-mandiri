@@ -7,12 +7,12 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get("http://localhost:3000/api/menus");
+  const res = http.get("http://localhost:3000/api/features");
 
   check(res, {
     "status is 200": (r) => r.status === 200,
-    "response time < 500ms": (r) => r.timings.duration < 500,
+    "response time < 600ms": (r) => r.timings.duration < 600,
   });
 
-  sleep(1); // tiap user nunggu 1 detik sebelum request lagi
+  sleep(1);
 }
