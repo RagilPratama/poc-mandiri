@@ -1,11 +1,10 @@
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import { pool } from "./db";
 import { connectRedis, disconnectRedis, redisClient } from "./redis";
 import { menuHandlers } from "./handlers/menu.handler";
 import { featureHandlers } from "./handlers/feature.handler";
 import { productHandlers } from "./handlers/products.handler";
-
 const port = process.env.PORT || 3000;
 
 // Connect to Redis on startup
@@ -72,6 +71,11 @@ const app = new Elysia()
     },
   })
   .get("/api/products", productHandlers.getAllProducts, {
+    query: t.Object({
+      page: t.Optional(t.Numeric()),
+      limit: t.Optional(t.Numeric())
+    })
+    ,
     detail: {
       tags: ["Products"],
       summary: "Get all products",
