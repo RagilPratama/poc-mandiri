@@ -15,12 +15,18 @@ export const villageRoutes = new Elysia({ prefix: "/api/master" })
     return await villageHandlers.searchVillages({ query });
   }, {
     query: t.Object({
-      q: t.String({ minLength: 1, description: "Search term for village name" }),
+      q: t.String({ 
+        minLength: 1, 
+        pattern: "^(?!\\s*$).+",
+        description: "Search term for village name (cannot be empty or whitespace)" 
+      }),
+      district_id: t.Optional(t.String({ pattern: "^[0-9]+$", description: "Filter by district ID (optional)" })),
     }),
     detail: {
       tags: ["Villages"],
       summary: "Search villages",
-      description: "Mencari desa/kelurahan berdasarkan nama",
+      description: "Mencari desa/kelurahan berdasarkan nama, dengan optional filter district_id",
+      operationId: "searchVillages",
     },
   })
   .get("/villages/district/:district_id", async ({ params }) => {

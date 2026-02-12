@@ -18,6 +18,46 @@ const app = new Elysia()
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   }))
   .use(errorMiddleware)
+  .onError(({ code, error, set }) => {
+    // Handle validation errors globally
+    if (code === 'VALIDATION') {
+      set.status = 400;
+      
+      // Extract field name dari error message atau all property
+      let field = 'parameter';
+      
+      // Coba extract dari berbagai format error message
+      const patterns = [
+        /property '\/(\w+)'/,
+        /path: '\/(\w+)'/,
+        /"\/(\w+)"/,
+      ];
+      
+      for (const pattern of patterns) {
+        const match = error.message.match(pattern);
+        if (match) {
+          field = match[1];
+          break;
+        }
+      }
+      
+      return {
+        success: false,
+        error: 'Validation Error',
+        message: `Invalid ${field}: cannot be empty or invalid format`,
+      };
+    }
+    
+    // Handle other errors
+    if (code === 'NOT_FOUND') {
+      set.status = 404;
+      return {
+        success: false,
+        error: 'Not Found',
+        message: 'Endpoint not found',
+      };
+    }
+  })
   .use(swagger({
     path: "/swagger",
     documentation: {

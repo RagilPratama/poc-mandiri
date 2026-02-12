@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { villages } from "../db/schema/villages";
-import { asc, count, eq, ilike } from "drizzle-orm";
+import { asc, count, eq, ilike, and } from "drizzle-orm";
 import { getCache, setCache } from "../redis";
 import { VillageResponse } from "../types/village";
 
@@ -129,8 +129,10 @@ export class VillageRepository {
     return result[0].count;
   }
 
-  async searchVillages(searchTerm: string): Promise<VillageResponse[]> {
-    const cacheKey = `villages:search:${searchTerm.toLowerCase()}`;
+  async searchVillages(searchTerm: string, district_id?: number): Promise<VillageResponse[]> {
+    const cacheKey = district_id 
+      ? `villages:search:${searchTerm.toLowerCase()}:district:${district_id}`
+      : `villages:search:${searchTerm.toLowerCase()}`;
 
     try {
       const cached = await getCache(cacheKey);
@@ -143,6 +145,11 @@ export class VillageRepository {
 
     const searchPattern = `%${searchTerm}%`;
 
+    const conditions = [ilike(villages.name, searchPattern)];
+    if (district_id) {
+      conditions.push(eq(villages.district_id, district_id));
+    }
+
     const result = await db
       .select({
         id: villages.id,
@@ -153,7 +160,7 @@ export class VillageRepository {
         longitude: villages.longitude,
       })
       .from(villages)
-      .where(ilike(villages.name, searchPattern))
+      .where(and(...conditions))
       .orderBy(asc(villages.name));
 
     const transformedData = result.map((row) => ({

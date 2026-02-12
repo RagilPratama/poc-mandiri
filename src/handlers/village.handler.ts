@@ -41,13 +41,14 @@ export const villageHandlers = {
     }
   },
 
-  async searchVillages({ query }: { query: { q?: string } }) {
+  async searchVillages({ query }: { query: { q?: string; district_id?: string } }) {
     try {
       if (!query.q || query.q.trim().length === 0) {
         throw new Error("Search query is required");
       }
 
-      const results = await villageRepo.searchVillages(query.q);
+      const district_id = query.district_id ? Number(query.district_id) : undefined;
+      const results = await villageRepo.searchVillages(query.q, district_id);
 
       return { data: Array.isArray(results) ? results : [], total: results.length };
     } catch (error) {
