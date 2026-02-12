@@ -1,4 +1,4 @@
-import { pgTable, text, bigint, numeric, foreignKey } from "drizzle-orm/pg-core";
+import { pgTable, text, bigint, numeric, foreignKey, index } from "drizzle-orm/pg-core";
 import { provinces } from "./provinces";
 
 export const regencies = pgTable(
@@ -16,6 +16,13 @@ export const regencies = pgTable(
       columns: [table.province_id],
       foreignColumns: [provinces.id],
     }).onDelete("cascade").onUpdate("cascade"),
+    
+    // Index untuk foreign key lookup
+    index("idx_regencies_province_id").on(table.province_id),
+    // Index untuk search by name (case-insensitive)
+    index("idx_regencies_name_lower").on(table.name),
+    // Composite index untuk filter + sort
+    index("idx_regencies_province_name").on(table.province_id, table.name),
   ]
 );
 

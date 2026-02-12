@@ -1,4 +1,4 @@
-import { pgTable, text, bigint, doublePrecision, foreignKey } from "drizzle-orm/pg-core";
+import { pgTable, text, bigint, doublePrecision, foreignKey, index } from "drizzle-orm/pg-core";
 import { districts } from "./districts";
 
 export const villages = pgTable(
@@ -16,6 +16,13 @@ export const villages = pgTable(
       columns: [table.district_id],
       foreignColumns: [districts.id],
     }).onDelete("cascade").onUpdate("cascade"),
+    
+    // Index untuk foreign key lookup
+    index("idx_villages_district_id").on(table.district_id),
+    // Index untuk search by name (case-insensitive)
+    index("idx_villages_name_lower").on(table.name),
+    // Composite index untuk filter + sort
+    index("idx_villages_district_name").on(table.district_id, table.name),
   ]
 );
 
