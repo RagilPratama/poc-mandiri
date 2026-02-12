@@ -6,7 +6,7 @@ export const provinceRoutes = new Elysia({ prefix: "/api/master" })
     return await provinceHandlers.getAllProvinces();
   }, {
     detail: {
-      tags: ["Province"],
+      tags: ["Master"],
       summary: "Get all provinces",
       description: "Menampilkan semua provinsi dengan data latitude dan longitude",
     },
@@ -18,7 +18,7 @@ export const provinceRoutes = new Elysia({ prefix: "/api/master" })
       q: t.String({ minLength: 1, description: "Search term for province name" }),
     }),
     detail: {
-      tags: ["Province"],
+      tags: ["Master"],
       summary: "Search provinces",
       description: "Mencari provinsi berdasarkan nama atau nama alternatif",
     },
@@ -30,7 +30,7 @@ export const provinceRoutes = new Elysia({ prefix: "/api/master" })
       id: t.Numeric({ minimum: 1, description: "Province ID" }),
     }),
     detail: {
-      tags: ["Province"],
+      tags: ["Master"],
       summary: "Get province by ID",
       description: "Menampilkan detail provinsi berdasarkan ID",
     },

@@ -18,7 +18,7 @@ export const villageRoutes = new Elysia({ prefix: "/api/master" })
       q: t.String({ minLength: 1, description: "Search term for village name" }),
     }),
     detail: {
-      tags: ["Village"],
+      tags: ["Master"],
       summary: "Search villages",
       description: "Mencari desa/kelurahan berdasarkan nama",
     },
@@ -30,7 +30,7 @@ export const villageRoutes = new Elysia({ prefix: "/api/master" })
       district_id: t.Numeric({ minimum: 1, description: "District ID" }),
     }),
     detail: {
-      tags: ["Village"],
+      tags: ["Master"],
       summary: "Get villages by district ID",
       description: "Menampilkan semua desa/kelurahan berdasarkan district ID",
     },
@@ -42,7 +42,7 @@ export const villageRoutes = new Elysia({ prefix: "/api/master" })
       id: t.Numeric({ minimum: 1, description: "Village ID" }),
     }),
     detail: {
-      tags: ["Village"],
+      tags: ["Master"],
       summary: "Get village by ID",
       description: "Menampilkan detail desa/kelurahan berdasarkan ID",
     },

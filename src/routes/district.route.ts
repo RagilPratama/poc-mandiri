@@ -6,7 +6,7 @@ export const districtRoutes = new Elysia({ prefix: "/api/master" })
     return await districtHandlers.getAllDistricts();
   }, {
     detail: {
-      tags: ["District"],
+      tags: ["Master"],
       summary: "Get all districts",
       description: "Menampilkan semua kecamatan dengan data latitude dan longitude",
     },
@@ -18,7 +18,7 @@ export const districtRoutes = new Elysia({ prefix: "/api/master" })
       q: t.String({ minLength: 1, description: "Search term for district name" }),
     }),
     detail: {
-      tags: ["District"],
+      tags: ["Master"],
       summary: "Search districts",
       description: "Mencari kecamatan berdasarkan nama",
     },
@@ -30,7 +30,7 @@ export const districtRoutes = new Elysia({ prefix: "/api/master" })
       regency_id: t.Numeric({ minimum: 1, description: "Regency ID" }),
     }),
     detail: {
-      tags: ["District"],
+      tags: ["Master"],
       summary: "Get districts by regency ID",
       description: "Menampilkan semua kecamatan berdasarkan regency ID",
     },
@@ -42,7 +42,7 @@ export const districtRoutes = new Elysia({ prefix: "/api/master" })
       id: t.Numeric({ minimum: 1, description: "District ID" }),
     }),
     detail: {
-      tags: ["District"],
+      tags: ["Master"],
       summary: "Get district by ID",
       description: "Menampilkan detail kecamatan berdasarkan ID",
     },

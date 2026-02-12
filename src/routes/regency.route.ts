@@ -6,7 +6,7 @@ export const regencyRoutes = new Elysia({ prefix: "/api/master" })
     return await regencyHandlers.getAllRegencies();
   }, {
     detail: {
-      tags: ["Regency"],
+      tags: ["Master"],
       summary: "Get all regencies",
       description: "Menampilkan semua kabupaten/kota dengan data latitude dan longitude",
     },
@@ -18,7 +18,7 @@ export const regencyRoutes = new Elysia({ prefix: "/api/master" })
       q: t.String({ minLength: 1, description: "Search term for regency name" }),
     }),
     detail: {
-      tags: ["Regency"],
+      tags: ["Master"],
       summary: "Search regencies",
       description: "Mencari kabupaten/kota berdasarkan nama",
     },
@@ -30,7 +30,7 @@ export const regencyRoutes = new Elysia({ prefix: "/api/master" })
       province_id: t.Numeric({ minimum: 1, description: "Province ID" }),
     }),
     detail: {
-      tags: ["Regency"],
+      tags: ["Master"],
       summary: "Get regencies by province ID",
       description: "Menampilkan semua kabupaten/kota berdasarkan province ID",
     },
@@ -42,7 +42,7 @@ export const regencyRoutes = new Elysia({ prefix: "/api/master" })
       id: t.Numeric({ minimum: 1, description: "Regency ID" }),
     }),
     detail: {
-      tags: ["Regency"],
+      tags: ["Master"],
       summary: "Get regency by ID",
       description: "Menampilkan detail kabupaten/kota berdasarkan ID",
     },
