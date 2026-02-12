@@ -1,29 +1,30 @@
-export interface ProvinceResponse {
+export interface RegencyResponse {
   id: number;
+  province_id: number;
   name: string;
   alt_name: string | null;
   latitude: string | null;
   longitude: string | null;
 }
 
-export interface ProvinceListResponse {
+export interface RegencyListResponse {
   success: boolean;
-  data: ProvinceResponse[];
+  data: RegencyResponse[];
   total?: number;
   error?: string;
   message?: string;
 }
 
-export interface ProvinceSingleResponse {
+export interface RegencySingleResponse {
   success: boolean;
-  data: ProvinceResponse | null;
+  data: RegencyResponse | null;
   error?: string;
   message?: string;
 }
 
-export interface ProvinceSearchResponse {
+export interface RegencySearchResponse {
   success: boolean;
-  data: ProvinceResponse[];
+  data: RegencyResponse[];
   total?: number;
   error?: string;
   message?: string;

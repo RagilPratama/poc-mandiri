@@ -1,29 +1,30 @@
-export interface ProvinceResponse {
+export interface DistrictResponse {
   id: number;
+  regency_id: number;
   name: string;
   alt_name: string | null;
   latitude: string | null;
   longitude: string | null;
 }
 
-export interface ProvinceListResponse {
+export interface DistrictListResponse {
   success: boolean;
-  data: ProvinceResponse[];
+  data: DistrictResponse[];
   total?: number;
   error?: string;
   message?: string;
 }
 
-export interface ProvinceSingleResponse {
+export interface DistrictSingleResponse {
   success: boolean;
-  data: ProvinceResponse | null;
+  data: DistrictResponse | null;
   error?: string;
   message?: string;
 }
 
-export interface ProvinceSearchResponse {
+export interface DistrictSearchResponse {
   success: boolean;
-  data: ProvinceResponse[];
+  data: DistrictResponse[];
   total?: number;
   error?: string;
   message?: string;

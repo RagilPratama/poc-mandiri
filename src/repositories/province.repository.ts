@@ -2,20 +2,19 @@ import { db } from "../db";
 import { provinces } from "../db/schema";
 import { asc, count, eq, like, ilike } from "drizzle-orm";
 import { getCache, setCache } from "../redis";
+import { ProvinceResponse } from "../types/province";
 
-const CACHE_TTL = 3600; // 1 hour
+const CACHE_TTL = 86400;
 
 export class ProvinceRepository {
-  async getAllProvinces() {
+  async getAllProvinces(): Promise<ProvinceResponse[]> {
     const cacheKey = "provinces:all";
 
     try {
       const cached = await getCache(cacheKey);
       if (cached) {
-        console.log("Cache hit: all provinces");
-        return cached;
+        return cached as ProvinceResponse[];
       }
-      console.log("Cache miss: all provinces");
     } catch (error) {
       console.warn("Cache gagal, fallback ke database:", error);
     }
@@ -43,16 +42,14 @@ export class ProvinceRepository {
     return transformedData;
   }
 
-  async getProvinceById(id: number) {
+  async getProvinceById(id: number): Promise<ProvinceResponse | null> {
     const cacheKey = `province:${id}`;
 
     try {
       const cached = await getCache(cacheKey);
       if (cached) {
-        console.log(`Cache hit: province ${id}`);
-        return cached;
+        return cached as ProvinceResponse;
       }
-      console.log(`Cache miss: province ${id}`);
     } catch (error) {
       console.warn("Cache gagal, fallback ke database:", error);
     }
@@ -85,21 +82,19 @@ export class ProvinceRepository {
     return transformedData;
   }
 
-  async countProvinces() {
+  async countProvinces(): Promise<number> {
     const result = await db.select({ count: count() }).from(provinces);
     return result[0].count;
   }
 
-  async searchProvinces(searchTerm: string) {
+  async searchProvinces(searchTerm: string): Promise<ProvinceResponse[]> {
     const cacheKey = `provinces:search:${searchTerm.toLowerCase()}`;
 
     try {
       const cached = await getCache(cacheKey);
       if (cached) {
-        console.log(`Cache hit: provinces search "${searchTerm}"`);
-        return cached;
+        return cached as ProvinceResponse[];
       }
-      console.log(`Cache miss: provinces search "${searchTerm}"`);
     } catch (error) {
       console.warn("Cache gagal, fallback ke database:", error);
     }

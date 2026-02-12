@@ -1,9 +1,10 @@
 import { ProvinceRepository } from "../repositories/province.repository";
+import { ProvinceListResponse, ProvinceSingleResponse, ProvinceSearchResponse } from "../types/province";
 
 const provinceRepo = new ProvinceRepository();
 
 export const provinceHandlers = {
-  async getAllProvinces() {
+  async getAllProvinces(): Promise<ProvinceListResponse> {
     try {
       const provinces = await provinceRepo.getAllProvinces();
       const total = await provinceRepo.countProvinces();
@@ -24,7 +25,7 @@ export const provinceHandlers = {
     }
   },
 
-  async getProvinceById({ params }: { params: { id: number } }) {
+  async getProvinceById({ params }: { params: { id: number } }): Promise<ProvinceSingleResponse> {
     try {
       const province = await provinceRepo.getProvinceById(params.id);
 
@@ -51,7 +52,7 @@ export const provinceHandlers = {
     }
   },
 
-  async searchProvinces({ query }: { query: { q?: string } }) {
+  async searchProvinces({ query }: { query: { q?: string } }): Promise<ProvinceSearchResponse> {
     try {
       if (!query.q || query.q.trim().length === 0) {
         return {
