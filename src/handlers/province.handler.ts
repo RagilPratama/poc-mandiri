@@ -1,64 +1,47 @@
 import { ProvinceRepository } from "../repositories/province.repository";
-import { ProvinceListResponse, ProvinceSingleResponse, ProvinceSearchResponse } from "../types/province";
-import { successResponse, errorResponse } from "../utils/response";
 
 const provinceRepo = new ProvinceRepository();
 
 export const provinceHandlers = {
-  async getAllProvinces(): Promise<ProvinceListResponse> {
+  async getAllProvinces() {
     try {
       const provinces = await provinceRepo.getAllProvinces();
       const total = await provinceRepo.countProvinces();
 
-      return successResponse(provinces, total) as ProvinceListResponse;
+      return { data: provinces, total };
     } catch (error) {
       console.error("Error fetching provinces:", error);
-      return {
-        ...errorResponse("Failed to fetch provinces", error instanceof Error ? error.message : "Unknown error"),
-        data: [],
-      };
+      throw error;
     }
   },
 
-  async getProvinceById({ params }: { params: { id: number } }): Promise<ProvinceSingleResponse> {
+  async getProvinceById({ params }: { params: { id: number } }) {
     try {
       const province = await provinceRepo.getProvinceById(params.id);
 
       if (!province) {
-        return {
-          ...errorResponse("Province not found"),
-          data: null,
-        };
+        throw new Error("Province not found");
       }
 
-      return successResponse(province) as ProvinceSingleResponse;
+      return { data: province };
     } catch (error) {
       console.error("Error fetching province:", error);
-      return {
-        ...errorResponse("Failed to fetch province", error instanceof Error ? error.message : "Unknown error"),
-        data: null,
-      };
+      throw error;
     }
   },
 
-  async searchProvinces({ query }: { query: { q?: string } }): Promise<ProvinceSearchResponse> {
+  async searchProvinces({ query }: { query: { q?: string } }) {
     try {
       if (!query.q || query.q.trim().length === 0) {
-        return {
-          ...errorResponse("Search query is required"),
-          data: [],
-        };
+        throw new Error("Search query is required");
       }
 
       const results = await provinceRepo.searchProvinces(query.q);
 
-      return successResponse(Array.isArray(results) ? results : [], results.length) as ProvinceSearchResponse;
+      return { data: results, total: results.length };
     } catch (error) {
       console.error("Error searching provinces:", error);
-      return {
-        ...errorResponse("Failed to search provinces", error instanceof Error ? error.message : "Unknown error"),
-        data: [],
-      };
+      throw error;
     }
   },
 };

@@ -6,13 +6,8 @@ import { connectRedis, disconnectRedis } from "./redis";
 import { warmupCache } from "./utils/cache-warmer";
 import { provinceRoutes, regencyRoutes, districtRoutes, villageRoutes, authRoutes, cacheRoutes } from "./routes";
 import { errorMiddleware } from "./middlewares/error.middleware";
-
 const port = process.env.PORT || 3000;
-
-// Connect to Redis on startup
 await connectRedis();
-
-// Warmup cache setelah Redis connect
 warmupCache().catch(console.error);
 
 const app = new Elysia()
@@ -30,8 +25,8 @@ const app = new Elysia()
         title: "Myfirst Elysia API",
         version: "1.0.0",
         description: "API documentation untuk Myfirst Elysia dengan Redis caching dan Gzip compression",
-      },
-      tags: [
+    },
+    tags: [
         { name: "Authentication", description: "Authentication endpoints using Clerk" },
         { name: "Cache", description: "Cache management endpoints" },
         { name: "Provinces", description: "Province master data" },
@@ -51,13 +46,9 @@ const app = new Elysia()
       },
     },
   }))
-
-  // macam-macam get
   .get("/", () => "Hello Elysia")
-  
   // Authentication routes
   .use(authRoutes)
-  
   // Cache routes (Protected)
   .use(cacheRoutes)
   
@@ -66,10 +57,7 @@ const app = new Elysia()
   .use(regencyRoutes)
   .use(districtRoutes)
   .use(villageRoutes)
-  
   .listen(port);
-
-
   console.log(
     `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
   );

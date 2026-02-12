@@ -21,7 +21,6 @@ const token = authHeader.substring(7);
 
 try {
     const session = await clerkClient.sessions.getSession(token);
-
     if (!session) {
         return {
             authorized: false,
@@ -44,18 +43,17 @@ return {
     lastName: user.lastName,
     },
 };
-} catch (error: any) {
-    
-return {
-    authorized: false,
-    error: {
-    success: false,
-    error: "Unauthorized",
-    message: "Token verification failed",
-    details: error.message,
-    },
-};
-}
+} catch (error: any) {    
+    return {
+        authorized: false,
+        error: {
+            success: false,
+            error: "Unauthorized",
+            message: "Token verification failed",
+            details: error.message,
+        },
+        };
+    }
 }
 
 export const cacheRoutes = new Elysia({ prefix: "/api/cache" })
@@ -70,15 +68,15 @@ if (!auth.authorized) {
 try {
     const keys = await redisClient.keys("*");
     return { 
-    success: true,
-    keys, 
-    total: keys.length 
+        success: true,
+        keys, 
+        total: keys.length 
     };
 } catch (error) {
     return {
-    success: false,
-    error: "Failed to get cache keys",
-    message: error instanceof Error ? error.message : "Unknown error",
+        success: false,
+        error: "Failed to get cache keys",
+        message: error instanceof Error ? error.message : "Unknown error",
     };
 }
 }, {
@@ -127,6 +125,44 @@ detail: {
     operationId: "getCacheByKey",
 },
 })
+
+// Delete cache by key
+.delete("/:key", async ({ params, request, set }) => {
+const auth = await verifyAuth(request);
+if (!auth.authorized) {
+    set.status = 401;
+    return auth.error;
+}
+
+try {
+    const deleted = await redisClient.del(params.key);
+    return {
+    success: true,
+    message: deleted > 0 ? "Cache key deleted successfully" : "Cache key not found",
+    key: params.key,
+    deleted: deleted > 0,
+    };
+} catch (error) {
+    return {
+    success: false,
+    error: "Failed to delete cache key",
+    message: error instanceof Error ? error.message : "Unknown error",
+    key: params.key,
+    };
+}
+}, {
+params: t.Object({
+    key: t.String({ description: "Cache key to delete" }),
+}),
+detail: {
+    tags: ["Cache"],
+    summary: "Delete cache by key (Protected)",
+    description: "Menghapus cache berdasarkan key yang diberikan. Requires authentication.",
+    security: [{ bearerAuth: [] }],
+    operationId: "deleteCacheByKey",
+},
+})
+
 // Clear all cache
 .delete("/", async ({ request, set }) => {
 const auth = await verifyAuth(request);

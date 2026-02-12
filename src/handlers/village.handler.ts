@@ -1,78 +1,58 @@
 import { VillageRepository } from "../repositories/village.repository";
-import { VillageListResponse, VillageSingleResponse, VillageSearchResponse } from "../types/village";
-import { successResponse, errorResponse } from "../utils/response";
 
 const villageRepo = new VillageRepository();
 
 export const villageHandlers = {
-  async getAllVillages(): Promise<VillageListResponse> {
+  async getAllVillages() {
     try {
       const villages = await villageRepo.getAllVillages();
       const total = await villageRepo.countVillages();
 
-      return successResponse(villages, total) as VillageListResponse;
+      return { data: villages, total };
     } catch (error) {
       console.error("Error fetching villages:", error);
-      return {
-        ...errorResponse("Failed to fetch villages", error instanceof Error ? error.message : "Unknown error"),
-        data: [],
-      };
+      throw error;
     }
   },
 
-  async getVillageById({ params }: { params: { id: number } }): Promise<VillageSingleResponse> {
+  async getVillageById({ params }: { params: { id: number } }) {
     try {
       const village = await villageRepo.getVillageById(params.id);
 
       if (!village) {
-        return {
-          ...errorResponse("Village not found"),
-          data: null,
-        };
+        throw new Error("Village not found");
       }
 
-      return successResponse(village) as VillageSingleResponse;
+      return { data: village };
     } catch (error) {
       console.error("Error fetching village:", error);
-      return {
-        ...errorResponse("Failed to fetch village", error instanceof Error ? error.message : "Unknown error"),
-        data: null,
-      };
+      throw error;
     }
   },
 
-  async getVillagesByDistrictId({ params }: { params: { district_id: number } }): Promise<VillageListResponse> {
+  async getVillagesByDistrictId({ params }: { params: { district_id: number } }) {
     try {
       const villages = await villageRepo.getVillagesByDistrictId(params.district_id);
 
-      return successResponse(villages, villages.length) as VillageListResponse;
+      return { data: villages, total: villages.length };
     } catch (error) {
       console.error("Error fetching villages by district:", error);
-      return {
-        ...errorResponse("Failed to fetch villages", error instanceof Error ? error.message : "Unknown error"),
-        data: [],
-      };
+      throw error;
     }
   },
 
-  async searchVillages({ query }: { query: { q?: string } }): Promise<VillageSearchResponse> {
+  async searchVillages({ query }: { query: { q?: string } }) {
     try {
       if (!query.q || query.q.trim().length === 0) {
-        return {
-          ...errorResponse("Search query is required"),
-          data: [],
-        };
+        throw new Error("Search query is required");
       }
 
       const results = await villageRepo.searchVillages(query.q);
 
-      return successResponse(Array.isArray(results) ? results : [], results.length) as VillageSearchResponse;
+      return { data: Array.isArray(results) ? results : [], total: results.length };
     } catch (error) {
       console.error("Error searching villages:", error);
-      return {
-        ...errorResponse("Failed to search villages", error instanceof Error ? error.message : "Unknown error"),
-        data: [],
-      };
+      throw error;
     }
   },
 };
