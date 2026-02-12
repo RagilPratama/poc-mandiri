@@ -1,5 +1,6 @@
 import { RegencyRepository } from "../repositories/regency.repository";
 import { RegencyListResponse, RegencySingleResponse, RegencySearchResponse } from "../types/regency";
+import { successResponse, errorResponse } from "../utils/response";
 
 const regencyRepo = new RegencyRepository();
 
@@ -9,17 +10,11 @@ export const regencyHandlers = {
       const regencies = await regencyRepo.getAllRegencies();
       const total = await regencyRepo.countRegencies();
 
-      return {
-        success: true,
-        data: regencies,
-        total,
-      };
+      return successResponse(regencies, total) as RegencyListResponse;
     } catch (error) {
       console.error("Error fetching regencies:", error);
       return {
-        success: false,
-        error: "Failed to fetch regencies",
-        message: error instanceof Error ? error.message : "Unknown error",
+        ...errorResponse("Failed to fetch regencies", error instanceof Error ? error.message : "Unknown error"),
         data: [],
       };
     }
@@ -31,22 +26,16 @@ export const regencyHandlers = {
 
       if (!regency) {
         return {
-          success: false,
-          error: "Regency not found",
+          ...errorResponse("Regency not found"),
           data: null,
         };
       }
 
-      return {
-        success: true,
-        data: regency,
-      };
+      return successResponse(regency) as RegencySingleResponse;
     } catch (error) {
       console.error("Error fetching regency:", error);
       return {
-        success: false,
-        error: "Failed to fetch regency",
-        message: error instanceof Error ? error.message : "Unknown error",
+        ...errorResponse("Failed to fetch regency", error instanceof Error ? error.message : "Unknown error"),
         data: null,
       };
     }
@@ -56,17 +45,11 @@ export const regencyHandlers = {
     try {
       const regencies = await regencyRepo.getRegenciesByProvinceId(params.province_id);
 
-      return {
-        success: true,
-        data: regencies,
-        total: regencies.length,
-      };
+      return successResponse(regencies, regencies.length) as RegencyListResponse;
     } catch (error) {
       console.error("Error fetching regencies by province:", error);
       return {
-        success: false,
-        error: "Failed to fetch regencies",
-        message: error instanceof Error ? error.message : "Unknown error",
+        ...errorResponse("Failed to fetch regencies", error instanceof Error ? error.message : "Unknown error"),
         data: [],
       };
     }
@@ -76,25 +59,18 @@ export const regencyHandlers = {
     try {
       if (!query.q || query.q.trim().length === 0) {
         return {
-          success: false,
-          error: "Search query is required",
+          ...errorResponse("Search query is required"),
           data: [],
         };
       }
 
       const results = await regencyRepo.searchRegencies(query.q);
 
-      return {
-        success: true,
-        data: Array.isArray(results) ? results : [],
-        total: Array.isArray(results) ? results.length : 0,
-      };
+      return successResponse(Array.isArray(results) ? results : [], results.length) as RegencySearchResponse;
     } catch (error) {
       console.error("Error searching regencies:", error);
       return {
-        success: false,
-        error: "Failed to search regencies",
-        message: error instanceof Error ? error.message : "Unknown error",
+        ...errorResponse("Failed to search regencies", error instanceof Error ? error.message : "Unknown error"),
         data: [],
       };
     }

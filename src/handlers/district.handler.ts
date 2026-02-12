@@ -1,5 +1,6 @@
 import { DistrictRepository } from "../repositories/district.repository";
 import { DistrictListResponse, DistrictSingleResponse, DistrictSearchResponse } from "../types/district";
+import { successResponse, errorResponse } from "../utils/response";
 
 const districtRepo = new DistrictRepository();
 
@@ -9,17 +10,11 @@ export const districtHandlers = {
       const districts = await districtRepo.getAllDistricts();
       const total = await districtRepo.countDistricts();
 
-      return {
-        success: true,
-        data: districts,
-        total,
-      };
+      return successResponse(districts, total) as DistrictListResponse;
     } catch (error) {
       console.error("Error fetching districts:", error);
       return {
-        success: false,
-        error: "Failed to fetch districts",
-        message: error instanceof Error ? error.message : "Unknown error",
+        ...errorResponse("Failed to fetch districts", error instanceof Error ? error.message : "Unknown error"),
         data: [],
       };
     }
@@ -31,22 +26,16 @@ export const districtHandlers = {
 
       if (!district) {
         return {
-          success: false,
-          error: "District not found",
+          ...errorResponse("District not found"),
           data: null,
         };
       }
 
-      return {
-        success: true,
-        data: district,
-      };
+      return successResponse(district) as DistrictSingleResponse;
     } catch (error) {
       console.error("Error fetching district:", error);
       return {
-        success: false,
-        error: "Failed to fetch district",
-        message: error instanceof Error ? error.message : "Unknown error",
+        ...errorResponse("Failed to fetch district", error instanceof Error ? error.message : "Unknown error"),
         data: null,
       };
     }
@@ -56,17 +45,11 @@ export const districtHandlers = {
     try {
       const districts = await districtRepo.getDistrictsByRegencyId(params.regency_id);
 
-      return {
-        success: true,
-        data: districts,
-        total: districts.length,
-      };
+      return successResponse(districts, districts.length) as DistrictListResponse;
     } catch (error) {
       console.error("Error fetching districts by regency:", error);
       return {
-        success: false,
-        error: "Failed to fetch districts",
-        message: error instanceof Error ? error.message : "Unknown error",
+        ...errorResponse("Failed to fetch districts", error instanceof Error ? error.message : "Unknown error"),
         data: [],
       };
     }
@@ -76,25 +59,18 @@ export const districtHandlers = {
     try {
       if (!query.q || query.q.trim().length === 0) {
         return {
-          success: false,
-          error: "Search query is required",
+          ...errorResponse("Search query is required"),
           data: [],
         };
       }
 
       const results = await districtRepo.searchDistricts(query.q);
 
-      return {
-        success: true,
-        data: Array.isArray(results) ? results : [],
-        total: Array.isArray(results) ? results.length : 0,
-      };
+      return successResponse(Array.isArray(results) ? results : [], results.length) as DistrictSearchResponse;
     } catch (error) {
       console.error("Error searching districts:", error);
       return {
-        success: false,
-        error: "Failed to search districts",
-        message: error instanceof Error ? error.message : "Unknown error",
+        ...errorResponse("Failed to search districts", error instanceof Error ? error.message : "Unknown error"),
         data: [],
       };
     }

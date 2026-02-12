@@ -1,5 +1,6 @@
 import { VillageRepository } from "../repositories/village.repository";
 import { VillageListResponse, VillageSingleResponse, VillageSearchResponse } from "../types/village";
+import { successResponse, errorResponse } from "../utils/response";
 
 const villageRepo = new VillageRepository();
 
@@ -9,17 +10,11 @@ export const villageHandlers = {
       const villages = await villageRepo.getAllVillages();
       const total = await villageRepo.countVillages();
 
-      return {
-        success: true,
-        data: villages,
-        total,
-      };
+      return successResponse(villages, total) as VillageListResponse;
     } catch (error) {
       console.error("Error fetching villages:", error);
       return {
-        success: false,
-        error: "Failed to fetch villages",
-        message: error instanceof Error ? error.message : "Unknown error",
+        ...errorResponse("Failed to fetch villages", error instanceof Error ? error.message : "Unknown error"),
         data: [],
       };
     }
@@ -31,22 +26,16 @@ export const villageHandlers = {
 
       if (!village) {
         return {
-          success: false,
-          error: "Village not found",
+          ...errorResponse("Village not found"),
           data: null,
         };
       }
 
-      return {
-        success: true,
-        data: village,
-      };
+      return successResponse(village) as VillageSingleResponse;
     } catch (error) {
       console.error("Error fetching village:", error);
       return {
-        success: false,
-        error: "Failed to fetch village",
-        message: error instanceof Error ? error.message : "Unknown error",
+        ...errorResponse("Failed to fetch village", error instanceof Error ? error.message : "Unknown error"),
         data: null,
       };
     }
@@ -56,17 +45,11 @@ export const villageHandlers = {
     try {
       const villages = await villageRepo.getVillagesByDistrictId(params.district_id);
 
-      return {
-        success: true,
-        data: villages,
-        total: villages.length,
-      };
+      return successResponse(villages, villages.length) as VillageListResponse;
     } catch (error) {
       console.error("Error fetching villages by district:", error);
       return {
-        success: false,
-        error: "Failed to fetch villages",
-        message: error instanceof Error ? error.message : "Unknown error",
+        ...errorResponse("Failed to fetch villages", error instanceof Error ? error.message : "Unknown error"),
         data: [],
       };
     }
@@ -76,25 +59,18 @@ export const villageHandlers = {
     try {
       if (!query.q || query.q.trim().length === 0) {
         return {
-          success: false,
-          error: "Search query is required",
+          ...errorResponse("Search query is required"),
           data: [],
         };
       }
 
       const results = await villageRepo.searchVillages(query.q);
 
-      return {
-        success: true,
-        data: Array.isArray(results) ? results : [],
-        total: Array.isArray(results) ? results.length : 0,
-      };
+      return successResponse(Array.isArray(results) ? results : [], results.length) as VillageSearchResponse;
     } catch (error) {
       console.error("Error searching villages:", error);
       return {
-        success: false,
-        error: "Failed to search villages",
-        message: error instanceof Error ? error.message : "Unknown error",
+        ...errorResponse("Failed to search villages", error instanceof Error ? error.message : "Unknown error"),
         data: [],
       };
     }
