@@ -5,7 +5,6 @@ import { pool } from "./db";
 import { connectRedis, disconnectRedis } from "./redis";
 import { warmupCache } from "./utils/cache-warmer";
 import { provinceRoutes, regencyRoutes, districtRoutes, villageRoutes, authRoutes, cacheRoutes } from "./routes";
-import { errorMiddleware } from "./middlewares/error.middleware";
 const port = process.env.PORT || 3000;
 await connectRedis();
 warmupCache().catch(console.error);
@@ -17,7 +16,6 @@ const app = new Elysia()
     allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   }))
-  .use(errorMiddleware)
   .onError(({ code, error, set }) => {
     // Handle validation errors globally
     if (code === 'VALIDATION') {
