@@ -2,9 +2,7 @@ import { Elysia, t } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import { pool } from "./db";
 import { connectRedis, disconnectRedis, redisClient } from "./redis";
-import { menuHandlers } from "./handlers/menu.handler";
-import { featureHandlers } from "./handlers/feature.handler";
-import { productHandlers } from "./handlers/products.handler";
+import { provinceHandlers } from "./handlers/province.handler";
 import { warmupCache } from "./utils/cache-warmer";
 
 const port = process.env.PORT || 3000;
@@ -29,16 +27,6 @@ const app = new Elysia()
 
   // macam-macam get
   .get("/", () => "Hello Elysia")
-  // Static path - akan match persis dengan /id/1
-  .get("/id/1", () => "static path")
-  // Dynamic path - akan match /id/apapun (contoh: /id/2, /id/abc, /id/123)
-  .get("/id/:id", ({ params }) => {
-    return `dynamic path - ID: ${params.id}`;
-  })
-  // Wildcard path - akan match /id/ diikuti apapun (termasuk nested paths)
-  .get("/id/*", () => "wildcard path")
-  
-
   //Cek Redis
   .get("/api/cache/keys", async () => {
     const keys = await redisClient.keys("*");
@@ -60,35 +48,42 @@ const app = new Elysia()
       description: "Menampilkan nilai cache berdasarkan key yang diberikan",
     },
   })
-  // Menu API endpoints
-  .get("/api/menus", menuHandlers.getAllMenus, {
+  // Province routes
+  .get("/api/provinces", async () => {
+    return await provinceHandlers.getAllProvinces();
+  }, {
     detail: {
-      tags: ["Menus"],
-      summary: "Get all menus",
-      description: "Mengambil semua data menu dengan caching Redis 5 Menit",
+      tags: ["Province"],
+      summary: "Get all provinces",
+      description: "Menampilkan semua provinsi dengan data latitude dan longitude",
     },
   })
-  .get("/api/features", featureHandlers.getAllFeature, {
+  .get("/api/provinces/search", async ({ query }) => {
+    return await provinceHandlers.searchProvinces({ query });
+  }, {
     detail: {
-      tags: ["Features"],
-      summary: "Get all features",
-      description: "Mengambil semua data fitur",
+      tags: ["Province"],
+      summary: "Search provinces",
+      description: "Mencari provinsi berdasarkan nama atau nama alternatif",
+      parameters: [
+        {
+          name: "q",
+          in: "query",
+          required: true,
+          description: "Search term for province name",
+          schema: { type: "string" },
+        },
+      ],
     },
   })
-  .get("/api/products", productHandlers.getAllProducts, {
-    query: t.Object({
-      page: t.Optional(t.Numeric()),
-      limit: t.Optional(t.Numeric())
-    })
-    ,
+  .get("/api/provinces/:id", async ({ params }) => {
+    return await provinceHandlers.getProvinceById({ params: { id: Number(params.id) } });
+  }, {
     detail: {
-      tags: ["Products"],
-      summary: "Get all products",
-      description: "Mengambil semua data produk dengan pagination dan caching",
+      tags: ["Province"],
+      summary: "Get province by ID",
+      description: "Menampilkan detail provinsi berdasarkan ID",
     },
-  })
-  .get("/test-big", () => {
-    return new Array(1000).fill({ name: "ragil", price: 10000 });
   })
   .listen(port);
 

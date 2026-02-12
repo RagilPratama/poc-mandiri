@@ -1,18 +1,20 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "@neondatabase/serverless";
+import { Pool } from "pg";
 import * as schema from "./db/schema";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is not set");
+  throw new Error("DATABASE_PUBLIC_URL or DATABASE_URL environment variable must be set");
 }
+
+console.log("Connecting to database:", DATABASE_URL.replace(/:[^:@]+@/, ':****@'));
 
 export const pool = new Pool({
   connectionString: DATABASE_URL,
-  max: 20,
+  max: 3,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
+  connectionTimeoutMillis: 10000
 });
 
 // Initialize Drizzle with the pool
@@ -25,8 +27,20 @@ pool.on("error", (err: any) => {
 
 // Handle pool connection
 pool.on("connect", () => {
-  console.log("New client connected to the pool");
+  console.log("✅ New client connected to the pool");
 });
+
+// Warm up pool and verify connection
+;(async () => {
+  try {
+    const result = await pool.query("SELECT NOW() as current_time, version() as pg_version");
+    console.log("✅ Database pool warmed up successfully");
+    console.log("📊 PostgreSQL version:", result.rows[0].pg_version.split(' ')[0] + ' ' + result.rows[0].pg_version.split(' ')[1]);
+    console.log("🕐 Server time:", result.rows[0].current_time);
+  } catch (err: any) {
+    console.error("❌ Database warmup failed:", err.message);
+  }
+})();
 
 // Graceful shutdown
 process.on("SIGTERM", async () => {
