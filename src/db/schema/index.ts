@@ -2,3 +2,4 @@ export * from "./provinces";
 export * from "./regencies";
 export * from "./districts";
 export * from "./villages";
+export * from "./unit_pelaksanaan_teknis";

@@ -4,3 +4,4 @@ export { districtRoutes } from "./district.route";
 export { villageRoutes } from "./village.route";
 export { authRoutes } from "./auth.route";
 export { cacheRoutes } from "./cache.route";
+export { unitPelaksanaanTeknisRoutes } from "./unit-pelaksanaan-teknis.route";
