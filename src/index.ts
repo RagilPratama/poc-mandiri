@@ -4,6 +4,7 @@ import { pool } from "./db";
 import { connectRedis, disconnectRedis, redisClient } from "./redis";
 import { warmupCache } from "./utils/cache-warmer";
 import { provinceRoutes, regencyRoutes, districtRoutes, villageRoutes } from "./routes";
+import { errorMiddleware } from "./middlewares/error.middleware";
 
 const port = process.env.PORT || 3000;
 
@@ -14,6 +15,7 @@ await connectRedis();
 warmupCache().catch(console.error);
 
 const app = new Elysia()
+  .use(errorMiddleware)
   .use(swagger({
     path: "/swagger",
     documentation: {
@@ -22,6 +24,13 @@ const app = new Elysia()
         version: "1.0.0",
         description: "API documentation untuk Myfirst Elysia dengan Redis caching dan Gzip compression",
       },
+      tags: [
+        { name: "Cache", description: "Cache management endpoints" },
+        { name: "Provinces", description: "Province master data" },
+        { name: "Regencies", description: "Regency master data" },
+        { name: "Districts", description: "District master data" },
+        { name: "Villages", description: "Village master data" },
+      ],
     },
   }))
 
