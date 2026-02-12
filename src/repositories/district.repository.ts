@@ -13,10 +13,8 @@ export class DistrictRepository {
     try {
       const cached = await getCache(cacheKey);
       if (cached) {
-        console.log("Cache hit: all districts");
         return cached as DistrictResponse[];
       }
-      console.log("Cache miss: all districts");
     } catch (error) {
       console.warn("Cache gagal, fallback ke database:", error);
     }
@@ -52,10 +50,8 @@ export class DistrictRepository {
     try {
       const cached = await getCache(cacheKey);
       if (cached) {
-        console.log(`Cache hit: districts for regency ${regency_id}`);
         return cached as DistrictResponse[];
       }
-      console.log(`Cache miss: districts for regency ${regency_id}`);
     } catch (error) {
       console.warn("Cache gagal, fallback ke database:", error);
     }
@@ -92,10 +88,8 @@ export class DistrictRepository {
     try {
       const cached = await getCache(cacheKey);
       if (cached) {
-        console.log(`Cache hit: district ${id}`);
         return cached as DistrictResponse;
       }
-      console.log(`Cache miss: district ${id}`);
     } catch (error) {
       console.warn("Cache gagal, fallback ke database:", error);
     }
@@ -141,10 +135,8 @@ export class DistrictRepository {
     try {
       const cached = await getCache(cacheKey);
       if (cached) {
-        console.log(`Cache hit: districts search "${searchTerm}"`);
         return cached as DistrictResponse[];
       }
-      console.log(`Cache miss: districts search "${searchTerm}"`);
     } catch (error) {
       console.warn("Cache gagal, fallback ke database:", error);
     }

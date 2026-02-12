@@ -1,9 +1,10 @@
 import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
+import { cors } from "@elysiajs/cors";
 import { pool } from "./db";
-import { connectRedis, disconnectRedis, redisClient } from "./redis";
+import { connectRedis, disconnectRedis } from "./redis";
 import { warmupCache } from "./utils/cache-warmer";
-import { provinceRoutes, regencyRoutes, districtRoutes, villageRoutes } from "./routes";
+import { provinceRoutes, regencyRoutes, districtRoutes, villageRoutes, authRoutes, cacheRoutes } from "./routes";
 import { errorMiddleware } from "./middlewares/error.middleware";
 
 const port = process.env.PORT || 3000;
@@ -15,6 +16,12 @@ await connectRedis();
 warmupCache().catch(console.error);
 
 const app = new Elysia()
+  .use(cors({
+    origin: true, // Allow all origins for development
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  }))
   .use(errorMiddleware)
   .use(swagger({
     path: "/swagger",
@@ -25,39 +32,34 @@ const app = new Elysia()
         description: "API documentation untuk Myfirst Elysia dengan Redis caching dan Gzip compression",
       },
       tags: [
+        { name: "Authentication", description: "Authentication endpoints using Clerk" },
         { name: "Cache", description: "Cache management endpoints" },
         { name: "Provinces", description: "Province master data" },
         { name: "Regencies", description: "Regency master data" },
         { name: "Districts", description: "District master data" },
         { name: "Villages", description: "Village master data" },
       ],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT",
+            description: "Enter your Clerk session token",
+          },
+        },
+      },
     },
   }))
 
   // macam-macam get
   .get("/", () => "Hello Elysia")
   
-  //Cek Redis
-  .get("/api/cache/keys", async () => {
-    const keys = await redisClient.keys("*");
-    return { keys, total: keys.length };
-  }, {
-    detail: {
-      tags: ["Cache"],
-      summary: "Get all Redis cache keys",
-      description: "Menampilkan semua keys yang tersimpan di Redis cache",
-    },
-  })
-  .get("/api/cache/:key", async ({ params }) => {
-    const value = await redisClient.get(params.key);
-    return { key: params.key, value: value ? JSON.parse(value) : null };
-  }, {
-    detail: {
-      tags: ["Cache"],
-      summary: "Get cache value by key",
-      description: "Menampilkan nilai cache berdasarkan key yang diberikan",
-    },
-  })
+  // Authentication routes
+  .use(authRoutes)
+  
+  // Cache routes (Protected)
+  .use(cacheRoutes)
   
   // Master data routes
   .use(provinceRoutes)
