@@ -7,3 +7,5 @@ export { cacheRoutes } from "./cache.route";
 export { unitPelaksanaanTeknisRoutes } from "./unit-pelaksanaan-teknis.route";
 export { roleRoutes } from "./role.route";
 export { organisasiRoutes } from "./organisasi.route";
+export { pegawaiRoute as pegawaiRoutes } from "./pegawai.route";
+export { kelompokNelayanRoute as kelompokNelayanRoutes } from "./kelompok-nelayan.route";

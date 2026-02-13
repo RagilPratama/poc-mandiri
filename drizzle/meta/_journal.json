@@ -15,6 +15,20 @@
       "when": 1770914833323,
       "tag": "0001_talented_microchip",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770979000000,
+      "tag": "0002_add_pegawai",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1770981000000,
+      "tag": "0003_add_kelompok_nelayan",
+      "breakpoints": true
     }
   ]
 }

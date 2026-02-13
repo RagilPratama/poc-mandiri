@@ -5,3 +5,5 @@ export * from "./villages";
 export * from "./unit_pelaksanaan_teknis";
 export * from "./roles";
 export * from "./organisasi";
+export * from "./pegawai";
+export * from "./kelompok_nelayan";
