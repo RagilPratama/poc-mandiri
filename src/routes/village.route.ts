@@ -11,6 +11,33 @@ export const villageRoutes = new Elysia({ prefix: "/api/master" })
       description: "Menampilkan semua desa/kelurahan dengan data latitude dan longitude",
     },
   })
+  .get("/villages/with-relations", async ({ query }) => {
+    return await villageHandlers.getAllVillagesWithRelations({ query });
+  }, {
+    query: t.Object({
+      page: t.Optional(t.String({ pattern: "^[0-9]+$", description: "Page number (default: 1)" })),
+      limit: t.Optional(t.String({ pattern: "^[0-9]+$", description: "Items per page (default: 10)" })),
+    }),
+    detail: {
+      tags: ["Villages"],
+      summary: "Get all villages with full relations (paginated)",
+      description: "Menampilkan semua desa/kelurahan dengan data district, regency, dan province. Mendukung pagination.",
+    },
+  })
+  .get("/villages/with-relations/search", async ({ query }) => {
+    return await villageHandlers.searchVillagesWithRelations({ query });
+  }, {
+    query: t.Object({
+      q: t.Optional(t.String({ description: "Search term for village name (optional)" })),
+      page: t.Optional(t.String({ pattern: "^[0-9]+$", description: "Page number (default: 1)" })),
+      limit: t.Optional(t.String({ pattern: "^[0-9]+$", description: "Items per page (default: 10)" })),
+    }),
+    detail: {
+      tags: ["Villages"],
+      summary: "Search villages with full relations (paginated)",
+      description: "Mencari desa/kelurahan dengan data district, regency, dan province. Mendukung pagination.",
+    },
+  })
   .get("/villages/search", async ({ query }) => {
     return await villageHandlers.searchVillages({ query });
   }, {

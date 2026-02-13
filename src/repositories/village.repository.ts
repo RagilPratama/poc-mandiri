@@ -1,5 +1,8 @@
 import { db } from "../db";
 import { villages } from "../db/schema/villages";
+import { districts } from "../db/schema/districts";
+import { regencies } from "../db/schema/regencies";
+import { provinces } from "../db/schema/provinces";
 import { asc, count, eq, ilike, and } from "drizzle-orm";
 import { getCache, setCache } from "../redis";
 import { VillageResponse } from "../types/village";
@@ -174,5 +177,127 @@ export class VillageRepository {
 
     await setCache(cacheKey, transformedData, CACHE_TTL);
     return transformedData;
+  }
+
+  // Method baru untuk get villages dengan semua relasi (district, regency, province) + pagination
+  async getAllVillagesWithRelations(page: number = 1, limit: number = 10) {
+    const offset = (page - 1) * limit;
+    const cacheKey = `villages:all:with_relations:page:${page}:limit:${limit}`;
+
+    try {
+      const cached = await getCache(cacheKey);
+      if (cached) {
+        return cached;
+      }
+    } catch (error) {
+      console.warn("Cache gagal, fallback ke database:", error);
+    }
+
+    // Get total count
+    const totalResult = await db.select({ count: count() }).from(villages);
+    const total = totalResult[0].count;
+
+    // Get paginated data
+    const result = await db
+      .select({
+        // Village data
+        village_id: villages.id,
+        village_name: villages.name,
+        // District data
+        district_id: districts.id,
+        district_name: districts.name,
+        // Regency data
+        regency_id: regencies.id,
+        regency_name: regencies.name,
+        // Province data
+        province_id: provinces.id,
+        province_name: provinces.name,
+      })
+      .from(villages)
+      .leftJoin(districts, eq(villages.district_id, districts.id))
+      .leftJoin(regencies, eq(districts.regency_id, regencies.id))
+      .leftJoin(provinces, eq(regencies.province_id, provinces.id))
+      .orderBy(asc(villages.name))
+      .limit(limit)
+      .offset(offset);
+
+    const response = {
+      data: result,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+
+    await setCache(cacheKey, response, CACHE_TTL);
+    return response;
+  }
+
+  // Method untuk search dengan relasi lengkap + pagination
+  async searchVillagesWithRelations(searchTerm?: string, page: number = 1, limit: number = 10) {
+    const offset = (page - 1) * limit;
+    const cacheKey = searchTerm 
+      ? `villages:search:${searchTerm.toLowerCase()}:with_relations:page:${page}:limit:${limit}`
+      : `villages:all:with_relations:page:${page}:limit:${limit}`;
+
+    try {
+      const cached = await getCache(cacheKey);
+      if (cached) {
+        return cached;
+      }
+    } catch (error) {
+      console.warn("Cache gagal, fallback ke database:", error);
+    }
+
+    const conditions = searchTerm 
+      ? [ilike(villages.name, `%${searchTerm}%`)]
+      : [];
+
+    // Get total count
+    const totalResult = await db
+      .select({ count: count() })
+      .from(villages)
+      .where(conditions.length > 0 ? and(...conditions) : undefined);
+    const total = totalResult[0].count;
+
+    // Get paginated data
+    const result = await db
+      .select({
+        // Village data
+        village_id: villages.id,
+        village_name: villages.name,
+        // District data
+        district_id: districts.id,
+        district_name: districts.name,
+        // Regency data
+        regency_id: regencies.id,
+        regency_name: regencies.name,
+        // Province data
+        province_id: provinces.id,
+        province_name: provinces.name,
+      })
+      .from(villages)
+      .leftJoin(districts, eq(villages.district_id, districts.id))
+      .leftJoin(regencies, eq(districts.regency_id, regencies.id))
+      .leftJoin(provinces, eq(regencies.province_id, provinces.id))
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .orderBy(asc(villages.name))
+      .limit(limit)
+      .offset(offset);
+
+    const response = {
+      data: result,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+
+    await setCache(cacheKey, response, CACHE_TTL);
+    return response;
   }
 }

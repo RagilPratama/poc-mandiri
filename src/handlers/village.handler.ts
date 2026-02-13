@@ -56,4 +56,38 @@ export const villageHandlers = {
       throw error;
     }
   },
+
+  // Handler baru untuk get villages dengan semua relasi + pagination
+  async getAllVillagesWithRelations({ query }: { query: { page?: string; limit?: string } }) {
+    try {
+      const page = query.page ? parseInt(query.page) : 1;
+      const limit = query.limit ? parseInt(query.limit) : 10;
+
+      const result = await villageRepo.getAllVillagesWithRelations(page, limit);
+      return { 
+        success: true,
+        ...result
+      };
+    } catch (error) {
+      console.error("Error fetching villages with relations:", error);
+      throw error;
+    }
+  },
+
+  // Handler untuk search dengan relasi + pagination
+  async searchVillagesWithRelations({ query }: { query: { q?: string; page?: string; limit?: string } }) {
+    try {
+      const page = query.page ? parseInt(query.page) : 1;
+      const limit = query.limit ? parseInt(query.limit) : 10;
+
+      const result = await villageRepo.searchVillagesWithRelations(query.q, page, limit);
+      return { 
+        success: true,
+        ...result
+      };
+    } catch (error) {
+      console.error("Error searching villages with relations:", error);
+      throw error;
+    }
+  },
 };

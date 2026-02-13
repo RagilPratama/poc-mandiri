@@ -4,7 +4,7 @@ import { cors } from "@elysiajs/cors";
 import { pool } from "./db";
 import { connectRedis, disconnectRedis } from "./redis";
 import { warmupCache } from "./utils/cache-warmer";
-import { provinceRoutes, regencyRoutes, districtRoutes, villageRoutes, authRoutes, cacheRoutes, unitPelaksanaanTeknisRoutes } from "./routes";
+import { provinceRoutes, regencyRoutes, districtRoutes, villageRoutes, authRoutes, cacheRoutes, unitPelaksanaanTeknisRoutes, roleRoutes, organisasiRoutes } from "./routes";
 const port = process.env.PORT || 3000;
 await connectRedis();
 warmupCache().catch(console.error);
@@ -72,6 +72,8 @@ const app = new Elysia()
         { name: "Districts", description: "District master data" },
         { name: "Villages", description: "Village master data" },
         { name: "Unit Pelaksanaan Teknis", description: "Unit Pelaksanaan Teknis master data" },
+        { name: "Roles", description: "Role master data" },
+        { name: "Organisasi", description: "Organisasi master data" },
       ],
       components: {
         securitySchemes: {
@@ -97,6 +99,8 @@ const app = new Elysia()
   .use(districtRoutes)
   .use(villageRoutes)
   .use(unitPelaksanaanTeknisRoutes)
+  .use(roleRoutes)
+  .use(organisasiRoutes)
   .listen(port);
   console.log(
     `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
