@@ -10,7 +10,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "seed:pegawai": "bun run scripts/seed-pegawai.ts",
-    "seed:kelompok-nelayan": "bun run scripts/seed-kelompok-nelayan.ts"
+    "seed:kelompok-nelayan": "bun run scripts/seed-kelompok-nelayan.ts",
+    "seed:penyuluh": "bun run scripts/seed-penyuluh.ts"
   },
   "engines": {
     "bun": ">=1.0.0"

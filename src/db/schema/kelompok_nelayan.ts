@@ -1,7 +1,7 @@
 import { pgTable, serial, varchar, integer, timestamp } from 'drizzle-orm/pg-core';
 import { unitPelaksanaanTeknis } from './unit_pelaksanaan_teknis';
 import { provinces } from './provinces';
-import { pegawai } from './pegawai';
+import { penyuluh } from './penyuluh';
 
 export const kelompokNelayan = pgTable('kelompok_nelayan', {
   id: serial('id').primaryKey(),
@@ -12,7 +12,7 @@ export const kelompokNelayan = pgTable('kelompok_nelayan', {
   nama_ketua: varchar('nama_ketua', { length: 255 }).notNull(),
   upt_id: integer('upt_id').notNull().references(() => unitPelaksanaanTeknis.id),
   province_id: integer('province_id').notNull().references(() => provinces.id),
-  penyuluh_id: integer('penyuluh_id').notNull().references(() => pegawai.id),
+  penyuluh_id: integer('penyuluh_id').notNull().references(() => penyuluh.id),
   gabungan_kelompok_id: integer('gabungan_kelompok_id').references(() => kelompokNelayan.id),
   jumlah_anggota: integer('jumlah_anggota').notNull().default(1),
   created_at: timestamp('created_at').defaultNow(),

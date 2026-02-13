@@ -29,6 +29,20 @@
       "when": 1770981000000,
       "tag": "0003_add_kelompok_nelayan",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1770982000000,
+      "tag": "0004_add_penyuluh",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1770983000000,
+      "tag": "0005_fix_relations",
+      "breakpoints": true
     }
   ]
 }

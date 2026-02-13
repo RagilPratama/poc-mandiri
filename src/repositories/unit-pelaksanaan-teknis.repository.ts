@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { db } from '../db';
 import { unitPelaksanaanTeknis } from '../db/schema/unit_pelaksanaan_teknis';
-import { regencies } from '../db/schema/regencies';
+import { provinces } from '../db/schema/provinces';
 import type { CreateUnitPelaksanaanTeknisDTO, UpdateUnitPelaksanaanTeknisDTO } from '../types/unit-pelaksanaan-teknis';
 
 export const unitPelaksanaanTeknisRepository = {
@@ -11,11 +11,11 @@ export const unitPelaksanaanTeknisRepository = {
         id: unitPelaksanaanTeknis.id,
         nama_organisasi: unitPelaksanaanTeknis.nama_organisasi,
         pimpinan: unitPelaksanaanTeknis.pimpinan,
-        regencies_id: unitPelaksanaanTeknis.regencies_id,
-        wilayah: regencies.name,
+        province_id: unitPelaksanaanTeknis.province_id,
+        wilayah: provinces.name,
       })
       .from(unitPelaksanaanTeknis)
-      .leftJoin(regencies, eq(unitPelaksanaanTeknis.regencies_id, regencies.id));
+      .leftJoin(provinces, eq(unitPelaksanaanTeknis.province_id, provinces.id));
   },
 
   async findById(id: number) {
@@ -24,11 +24,11 @@ export const unitPelaksanaanTeknisRepository = {
         id: unitPelaksanaanTeknis.id,
         nama_organisasi: unitPelaksanaanTeknis.nama_organisasi,
         pimpinan: unitPelaksanaanTeknis.pimpinan,
-        regencies_id: unitPelaksanaanTeknis.regencies_id,
-        wilayah: regencies.name,
+        province_id: unitPelaksanaanTeknis.province_id,
+        wilayah: provinces.name,
       })
       .from(unitPelaksanaanTeknis)
-      .leftJoin(regencies, eq(unitPelaksanaanTeknis.regencies_id, regencies.id))
+      .leftJoin(provinces, eq(unitPelaksanaanTeknis.province_id, provinces.id))
       .where(eq(unitPelaksanaanTeknis.id, id));
     
     return result[0];

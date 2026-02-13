@@ -3,6 +3,7 @@ import { db } from '../db';
 import { kelompokNelayan } from '../db/schema/kelompok_nelayan';
 import { unitPelaksanaanTeknis } from '../db/schema/unit_pelaksanaan_teknis';
 import { provinces } from '../db/schema/provinces';
+import { penyuluh } from '../db/schema/penyuluh';
 import { pegawai } from '../db/schema/pegawai';
 import type { CreateKelompokNelayanType, UpdateKelompokNelayanType, KelompokNelayanQueryType } from '../types/kelompok-nelayan';
 
@@ -44,9 +45,6 @@ export class KelompokNelayanRepository {
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-    // Alias untuk gabungan kelompok
-    const gabunganKelompok = kelompokNelayan;
-
     const [data, countResult] = await Promise.all([
       db
         .select({
@@ -70,7 +68,8 @@ export class KelompokNelayanRepository {
         .from(kelompokNelayan)
         .leftJoin(unitPelaksanaanTeknis, eq(kelompokNelayan.upt_id, unitPelaksanaanTeknis.id))
         .leftJoin(provinces, eq(kelompokNelayan.province_id, provinces.id))
-        .leftJoin(pegawai, eq(kelompokNelayan.penyuluh_id, pegawai.id))
+        .leftJoin(penyuluh, eq(kelompokNelayan.penyuluh_id, penyuluh.id))
+        .leftJoin(pegawai, eq(penyuluh.pegawai_id, pegawai.id))
         .where(whereClause)
         .orderBy(desc(kelompokNelayan.created_at))
         .limit(limit)
@@ -120,7 +119,8 @@ export class KelompokNelayanRepository {
       .from(kelompokNelayan)
       .leftJoin(unitPelaksanaanTeknis, eq(kelompokNelayan.upt_id, unitPelaksanaanTeknis.id))
       .leftJoin(provinces, eq(kelompokNelayan.province_id, provinces.id))
-      .leftJoin(pegawai, eq(kelompokNelayan.penyuluh_id, pegawai.id))
+      .leftJoin(penyuluh, eq(kelompokNelayan.penyuluh_id, penyuluh.id))
+      .leftJoin(pegawai, eq(penyuluh.pegawai_id, pegawai.id))
       .where(eq(kelompokNelayan.id, id))
       .limit(1);
 

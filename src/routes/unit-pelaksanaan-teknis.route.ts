@@ -29,7 +29,7 @@ export const unitPelaksanaanTeknisRoutes = new Elysia({ prefix: "/api/master" })
     body: t.Object({
         nama_organisasi: t.String({ minLength: 1, description: "Nama organisasi" }),
         pimpinan: t.String({ minLength: 1, description: "Nama pimpinan" }),
-        regencies_id: t.Number({ minimum: 1, description: "Regency ID" }),
+        province_id: t.Number({ minimum: 1, description: "Province ID" }),
     }),
     detail: {
         tags: ["Unit Pelaksanaan Teknis"],
@@ -46,7 +46,7 @@ export const unitPelaksanaanTeknisRoutes = new Elysia({ prefix: "/api/master" })
     body: t.Object({
         nama_organisasi: t.Optional(t.String({ minLength: 1, description: "Nama organisasi" })),
         pimpinan: t.Optional(t.String({ minLength: 1, description: "Nama pimpinan" })),
-        regencies_id: t.Optional(t.Number({ minimum: 1, description: "Regency ID" })),
+        province_id: t.Optional(t.Number({ minimum: 1, description: "Province ID" })),
     }),
     detail: {
         tags: ["Unit Pelaksanaan Teknis"],
