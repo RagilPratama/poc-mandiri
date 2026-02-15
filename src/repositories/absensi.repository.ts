@@ -1,0 +1,179 @@
+import { eq, and, gte, lte, sql, desc } from 'drizzle-orm';
+import { db } from '../db';
+import { absensi } from '../db/schema/absensi';
+import { pegawai } from '../db/schema/pegawai';
+import type { CreateAbsensiType, CheckoutAbsensiType, UpdateAbsensiType, AbsensiQueryType } from '../types/absensi';
+
+export class AbsensiRepository {
+  async findAll(query: AbsensiQueryType) {
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const offset = (page - 1) * limit;
+
+    const conditions = [];
+
+    if (query.nip) {
+      conditions.push(eq(absensi.nip, query.nip));
+    }
+
+    if (query.date_from) {
+      conditions.push(gte(absensi.date, query.date_from));
+    }
+
+    if (query.date_to) {
+      conditions.push(lte(absensi.date, query.date_to));
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [data, countResult] = await Promise.all([
+      db
+        .select({
+          id: absensi.id,
+          date: absensi.date,
+          nip: absensi.nip,
+          nama: pegawai.nama,
+          checkin: absensi.checkin,
+          checkout: absensi.checkout,
+          working_hours: absensi.working_hours,
+          latitude: absensi.latitude,
+          longitude: absensi.longitude,
+          created_at: absensi.created_at,
+          updated_at: absensi.updated_at,
+        })
+        .from(absensi)
+        .leftJoin(pegawai, eq(absensi.nip, pegawai.nip))
+        .where(whereClause)
+        .orderBy(desc(absensi.date), desc(absensi.checkin))
+        .limit(limit)
+        .offset(offset),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(absensi)
+        .where(whereClause),
+    ]);
+
+    const total = countResult[0]?.count || 0;
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    };
+  }
+
+  async findById(id: number) {
+    const result = await db
+      .select({
+        id: absensi.id,
+        date: absensi.date,
+        nip: absensi.nip,
+        nama: pegawai.nama,
+        checkin: absensi.checkin,
+        checkout: absensi.checkout,
+        working_hours: absensi.working_hours,
+        latitude: absensi.latitude,
+        longitude: absensi.longitude,
+        created_at: absensi.created_at,
+        updated_at: absensi.updated_at,
+      })
+      .from(absensi)
+      .leftJoin(pegawai, eq(absensi.nip, pegawai.nip))
+      .where(eq(absensi.id, id))
+      .limit(1);
+
+    return result[0] || null;
+  }
+
+  async findByNipAndDate(nip: string, date: string) {
+    const result = await db
+      .select()
+      .from(absensi)
+      .where(and(eq(absensi.nip, nip), eq(absensi.date, date)))
+      .limit(1);
+
+    return result[0] || null;
+  }
+
+  async create(data: CreateAbsensiType) {
+    const result = await db
+      .insert(absensi)
+      .values({
+        date: data.date,
+        nip: data.nip,
+        checkin: typeof data.checkin === 'string' ? new Date(data.checkin) : data.checkin,
+        latitude: data.latitude,
+        longitude: data.longitude,
+      })
+      .returning();
+
+    return result[0];
+  }
+
+  async checkout(id: number, data: CheckoutAbsensiType) {
+    // Get checkin time first
+    const record = await db
+      .select({ checkin: absensi.checkin })
+      .from(absensi)
+      .where(eq(absensi.id, id))
+      .limit(1);
+
+    if (!record[0]) return null;
+
+    // Calculate working hours
+    const checkinTime = new Date(record[0].checkin);
+    const checkoutTime = typeof data.checkout === 'string' ? new Date(data.checkout) : data.checkout;
+    const diffMs = checkoutTime.getTime() - checkinTime.getTime();
+    const workingHours = (diffMs / (1000 * 60 * 60)).toFixed(2);
+
+    const result = await db
+      .update(absensi)
+      .set({
+        checkout: checkoutTime,
+        working_hours: workingHours,
+        updated_at: new Date(),
+      })
+      .where(eq(absensi.id, id))
+      .returning();
+
+    return result[0] || null;
+  }
+
+  async update(id: number, data: UpdateAbsensiType) {
+    const updateData: any = {
+      updated_at: new Date(),
+    };
+
+    if (data.date !== undefined) updateData.date = data.date;
+    if (data.checkin !== undefined) {
+      updateData.checkin = typeof data.checkin === 'string' ? new Date(data.checkin) : data.checkin;
+    }
+    if (data.checkout !== undefined) {
+      updateData.checkout = typeof data.checkout === 'string' ? new Date(data.checkout) : data.checkout;
+    }
+    if (data.latitude !== undefined) updateData.latitude = data.latitude;
+    if (data.longitude !== undefined) updateData.longitude = data.longitude;
+
+    const result = await db
+      .update(absensi)
+      .set(updateData)
+      .where(eq(absensi.id, id))
+      .returning();
+
+    return result[0] || null;
+  }
+
+  async delete(id: number) {
+    const result = await db
+      .delete(absensi)
+      .where(eq(absensi.id, id))
+      .returning();
+
+    return result[0] || null;
+  }
+}

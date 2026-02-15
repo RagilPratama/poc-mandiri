@@ -10,3 +10,4 @@ export { organisasiRoutes } from "./organisasi.route";
 export { pegawaiRoute as pegawaiRoutes } from "./pegawai.route";
 export { kelompokNelayanRoute as kelompokNelayanRoutes } from "./kelompok-nelayan.route";
 export { penyuluhRoute as penyuluhRoutes } from "./penyuluh.route";
+export { absensiRoute as absensiRoutes } from "./absensi.route";

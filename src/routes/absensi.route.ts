@@ -1,0 +1,132 @@
+import { Elysia, t } from 'elysia';
+import { absensiHandler } from '../handlers/absensi.handler';
+import {
+  CreateAbsensiSchema,
+  CheckoutAbsensiSchema,
+  UpdateAbsensiSchema,
+  AbsensiQuerySchema,
+} from '../types/absensi';
+
+export const absensiRoute = new Elysia({ prefix: '/absensi' })
+  .get('/', absensiHandler.getAll, {
+    query: AbsensiQuerySchema,
+    detail: {
+      tags: ['Absensi'],
+      summary: 'Get all absensi',
+      description: `Menampilkan semua data absensi dengan pagination dan filter.
+
+**Query Parameters:**
+- \`page\`: Nomor halaman (default: 1)
+- \`limit\`: Jumlah data per halaman (default: 10, max: 100)
+- \`nip\`: Filter berdasarkan NIP pegawai
+- \`date_from\`: Filter dari tanggal (YYYY-MM-DD)
+- \`date_to\`: Filter sampai tanggal (YYYY-MM-DD)
+
+**Contoh Request:**
+\`\`\`
+GET /absensi?page=1&limit=10
+GET /absensi?nip=00001
+GET /absensi?date_from=2026-02-10&date_to=2026-02-15
+GET /absensi?nip=00001&date_from=2026-02-10&date_to=2026-02-12
+\`\`\``,
+    },
+  })
+  .get('/:id', absensiHandler.getById, {
+    params: t.Object({
+      id: t.String()
+    }),
+    detail: {
+      tags: ['Absensi'],
+      summary: 'Get absensi by ID',
+      description: 'Menampilkan detail data absensi berdasarkan ID',
+    },
+  })
+  .post('/checkin', absensiHandler.checkin, {
+    body: CreateAbsensiSchema,
+    detail: {
+      tags: ['Absensi'],
+      summary: 'Check-in',
+      description: `Membuat record absensi baru (check-in) dengan lokasi GPS.
+
+**Contoh Request Body:**
+\`\`\`json
+{
+  "date": "2026-02-15",
+  "nip": "00001",
+  "checkin": "2026-02-15T08:00:00Z",
+  "latitude": "-6.200000",
+  "longitude": "106.816666"
+}
+\`\`\`
+
+**Catatan:**
+- Pegawai hanya bisa check-in 1x per hari
+- Format date: YYYY-MM-DD
+- Format checkin: ISO 8601 timestamp (contoh: 2026-02-15T08:00:00Z)
+- Latitude: -90 sampai 90 (Jakarta: -6.200000)
+- Longitude: -180 sampai 180 (Jakarta: 106.816666)
+- NIP harus terdaftar di tabel pegawai`,
+    },
+  })
+  .post('/:id/checkout', absensiHandler.checkout, {
+    params: t.Object({
+      id: t.String()
+    }),
+    body: CheckoutAbsensiSchema,
+    detail: {
+      tags: ['Absensi'],
+      summary: 'Check-out',
+      description: `Update record absensi dengan waktu check-out. Jam kerja akan dihitung otomatis.
+
+**Contoh Request Body:**
+\`\`\`json
+{
+  "checkout": "2026-02-15T17:30:00Z",
+  "latitude": "-6.200000",
+  "longitude": "106.816666"
+}
+\`\`\`
+
+**Catatan:**
+- Hanya bisa check-out jika sudah check-in
+- Tidak bisa check-out 2x
+- Jam kerja dihitung otomatis: (checkout - checkin) dalam jam
+- Format checkout: ISO 8601 timestamp (contoh: 2026-02-15T17:30:00Z)
+- Latitude & Longitude: Lokasi GPS saat check-out
+- Format jam kerja: desimal (9.50 = 9 jam 30 menit)
+
+**Contoh Response:**
+\`\`\`json
+{
+  "success": true,
+  "message": "Check-out berhasil",
+  "data": {
+    "id": 1,
+    "working_hours": "9.50",
+    ...
+  }
+}
+\`\`\``,
+    },
+  })
+  .put('/:id', absensiHandler.update, {
+    params: t.Object({
+      id: t.String()
+    }),
+    body: UpdateAbsensiSchema,
+    detail: {
+      tags: ['Absensi'],
+      summary: 'Update absensi',
+      description: 'Update data absensi berdasarkan ID (admin only)',
+    },
+  })
+  .delete('/:id', absensiHandler.delete, {
+    params: t.Object({
+      id: t.String()
+    }),
+    detail: {
+      tags: ['Absensi'],
+      summary: 'Delete absensi',
+      description: 'Hapus data absensi berdasarkan ID (admin only)',
+    },
+  });

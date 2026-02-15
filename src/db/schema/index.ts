@@ -8,3 +8,4 @@ export * from "./organisasi";
 export * from "./pegawai";
 export * from "./kelompok_nelayan";
 export * from "./penyuluh";
+export * from "./absensi";
