@@ -1,3 +1,6 @@
+import { sql, eq } from 'drizzle-orm';
+import { db } from '../db';
+import { absensi } from '../db/schema/absensi';
 import { AbsensiRepository } from '../repositories/absensi.repository';
 import type { CreateAbsensiType, CheckoutAbsensiType, UpdateAbsensiType, AbsensiQueryType } from '../types/absensi';
 
@@ -168,6 +171,40 @@ export const absensiHandler = {
       };
     } catch (error) {
       console.error('Error deleting absensi:', error);
+      throw new Error('Gagal menghapus data absensi');
+    }
+  },
+
+  async deleteByDate({ body }: any) {
+    try {
+      const { date } = body;
+
+      // Check if any records exist for this date
+      const existing = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(absensi)
+        .where(eq(absensi.date, date));
+
+      const count = existing[0]?.count || 0;
+      
+      if (count === 0) {
+        return {
+          success: false,
+          message: 'Tidak ada data absensi pada tanggal tersebut',
+        };
+      }
+
+      const deleted = await absensiRepo.deleteAllByDate(date);
+      return {
+        success: true,
+        message: `Berhasil menghapus ${deleted.length} data absensi`,
+        data: {
+          deleted_count: deleted.length,
+          date: date,
+        },
+      };
+    } catch (error) {
+      console.error('Error deleting absensi by date:', error);
       throw new Error('Gagal menghapus data absensi');
     }
   },

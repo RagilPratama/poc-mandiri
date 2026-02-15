@@ -176,4 +176,22 @@ export class AbsensiRepository {
 
     return result[0] || null;
   }
+
+  async deleteByDate(nip: string, date: string) {
+    const result = await db
+      .delete(absensi)
+      .where(and(eq(absensi.nip, nip), eq(absensi.date, date)))
+      .returning();
+
+    return result;
+  }
+
+  async deleteAllByDate(date: string) {
+    const result = await db
+      .delete(absensi)
+      .where(eq(absensi.date, date))
+      .returning();
+
+    return result;
+  }
 }

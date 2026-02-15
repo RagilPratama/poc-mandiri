@@ -126,7 +126,30 @@ GET /absensi?nip=00001&date_from=2026-02-10&date_to=2026-02-12
     }),
     detail: {
       tags: ['Absensi'],
-      summary: 'Delete absensi',
+      summary: 'Delete absensi by ID',
       description: 'Hapus data absensi berdasarkan ID (admin only)',
+    },
+  })
+  .delete('/by-date', absensiHandler.deleteByDate, {
+    body: t.Object({
+      date: t.String({ format: 'date', description: 'Tanggal absensi (YYYY-MM-DD)' }),
+    }),
+    detail: {
+      tags: ['Absensi'],
+      summary: 'Delete absensi by date',
+      description: `Hapus semua data absensi pada tanggal tertentu (admin only).
+
+**Contoh Request Body:**
+\`\`\`json
+{
+  "date": "2026-02-15"
+}
+\`\`\`
+
+**Catatan:**
+- Menghapus SEMUA absensi pada tanggal yang ditentukan
+- Berguna untuk menghapus data absensi yang salah input di hari tertentu
+- Hanya admin yang bisa menggunakan endpoint ini
+- Akan mengembalikan jumlah data yang dihapus`,
     },
   });
