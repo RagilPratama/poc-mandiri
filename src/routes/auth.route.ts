@@ -232,7 +232,7 @@ try {
     }
 
     const user = await clerkClient.users.getUser(session.userId);
-
+    console.log(user)
     return {
     success: true,
     data: {
@@ -240,6 +240,7 @@ try {
         email: user.emailAddresses[0]?.emailAddress,
         firstName: user.firstName,
         lastName: user.lastName,
+        username: user.username,
         createdAt: user.createdAt,
     },
     };

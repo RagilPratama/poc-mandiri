@@ -26,6 +26,16 @@ export const pegawaiRoute = new Elysia({ prefix: '/pegawai' })
       description: 'Get pegawai detail by ID with organisasi and role relations',
     },
   })
+  .get('/email/:email', pegawaiHandler.getByEmail, {
+    params: t.Object({
+      email: t.String({ format: 'email' })
+    }),
+    detail: {
+      tags: ['Pegawai'],
+      summary: 'Get pegawai by email',
+      description: 'Get pegawai detail by email with organisasi and role relations',
+    },
+  })
   .post('/', pegawaiHandler.create, {
     body: CreatePegawaiSchema,
     detail: {

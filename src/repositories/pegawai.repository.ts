@@ -124,8 +124,27 @@ export class PegawaiRepository {
 
   async findByEmail(email: string) {
     const result = await db
-      .select()
+      .select({
+        id: pegawai.id,
+        nip: pegawai.nip,
+        nama: pegawai.nama,
+        email: pegawai.email,
+        jabatan: pegawai.jabatan,
+        organisasi_id: pegawai.organisasi_id,
+        organisasi_nama: organisasi.nama_organisasi,
+        organisasi_kode: organisasi.kode_organisasi,
+        organisasi_level: organisasi.level_organisasi,
+        role_id: pegawai.role_id,
+        role_nama: roles.nama_role,
+        level_role: roles.level_role,
+        status_aktif: pegawai.status_aktif,
+        last_login: pegawai.last_login,
+        created_at: pegawai.created_at,
+        updated_at: pegawai.updated_at,
+      })
       .from(pegawai)
+      .leftJoin(organisasi, eq(pegawai.organisasi_id, organisasi.id))
+      .leftJoin(roles, eq(pegawai.role_id, roles.id))
       .where(eq(pegawai.email, email))
       .limit(1);
 

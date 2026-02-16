@@ -48,6 +48,29 @@ export const pegawaiHandler = {
     }
   },
 
+  async getByEmail({ params }: Context<{ params: { email: string } }>) {
+    try {
+      const { email } = params;
+      
+      const pegawai = await pegawaiRepo.findByEmail(email);
+      if (!pegawai) {
+        return {
+          success: false,
+          message: 'Pegawai tidak ditemukan',
+        };
+      }
+
+      return {
+        success: true,
+        message: 'Data pegawai berhasil diambil',
+        data: pegawai,
+      };
+    } catch (error) {
+      console.error('Error getting pegawai by email:', error);
+      throw new Error('Gagal mengambil data pegawai');
+    }
+  },
+
   async create({ body }: Context<{ body: CreatePegawaiType }>) {
     try {
       // Check if NIP already exists
