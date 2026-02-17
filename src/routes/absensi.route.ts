@@ -18,16 +18,17 @@ export const absensiRoute = new Elysia({ prefix: '/absensi' })
 **Query Parameters:**
 - \`page\`: Nomor halaman (default: 1)
 - \`limit\`: Jumlah data per halaman (default: 10, max: 100)
-- \`nip\`: Filter berdasarkan NIP pegawai
 - \`date_from\`: Filter dari tanggal (YYYY-MM-DD)
 - \`date_to\`: Filter sampai tanggal (YYYY-MM-DD)
+- \`search\`: Cari berdasarkan nama atau NIP (LIKE search, case-insensitive)
 
 **Contoh Request:**
 \`\`\`
 GET /absensi?page=1&limit=10
-GET /absensi?nip=00001
+GET /absensi?search=budi
+GET /absensi?search=00001
 GET /absensi?date_from=2026-02-10&date_to=2026-02-15
-GET /absensi?nip=00001&date_from=2026-02-10&date_to=2026-02-12
+GET /absensi?search=siti&date_from=2026-02-10
 \`\`\``,
     },
   })

@@ -27,9 +27,9 @@ export interface UpdateAbsensiType {
 export interface AbsensiQueryType {
   page?: number;
   limit?: number;
-  nip?: string;
   date_from?: string;
   date_to?: string;
+  search?: string;
 }
 
 export const CreateAbsensiSchema = t.Object({
@@ -59,7 +59,7 @@ export const UpdateAbsensiSchema = t.Object({
 export const AbsensiQuerySchema = t.Object({
   page: t.Optional(t.Numeric({ minimum: 1, description: 'Page number' })),
   limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100, description: 'Items per page' })),
-  nip: t.Optional(t.String({ description: 'Filter by NIP' })),
   date_from: t.Optional(t.String({ format: 'date', description: 'Filter from date (YYYY-MM-DD)' })),
   date_to: t.Optional(t.String({ format: 'date', description: 'Filter to date (YYYY-MM-DD)' })),
+  search: t.Optional(t.String({ description: 'Search by nama or NIP (LIKE)' })),
 });

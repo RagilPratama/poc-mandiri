@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, sql, desc } from 'drizzle-orm';
+import { eq, and, gte, lte, sql, desc, or, ilike } from 'drizzle-orm';
 import { db } from '../db';
 import { absensi } from '../db/schema/absensi';
 import { pegawai } from '../db/schema/pegawai';
@@ -12,16 +12,20 @@ export class AbsensiRepository {
 
     const conditions = [];
 
-    if (query.nip) {
-      conditions.push(eq(absensi.nip, query.nip));
-    }
-
     if (query.date_from) {
       conditions.push(gte(absensi.date, query.date_from));
     }
 
     if (query.date_to) {
       conditions.push(lte(absensi.date, query.date_to));
+    }
+
+    if (query.search) {
+      const searchCondition = or(
+        ilike(pegawai.nama, `%${query.search}%`),
+        ilike(absensi.nip, `%${query.search}%`)
+      );
+      conditions.push(searchCondition);
     }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
@@ -54,6 +58,7 @@ export class AbsensiRepository {
       db
         .select({ count: sql<number>`count(*)::int` })
         .from(absensi)
+        .leftJoin(pegawai, eq(absensi.nip, pegawai.nip))
         .where(whereClause),
     ]);
 
