@@ -4,22 +4,24 @@ export interface CreateAbsensiType {
   date: string;
   nip: string;
   checkin: Date | string;
-  latitude: string;
-  longitude: string;
+  ci_latitude: string;
+  ci_longitude: string;
 }
 
 export interface CheckoutAbsensiType {
   checkout: Date | string;
-  latitude: string;
-  longitude: string;
+  co_latitude: string;
+  co_longitude: string;
 }
 
 export interface UpdateAbsensiType {
   date?: string;
   checkin?: Date | string;
+  ci_latitude?: string;
+  ci_longitude?: string;
   checkout?: Date | string;
-  latitude?: string;
-  longitude?: string;
+  co_latitude?: string;
+  co_longitude?: string;
 }
 
 export interface AbsensiQueryType {
@@ -34,22 +36,24 @@ export const CreateAbsensiSchema = t.Object({
   date: t.String({ format: 'date', description: 'Tanggal absensi (YYYY-MM-DD)' }),
   nip: t.String({ minLength: 1, description: 'NIP pegawai' }),
   checkin: t.String({ format: 'date-time', description: 'Waktu check-in (ISO 8601)' }),
-  latitude: t.String({ description: 'Latitude lokasi check-in' }),
-  longitude: t.String({ description: 'Longitude lokasi check-in' }),
+  ci_latitude: t.String({ description: 'Latitude lokasi check-in' }),
+  ci_longitude: t.String({ description: 'Longitude lokasi check-in' }),
 });
 
 export const CheckoutAbsensiSchema = t.Object({
   checkout: t.String({ format: 'date-time', description: 'Waktu check-out (ISO 8601)' }),
-  latitude: t.String({ description: 'Latitude lokasi check-out' }),
-  longitude: t.String({ description: 'Longitude lokasi check-out' }),
+  co_latitude: t.String({ description: 'Latitude lokasi check-out' }),
+  co_longitude: t.String({ description: 'Longitude lokasi check-out' }),
 });
 
 export const UpdateAbsensiSchema = t.Object({
   date: t.Optional(t.String({ format: 'date', description: 'Tanggal absensi (YYYY-MM-DD)' })),
   checkin: t.Optional(t.String({ format: 'date-time', description: 'Waktu check-in (ISO 8601)' })),
+  ci_latitude: t.Optional(t.String({ description: 'Latitude lokasi check-in' })),
+  ci_longitude: t.Optional(t.String({ description: 'Longitude lokasi check-in' })),
   checkout: t.Optional(t.String({ format: 'date-time', description: 'Waktu check-out (ISO 8601)' })),
-  latitude: t.Optional(t.String({ description: 'Latitude lokasi' })),
-  longitude: t.Optional(t.String({ description: 'Longitude lokasi' })),
+  co_latitude: t.Optional(t.String({ description: 'Latitude lokasi check-out' })),
+  co_longitude: t.Optional(t.String({ description: 'Longitude lokasi check-out' })),
 });
 
 export const AbsensiQuerySchema = t.Object({

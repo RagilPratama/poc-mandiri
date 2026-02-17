@@ -34,10 +34,12 @@ export class AbsensiRepository {
           nip: absensi.nip,
           nama: pegawai.nama,
           checkin: absensi.checkin,
+          ci_latitude: absensi.ci_latitude,
+          ci_longitude: absensi.ci_longitude,
           checkout: absensi.checkout,
+          co_latitude: absensi.co_latitude,
+          co_longitude: absensi.co_longitude,
           working_hours: absensi.working_hours,
-          latitude: absensi.latitude,
-          longitude: absensi.longitude,
           created_at: absensi.created_at,
           updated_at: absensi.updated_at,
         })
@@ -75,10 +77,12 @@ export class AbsensiRepository {
         nip: absensi.nip,
         nama: pegawai.nama,
         checkin: absensi.checkin,
+        ci_latitude: absensi.ci_latitude,
+        ci_longitude: absensi.ci_longitude,
         checkout: absensi.checkout,
+        co_latitude: absensi.co_latitude,
+        co_longitude: absensi.co_longitude,
         working_hours: absensi.working_hours,
-        latitude: absensi.latitude,
-        longitude: absensi.longitude,
         created_at: absensi.created_at,
         updated_at: absensi.updated_at,
       })
@@ -107,8 +111,8 @@ export class AbsensiRepository {
         date: data.date,
         nip: data.nip,
         checkin: typeof data.checkin === 'string' ? new Date(data.checkin) : data.checkin,
-        latitude: data.latitude,
-        longitude: data.longitude,
+        ci_latitude: data.ci_latitude,
+        ci_longitude: data.ci_longitude,
       })
       .returning();
 
@@ -135,6 +139,8 @@ export class AbsensiRepository {
       .update(absensi)
       .set({
         checkout: checkoutTime,
+        co_latitude: data.co_latitude,
+        co_longitude: data.co_longitude,
         working_hours: workingHours,
         updated_at: new Date(),
       })
@@ -153,11 +159,13 @@ export class AbsensiRepository {
     if (data.checkin !== undefined) {
       updateData.checkin = typeof data.checkin === 'string' ? new Date(data.checkin) : data.checkin;
     }
+    if (data.ci_latitude !== undefined) updateData.ci_latitude = data.ci_latitude;
+    if (data.ci_longitude !== undefined) updateData.ci_longitude = data.ci_longitude;
     if (data.checkout !== undefined) {
       updateData.checkout = typeof data.checkout === 'string' ? new Date(data.checkout) : data.checkout;
     }
-    if (data.latitude !== undefined) updateData.latitude = data.latitude;
-    if (data.longitude !== undefined) updateData.longitude = data.longitude;
+    if (data.co_latitude !== undefined) updateData.co_latitude = data.co_latitude;
+    if (data.co_longitude !== undefined) updateData.co_longitude = data.co_longitude;
 
     const result = await db
       .update(absensi)

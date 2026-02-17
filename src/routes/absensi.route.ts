@@ -54,8 +54,8 @@ GET /absensi?nip=00001&date_from=2026-02-10&date_to=2026-02-12
   "date": "2026-02-15",
   "nip": "00001",
   "checkin": "2026-02-15T08:00:00Z",
-  "latitude": "-6.200000",
-  "longitude": "106.816666"
+  "ci_latitude": "-6.200000",
+  "ci_longitude": "106.816666"
 }
 \`\`\`
 
@@ -63,8 +63,8 @@ GET /absensi?nip=00001&date_from=2026-02-10&date_to=2026-02-12
 - Pegawai hanya bisa check-in 1x per hari
 - Format date: YYYY-MM-DD
 - Format checkin: ISO 8601 timestamp (contoh: 2026-02-15T08:00:00Z)
-- Latitude: -90 sampai 90 (Jakarta: -6.200000)
-- Longitude: -180 sampai 180 (Jakarta: 106.816666)
+- ci_latitude: Latitude lokasi check-in (-90 sampai 90, Jakarta: -6.200000)
+- ci_longitude: Longitude lokasi check-in (-180 sampai 180, Jakarta: 106.816666)
 - NIP harus terdaftar di tabel pegawai`,
     },
   })
@@ -82,8 +82,8 @@ GET /absensi?nip=00001&date_from=2026-02-10&date_to=2026-02-12
 \`\`\`json
 {
   "checkout": "2026-02-15T17:30:00Z",
-  "latitude": "-6.200000",
-  "longitude": "106.816666"
+  "co_latitude": "-6.200000",
+  "co_longitude": "106.816666"
 }
 \`\`\`
 
@@ -92,7 +92,7 @@ GET /absensi?nip=00001&date_from=2026-02-10&date_to=2026-02-12
 - Tidak bisa check-out 2x
 - Jam kerja dihitung otomatis: (checkout - checkin) dalam jam
 - Format checkout: ISO 8601 timestamp (contoh: 2026-02-15T17:30:00Z)
-- Latitude & Longitude: Lokasi GPS saat check-out
+- co_latitude & co_longitude: Lokasi GPS saat check-out
 - Format jam kerja: desimal (9.50 = 9 jam 30 menit)
 
 **Contoh Response:**
