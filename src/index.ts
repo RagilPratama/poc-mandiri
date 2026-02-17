@@ -60,7 +60,7 @@ const app = new Elysia()
     path: "/swagger",
     documentation: {
       info: {
-        title: "Myfirst Elysia API",
+        title: "POC API",
         version: "1.0.0",
         description: "API documentation untuk Myfirst Elysia dengan Redis caching dan Gzip compression",
     },

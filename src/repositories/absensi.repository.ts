@@ -40,6 +40,8 @@ export class AbsensiRepository {
           co_latitude: absensi.co_latitude,
           co_longitude: absensi.co_longitude,
           working_hours: absensi.working_hours,
+          status: absensi.status,
+          total_overtime: absensi.total_overtime,
           created_at: absensi.created_at,
           updated_at: absensi.updated_at,
         })
@@ -83,6 +85,8 @@ export class AbsensiRepository {
         co_latitude: absensi.co_latitude,
         co_longitude: absensi.co_longitude,
         working_hours: absensi.working_hours,
+        status: absensi.status,
+        total_overtime: absensi.total_overtime,
         created_at: absensi.created_at,
         updated_at: absensi.updated_at,
       })
@@ -113,6 +117,7 @@ export class AbsensiRepository {
         checkin: typeof data.checkin === 'string' ? new Date(data.checkin) : data.checkin,
         ci_latitude: data.ci_latitude,
         ci_longitude: data.ci_longitude,
+        status: 'Masih Berjalan', // Default status saat check-in
       })
       .returning();
 
@@ -133,7 +138,23 @@ export class AbsensiRepository {
     const checkinTime = new Date(record[0].checkin);
     const checkoutTime = typeof data.checkout === 'string' ? new Date(data.checkout) : data.checkout;
     const diffMs = checkoutTime.getTime() - checkinTime.getTime();
-    const workingHours = (diffMs / (1000 * 60 * 60)).toFixed(2);
+    const workingHoursDecimal = diffMs / (1000 * 60 * 60);
+    const workingHours = workingHoursDecimal.toFixed(2);
+
+    // Determine status and overtime
+    let status = 'Tepat Waktu';
+    let totalOvertime = '0.00';
+
+    if (workingHoursDecimal < 8) {
+      status = 'Pulang Sebelum Waktunya';
+    } else if (workingHoursDecimal >= 8 && workingHoursDecimal <= 8.25) {
+      status = 'Tepat Waktu';
+    } else if (workingHoursDecimal > 8.25) {
+      status = 'Lembur';
+      // Calculate overtime in hours (lebih dari 8.25 jam)
+      const overtimeHours = workingHoursDecimal - 8.25;
+      totalOvertime = overtimeHours.toFixed(2);
+    }
 
     const result = await db
       .update(absensi)
@@ -142,6 +163,8 @@ export class AbsensiRepository {
         co_latitude: data.co_latitude,
         co_longitude: data.co_longitude,
         working_hours: workingHours,
+        status: status,
+        total_overtime: totalOvertime,
         updated_at: new Date(),
       })
       .where(eq(absensi.id, id))

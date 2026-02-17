@@ -95,6 +95,18 @@ GET /absensi?nip=00001&date_from=2026-02-10&date_to=2026-02-12
 - co_latitude & co_longitude: Lokasi GPS saat check-out
 - Format jam kerja: desimal (9.50 = 9 jam 30 menit)
 
+**Status Otomatis:**
+- **Masih Berjalan**: Sudah check-in, belum check-out
+- **Pulang Sebelum Waktunya**: Working hours < 8 jam
+- **Tepat Waktu**: Working hours 8 - 8.25 jam
+- **Lembur**: Working hours > 8.25 jam
+
+**Total Overtime:**
+- Dihitung otomatis jika status = Lembur
+- Format: menit (integer)
+- Rumus: (working_hours - 8.25) × 60
+- Contoh: 10 jam kerja = (10 - 8.25) × 60 = 105 menit
+
 **Contoh Response:**
 \`\`\`json
 {
@@ -102,7 +114,9 @@ GET /absensi?nip=00001&date_from=2026-02-10&date_to=2026-02-12
   "message": "Check-out berhasil",
   "data": {
     "id": 1,
-    "working_hours": "9.50",
+    "working_hours": "10.00",
+    "status": "Lembur",
+    "total_overtime": 105,
     ...
   }
 }
