@@ -61,14 +61,26 @@ export const absensiHandler = {
         };
       }
 
+      const checkinDate = new Date(body.checkin);
       const absensi = await absensiRepo.create({
         ...body,
-        checkin: new Date(body.checkin),
+        checkin: checkinDate,
       });
+
+      // Format jam check-in (HH:MM)
+      const checkinTime = checkinDate.toLocaleTimeString('id-ID', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+      });
+
       return {
         success: true,
         message: 'Check-in berhasil',
-        data: absensi,
+        data: {
+          ...absensi,
+          checkin_time: checkinTime,
+        },
       };
     } catch (error) {
       console.error('Error check-in:', error);
@@ -101,14 +113,50 @@ export const absensiHandler = {
         };
       }
 
+      const checkoutDate = new Date(body.checkout);
       const absensi = await absensiRepo.checkout(id, {
         ...body,
-        checkout: new Date(body.checkout),
+        checkout: checkoutDate,
       });
+
+      // Format jam check-in dan check-out (HH:MM)
+      const checkinTime = new Date(existing.checkin).toLocaleTimeString('id-ID', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+      });
+      
+      const checkoutTime = checkoutDate.toLocaleTimeString('id-ID', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+      });
+
+      // Format working hours (X jam Y menit)
+      const workingHoursDecimal = parseFloat(absensi?.working_hours || '0');
+      const hours = Math.floor(workingHoursDecimal);
+      const minutes = Math.round((workingHoursDecimal % 1) * 60);
+      const workingHoursFormatted = `${hours} jam ${minutes} menit`;
+
+      // Format overtime (X jam Y menit)
+      let overtimeFormatted = '0 jam 0 menit';
+      if (absensi?.total_overtime) {
+        const overtimeDecimal = parseFloat(absensi.total_overtime);
+        const overtimeHours = Math.floor(overtimeDecimal);
+        const overtimeMinutes = Math.round((overtimeDecimal % 1) * 60);
+        overtimeFormatted = `${overtimeHours} jam ${overtimeMinutes} menit`;
+      }
+
       return {
         success: true,
         message: 'Check-out berhasil',
-        data: absensi,
+        data: {
+          ...absensi,
+          checkin_time: checkinTime,
+          checkout_time: checkoutTime,
+          working_hours_formatted: workingHoursFormatted,
+          total_overtime_formatted: overtimeFormatted,
+        },
       };
     } catch (error) {
       console.error('Error check-out:', error);
