@@ -3,6 +3,7 @@ import { db } from '../db';
 import { absensi } from '../db/schema/absensi';
 import { AbsensiRepository } from '../repositories/absensi.repository';
 import { uploadImage } from '../utils/imagekit';
+import { successResponse, successResponseWithPagination } from '../utils/response';
 import type { CreateAbsensiType, CheckoutAbsensiType, UpdateAbsensiType, AbsensiQueryType } from '../types/absensi';
 
 const absensiRepo = new AbsensiRepository();
@@ -11,11 +12,11 @@ export const absensiHandler = {
   async getAll({ query }: any) {
     try {
       const result = await absensiRepo.findAll(query);
-      return {
-        success: true,
-        message: 'Data absensi berhasil diambil',
-        ...result,
-      };
+      return successResponseWithPagination(
+        'Data absensi berhasil diambil',
+        result.data,
+        result.pagination
+      );
     } catch (error) {
       console.error('Error getting absensi:', error);
       throw new Error('Gagal mengambil data absensi');
@@ -27,7 +28,6 @@ export const absensiHandler = {
       const id = parseInt(params.id);
       if (isNaN(id)) {
         return {
-          success: false,
           message: 'ID tidak valid',
         };
       }
@@ -35,16 +35,11 @@ export const absensiHandler = {
       const absensi = await absensiRepo.findById(id);
       if (!absensi) {
         return {
-          success: false,
           message: 'Data absensi tidak ditemukan',
         };
       }
 
-      return {
-        success: true,
-        message: 'Data absensi berhasil diambil',
-        data: absensi,
-      };
+      return successResponse('Data absensi berhasil diambil', absensi);
     } catch (error) {
       console.error('Error getting absensi by id:', error);
       throw new Error('Gagal mengambil data absensi');
@@ -57,7 +52,6 @@ export const absensiHandler = {
       const existing = await absensiRepo.findByNipAndDate(body.nip, body.date);
       if (existing) {
         return {
-          success: false,
           message: 'Sudah melakukan check-in hari ini',
         };
       }
@@ -65,7 +59,6 @@ export const absensiHandler = {
       // Validate photo
       if (!body.checkin_photo) {
         return {
-          success: false,
           message: 'Foto check-in wajib diupload',
         };
       }
@@ -96,14 +89,10 @@ export const absensiHandler = {
         hour12: false 
       });
 
-      return {
-        success: true,
-        message: 'Check-in berhasil',
-        data: {
-          ...absensi,
-          checkin_time: checkinTime,
-        },
-      };
+      return successResponse('Check-in berhasil', {
+        ...absensi,
+        checkin_time: checkinTime,
+      });
     } catch (error) {
       console.error('Error check-in:', error);
       throw new Error('Gagal melakukan check-in');
@@ -115,7 +104,6 @@ export const absensiHandler = {
       const id = parseInt(params.id);
       if (isNaN(id)) {
         return {
-          success: false,
           message: 'ID tidak valid',
         };
       }
@@ -123,14 +111,12 @@ export const absensiHandler = {
       const existing = await absensiRepo.findById(id);
       if (!existing) {
         return {
-          success: false,
           message: 'Data absensi tidak ditemukan',
         };
       }
 
       if (existing.checkout) {
         return {
-          success: false,
           message: 'Sudah melakukan check-out',
         };
       }
@@ -169,17 +155,13 @@ export const absensiHandler = {
         overtimeFormatted = `${overtimeHours} jam ${overtimeMinutes} menit`;
       }
 
-      return {
-        success: true,
-        message: 'Check-out berhasil',
-        data: {
-          ...absensi,
-          checkin_time: checkinTime,
-          checkout_time: checkoutTime,
-          working_hours_formatted: workingHoursFormatted,
-          total_overtime_formatted: overtimeFormatted,
-        },
-      };
+      return successResponse('Check-out berhasil', {
+        ...absensi,
+        checkin_time: checkinTime,
+        checkout_time: checkoutTime,
+        working_hours_formatted: workingHoursFormatted,
+        total_overtime_formatted: overtimeFormatted,
+      });
     } catch (error) {
       console.error('Error check-out:', error);
       throw new Error('Gagal melakukan check-out');
@@ -191,7 +173,6 @@ export const absensiHandler = {
       const id = parseInt(params.id);
       if (isNaN(id)) {
         return {
-          success: false,
           message: 'ID tidak valid',
         };
       }
@@ -199,17 +180,12 @@ export const absensiHandler = {
       const existing = await absensiRepo.findById(id);
       if (!existing) {
         return {
-          success: false,
           message: 'Data absensi tidak ditemukan',
         };
       }
 
       const absensi = await absensiRepo.update(id, body);
-      return {
-        success: true,
-        message: 'Data absensi berhasil diupdate',
-        data: absensi,
-      };
+      return successResponse('Data absensi berhasil diupdate', absensi);
     } catch (error) {
       console.error('Error updating absensi:', error);
       throw new Error('Gagal mengupdate data absensi');
@@ -221,7 +197,6 @@ export const absensiHandler = {
       const id = parseInt(params.id);
       if (isNaN(id)) {
         return {
-          success: false,
           message: 'ID tidak valid',
         };
       }
@@ -229,16 +204,12 @@ export const absensiHandler = {
       const existing = await absensiRepo.findById(id);
       if (!existing) {
         return {
-          success: false,
           message: 'Data absensi tidak ditemukan',
         };
       }
 
       await absensiRepo.delete(id);
-      return {
-        success: true,
-        message: 'Data absensi berhasil dihapus',
-      };
+      return successResponse('Data absensi berhasil dihapus');
     } catch (error) {
       console.error('Error deleting absensi:', error);
       throw new Error('Gagal menghapus data absensi');
@@ -259,20 +230,15 @@ export const absensiHandler = {
       
       if (count === 0) {
         return {
-          success: false,
           message: 'Tidak ada data absensi pada tanggal tersebut',
         };
       }
 
       const deleted = await absensiRepo.deleteAllByDate(date);
-      return {
-        success: true,
-        message: `Berhasil menghapus ${deleted.length} data absensi`,
-        data: {
-          deleted_count: deleted.length,
-          date: date,
-        },
-      };
+      return successResponse(`Berhasil menghapus ${deleted.length} data absensi`, {
+        deleted_count: deleted.length,
+        date: date,
+      });
     } catch (error) {
       console.error('Error deleting absensi by date:', error);
       throw new Error('Gagal menghapus data absensi');

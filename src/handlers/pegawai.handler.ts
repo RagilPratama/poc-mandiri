@@ -1,5 +1,6 @@
 import { Context } from 'elysia';
 import { PegawaiRepository } from '../repositories/pegawai.repository';
+import { successResponse, successResponseWithPagination } from '../utils/response';
 import type { CreatePegawaiType, UpdatePegawaiType, PegawaiQueryType } from '../types/pegawai';
 
 const pegawaiRepo = new PegawaiRepository();
@@ -8,11 +9,11 @@ export const pegawaiHandler = {
   async getAll({ query }: Context<{ query: PegawaiQueryType }>) {
     try {
       const result = await pegawaiRepo.findAll(query);
-      return {
-        success: true,
-        message: 'Data pegawai berhasil diambil',
-        ...result,
-      };
+      return successResponseWithPagination(
+        'Data pegawai berhasil diambil',
+        result.data,
+        result.pagination
+      );
     } catch (error) {
       console.error('Error getting pegawai:', error);
       throw new Error('Gagal mengambil data pegawai');
@@ -24,7 +25,6 @@ export const pegawaiHandler = {
       const id = parseInt(params.id);
       if (isNaN(id)) {
         return {
-          success: false,
           message: 'ID tidak valid',
         };
       }
@@ -32,16 +32,11 @@ export const pegawaiHandler = {
       const pegawai = await pegawaiRepo.findById(id);
       if (!pegawai) {
         return {
-          success: false,
           message: 'Pegawai tidak ditemukan',
         };
       }
 
-      return {
-        success: true,
-        message: 'Data pegawai berhasil diambil',
-        data: pegawai,
-      };
+      return successResponse('Data pegawai berhasil diambil', pegawai);
     } catch (error) {
       console.error('Error getting pegawai by id:', error);
       throw new Error('Gagal mengambil data pegawai');
@@ -55,16 +50,11 @@ export const pegawaiHandler = {
       const pegawai = await pegawaiRepo.findByEmail(email);
       if (!pegawai) {
         return {
-          success: false,
           message: 'Pegawai tidak ditemukan',
         };
       }
 
-      return {
-        success: true,
-        message: 'Data pegawai berhasil diambil',
-        data: pegawai,
-      };
+      return successResponse('Data pegawai berhasil diambil', pegawai);
     } catch (error) {
       console.error('Error getting pegawai by email:', error);
       throw new Error('Gagal mengambil data pegawai');
@@ -77,7 +67,6 @@ export const pegawaiHandler = {
       const existingNip = await pegawaiRepo.findByNip(body.nip);
       if (existingNip) {
         return {
-          success: false,
           message: 'NIP sudah terdaftar',
         };
       }
@@ -86,17 +75,12 @@ export const pegawaiHandler = {
       const existingEmail = await pegawaiRepo.findByEmail(body.email);
       if (existingEmail) {
         return {
-          success: false,
           message: 'Email sudah terdaftar',
         };
       }
 
       const pegawai = await pegawaiRepo.create(body);
-      return {
-        success: true,
-        message: 'Pegawai berhasil ditambahkan',
-        data: pegawai,
-      };
+      return successResponse('Pegawai berhasil ditambahkan', pegawai);
     } catch (error) {
       console.error('Error creating pegawai:', error);
       throw new Error('Gagal menambahkan pegawai');
@@ -108,7 +92,6 @@ export const pegawaiHandler = {
       const id = parseInt(params.id);
       if (isNaN(id)) {
         return {
-          success: false,
           message: 'ID tidak valid',
         };
       }
@@ -116,7 +99,6 @@ export const pegawaiHandler = {
       const existing = await pegawaiRepo.findById(id);
       if (!existing) {
         return {
-          success: false,
           message: 'Pegawai tidak ditemukan',
         };
       }
@@ -126,7 +108,6 @@ export const pegawaiHandler = {
         const existingNip = await pegawaiRepo.findByNip(body.nip);
         if (existingNip) {
           return {
-            success: false,
             message: 'NIP sudah terdaftar',
           };
         }
@@ -137,18 +118,13 @@ export const pegawaiHandler = {
         const existingEmail = await pegawaiRepo.findByEmail(body.email);
         if (existingEmail) {
           return {
-            success: false,
             message: 'Email sudah terdaftar',
           };
         }
       }
 
       const pegawai = await pegawaiRepo.update(id, body);
-      return {
-        success: true,
-        message: 'Pegawai berhasil diupdate',
-        data: pegawai,
-      };
+      return successResponse('Pegawai berhasil diupdate', pegawai);
     } catch (error) {
       console.error('Error updating pegawai:', error);
       throw new Error('Gagal mengupdate pegawai');
@@ -160,7 +136,6 @@ export const pegawaiHandler = {
       const id = parseInt(params.id);
       if (isNaN(id)) {
         return {
-          success: false,
           message: 'ID tidak valid',
         };
       }
@@ -168,16 +143,12 @@ export const pegawaiHandler = {
       const existing = await pegawaiRepo.findById(id);
       if (!existing) {
         return {
-          success: false,
           message: 'Pegawai tidak ditemukan',
         };
       }
 
       await pegawaiRepo.delete(id);
-      return {
-        success: true,
-        message: 'Pegawai berhasil dihapus',
-      };
+      return successResponse('Pegawai berhasil dihapus');
     } catch (error) {
       console.error('Error deleting pegawai:', error);
       throw new Error('Gagal menghapus pegawai');
