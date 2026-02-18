@@ -6,6 +6,7 @@ export interface CreateAbsensiType {
   checkin: Date | string;
   ci_latitude: string;
   ci_longitude: string;
+  checkin_photo?: File | Blob;
 }
 
 export interface CheckoutAbsensiType {
@@ -38,6 +39,7 @@ export const CreateAbsensiSchema = t.Object({
   checkin: t.String({ format: 'date-time', description: 'Waktu check-in (ISO 8601)' }),
   ci_latitude: t.String({ description: 'Latitude lokasi check-in' }),
   ci_longitude: t.String({ description: 'Longitude lokasi check-in' }),
+  checkin_photo: t.File({ description: 'Foto selfie saat check-in (JPG/PNG, max 5MB)' }),
 });
 
 export const CheckoutAbsensiSchema = t.Object({

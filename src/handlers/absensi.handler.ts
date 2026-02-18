@@ -2,6 +2,7 @@ import { sql, eq } from 'drizzle-orm';
 import { db } from '../db';
 import { absensi } from '../db/schema/absensi';
 import { AbsensiRepository } from '../repositories/absensi.repository';
+import { uploadImage } from '../utils/imagekit';
 import type { CreateAbsensiType, CheckoutAbsensiType, UpdateAbsensiType, AbsensiQueryType } from '../types/absensi';
 
 const absensiRepo = new AbsensiRepository();
@@ -61,10 +62,31 @@ export const absensiHandler = {
         };
       }
 
+      // Validate photo
+      if (!body.checkin_photo) {
+        return {
+          success: false,
+          message: 'Foto check-in wajib diupload',
+        };
+      }
+
+      // Upload photo to ImageKit
+      const photoFile = body.checkin_photo;
+      const photoBuffer = Buffer.from(await photoFile.arrayBuffer());
+      const fileName = `checkin_${body.nip}_${body.date}_${Date.now()}.jpg`;
+      const folder = `/absensi/${body.nip}/${body.date}`;
+
+      const uploadResult = await uploadImage(photoBuffer, fileName, folder);
+
       const checkinDate = new Date(body.checkin);
       const absensi = await absensiRepo.create({
-        ...body,
+        date: body.date,
+        nip: body.nip,
         checkin: checkinDate,
+        ci_latitude: body.ci_latitude,
+        ci_longitude: body.ci_longitude,
+        checkin_photo_url: uploadResult.url,
+        checkin_photo_id: uploadResult.fileId,
       });
 
       // Format jam check-in (HH:MM)

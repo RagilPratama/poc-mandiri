@@ -44,28 +44,36 @@ GET /absensi?search=siti&date_from=2026-02-10
   })
   .post('/checkin', absensiHandler.checkin, {
     body: CreateAbsensiSchema,
+    type: 'multipart/form-data',
     detail: {
       tags: ['Absensi'],
-      summary: 'Check-in',
-      description: `Membuat record absensi baru (check-in) dengan lokasi GPS.
+      summary: 'Check-in dengan foto',
+      description: `Membuat record absensi baru (check-in) dengan lokasi GPS dan foto selfie.
 
-**Contoh Request Body:**
-\`\`\`json
-{
-  "date": "2026-02-15",
-  "nip": "00001",
-  "checkin": "2026-02-15T08:00:00Z",
-  "ci_latitude": "-6.200000",
-  "ci_longitude": "106.816666"
-}
+**Request Body (multipart/form-data):**
+- \`date\`: Tanggal absensi (YYYY-MM-DD)
+- \`nip\`: NIP pegawai
+- \`checkin\`: Waktu check-in (ISO 8601 timestamp)
+- \`ci_latitude\`: Latitude lokasi check-in
+- \`ci_longitude\`: Longitude lokasi check-in
+- \`checkin_photo\`: File foto selfie (JPG/PNG, max 5MB)
+
+**Contoh Request (cURL):**
+\`\`\`bash
+curl -X POST 'http://localhost:3000/absensi/checkin' \\
+  -F 'date=2026-02-19' \\
+  -F 'nip=01928001' \\
+  -F 'checkin=2026-02-19T08:00:00Z' \\
+  -F 'ci_latitude=-6.200000' \\
+  -F 'ci_longitude=106.816666' \\
+  -F 'checkin_photo=@/path/to/photo.jpg'
 \`\`\`
 
 **Catatan:**
 - Pegawai hanya bisa check-in 1x per hari
-- Format date: YYYY-MM-DD
-- Format checkin: ISO 8601 timestamp (contoh: 2026-02-15T08:00:00Z)
-- ci_latitude: Latitude lokasi check-in (-90 sampai 90, Jakarta: -6.200000)
-- ci_longitude: Longitude lokasi check-in (-180 sampai 180, Jakarta: 106.816666)
+- Foto wajib diupload (JPG/PNG, max 5MB)
+- Foto akan disimpan di ImageKit
+- Format checkin: ISO 8601 timestamp (contoh: 2026-02-19T08:00:00Z)
 - NIP harus terdaftar di tabel pegawai`,
     },
   })

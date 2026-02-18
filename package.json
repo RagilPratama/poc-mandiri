@@ -24,6 +24,7 @@
     "compression": "^1.8.1",
     "drizzle-orm": "^0.45.1",
     "elysia": "latest",
+    "imagekit": "^6.0.0",
     "pg": "^8.18.0",
     "redis": "^5.10.0"
   },

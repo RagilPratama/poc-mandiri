@@ -113,7 +113,7 @@ export class AbsensiRepository {
     return result[0] || null;
   }
 
-  async create(data: CreateAbsensiType) {
+  async create(data: CreateAbsensiType & { checkin_photo_url?: string; checkin_photo_id?: string }) {
     const result = await db
       .insert(absensi)
       .values({
@@ -122,6 +122,8 @@ export class AbsensiRepository {
         checkin: typeof data.checkin === 'string' ? new Date(data.checkin) : data.checkin,
         ci_latitude: data.ci_latitude,
         ci_longitude: data.ci_longitude,
+        checkin_photo_url: data.checkin_photo_url,
+        checkin_photo_id: data.checkin_photo_id,
         status: 'Masih Berjalan', // Default status saat check-in
       })
       .returning();

@@ -6,6 +6,11 @@ export const config = {
   redis: {
     url: process.env.REDIS_URL || "redis://localhost:6379",
   },
+  imagekit: {
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY || "",
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY || "",
+    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT || "",
+  },
   app: {
     name: "POC API",
     version: "1.0.0",

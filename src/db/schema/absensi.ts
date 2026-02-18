@@ -8,6 +8,8 @@ export const absensi = pgTable('absensi', {
   checkin: timestamp('checkin').notNull(),
   ci_latitude: decimal('ci_latitude', { precision: 10, scale: 8 }).notNull(),
   ci_longitude: decimal('ci_longitude', { precision: 11, scale: 8 }).notNull(),
+  checkin_photo_url: varchar('checkin_photo_url', { length: 500 }),
+  checkin_photo_id: varchar('checkin_photo_id', { length: 255 }),
   checkout: timestamp('checkout'),
   co_latitude: decimal('co_latitude', { precision: 10, scale: 8 }),
   co_longitude: decimal('co_longitude', { precision: 11, scale: 8 }),
