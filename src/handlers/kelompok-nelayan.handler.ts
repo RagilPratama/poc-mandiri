@@ -1,5 +1,6 @@
 import { Context } from 'elysia';
 import { KelompokNelayanRepository } from '../repositories/kelompok-nelayan.repository';
+import { successResponse, successResponseWithPagination } from '../utils/response';
 import type { CreateKelompokNelayanType, UpdateKelompokNelayanType, KelompokNelayanQueryType } from '../types/kelompok-nelayan';
 
 const kelompokNelayanRepo = new KelompokNelayanRepository();
@@ -8,11 +9,11 @@ export const kelompokNelayanHandler = {
   async getAll({ query }: Context<{ query: KelompokNelayanQueryType }>) {
     try {
       const result = await kelompokNelayanRepo.findAll(query);
-      return {
-        success: true,
-        message: 'Data kelompok nelayan berhasil diambil',
-        ...result,
-      };
+      return successResponseWithPagination(
+        "Data kelompok nelayan berhasil diambil",
+        result.data,
+        result.pagination
+      );
     } catch (error) {
       console.error('Error getting kelompok nelayan:', error);
       throw new Error('Gagal mengambil data kelompok nelayan');
@@ -24,7 +25,6 @@ export const kelompokNelayanHandler = {
       const id = parseInt(params.id);
       if (isNaN(id)) {
         return {
-          success: false,
           message: 'ID tidak valid',
         };
       }
@@ -32,16 +32,11 @@ export const kelompokNelayanHandler = {
       const kelompok = await kelompokNelayanRepo.findById(id);
       if (!kelompok) {
         return {
-          success: false,
           message: 'Kelompok nelayan tidak ditemukan',
         };
       }
 
-      return {
-        success: true,
-        message: 'Data kelompok nelayan berhasil diambil',
-        data: kelompok,
-      };
+      return successResponse("Data kelompok nelayan berhasil diambil", kelompok);
     } catch (error) {
       console.error('Error getting kelompok nelayan by id:', error);
       throw new Error('Gagal mengambil data kelompok nelayan');
@@ -54,7 +49,6 @@ export const kelompokNelayanHandler = {
       const existingNib = await kelompokNelayanRepo.findByNibKelompok(body.nib_kelompok);
       if (existingNib) {
         return {
-          success: false,
           message: 'NIB Kelompok sudah terdaftar',
         };
       }
@@ -63,17 +57,12 @@ export const kelompokNelayanHandler = {
       const existingNoReg = await kelompokNelayanRepo.findByNoRegistrasi(body.no_registrasi);
       if (existingNoReg) {
         return {
-          success: false,
           message: 'Nomor Registrasi sudah terdaftar',
         };
       }
 
       const kelompok = await kelompokNelayanRepo.create(body);
-      return {
-        success: true,
-        message: 'Kelompok nelayan berhasil ditambahkan',
-        data: kelompok,
-      };
+      return successResponse("Kelompok nelayan berhasil ditambahkan", kelompok);
     } catch (error) {
       console.error('Error creating kelompok nelayan:', error);
       throw new Error('Gagal menambahkan kelompok nelayan');
@@ -85,7 +74,6 @@ export const kelompokNelayanHandler = {
       const id = parseInt(params.id);
       if (isNaN(id)) {
         return {
-          success: false,
           message: 'ID tidak valid',
         };
       }
@@ -93,7 +81,6 @@ export const kelompokNelayanHandler = {
       const existing = await kelompokNelayanRepo.findById(id);
       if (!existing) {
         return {
-          success: false,
           message: 'Kelompok nelayan tidak ditemukan',
         };
       }
@@ -103,7 +90,6 @@ export const kelompokNelayanHandler = {
         const existingNib = await kelompokNelayanRepo.findByNibKelompok(body.nib_kelompok);
         if (existingNib) {
           return {
-            success: false,
             message: 'NIB Kelompok sudah terdaftar',
           };
         }
@@ -114,18 +100,13 @@ export const kelompokNelayanHandler = {
         const existingNoReg = await kelompokNelayanRepo.findByNoRegistrasi(body.no_registrasi);
         if (existingNoReg) {
           return {
-            success: false,
             message: 'Nomor Registrasi sudah terdaftar',
           };
         }
       }
 
       const kelompok = await kelompokNelayanRepo.update(id, body);
-      return {
-        success: true,
-        message: 'Kelompok nelayan berhasil diupdate',
-        data: kelompok,
-      };
+      return successResponse("Kelompok nelayan berhasil diupdate", kelompok);
     } catch (error) {
       console.error('Error updating kelompok nelayan:', error);
       throw new Error('Gagal mengupdate kelompok nelayan');
@@ -137,7 +118,6 @@ export const kelompokNelayanHandler = {
       const id = parseInt(params.id);
       if (isNaN(id)) {
         return {
-          success: false,
           message: 'ID tidak valid',
         };
       }
@@ -145,16 +125,12 @@ export const kelompokNelayanHandler = {
       const existing = await kelompokNelayanRepo.findById(id);
       if (!existing) {
         return {
-          success: false,
           message: 'Kelompok nelayan tidak ditemukan',
         };
       }
 
       await kelompokNelayanRepo.delete(id);
-      return {
-        success: true,
-        message: 'Kelompok nelayan berhasil dihapus',
-      };
+      return successResponse("Kelompok nelayan berhasil dihapus");
     } catch (error) {
       console.error('Error deleting kelompok nelayan:', error);
       throw new Error('Gagal menghapus kelompok nelayan');

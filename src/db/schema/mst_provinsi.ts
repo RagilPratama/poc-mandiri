@@ -1,7 +1,7 @@
 import { pgTable, text, numeric, integer, index } from "drizzle-orm/pg-core";
 
-export const provinces = pgTable(
-  "provinces",
+export const mstProvinsi = pgTable(
+  "mst_provinsi",
   {
     id: integer().primaryKey(),
     name: text().notNull(),
@@ -11,9 +11,9 @@ export const provinces = pgTable(
   },
   (table) => [
     // Index untuk search by name (case-insensitive)
-    index("idx_provinces_name_lower").on(table.name),
+    index("idx_mst_provinsi_name_lower").on(table.name),
   ]
 );
 
-export type Province = typeof provinces.$inferSelect;
-export type InsertProvince = typeof provinces.$inferInsert;
+export type MstProvinsi = typeof mstProvinsi.$inferSelect;
+export type InsertMstProvinsi = typeof mstProvinsi.$inferInsert;

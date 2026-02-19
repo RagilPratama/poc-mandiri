@@ -1,6 +1,6 @@
 import { pgTable, serial, varchar, text, timestamp } from 'drizzle-orm/pg-core';
 
-export const organisasi = pgTable('organisasi', {
+export const mstOrganisasi = pgTable('mst_organisasi', {
   id: serial('id').primaryKey(),
   level_organisasi: varchar('level_organisasi', { length: 100 }).notNull(),
   kode_organisasi: varchar('kode_organisasi', { length: 50 }).notNull(),
@@ -10,5 +10,5 @@ export const organisasi = pgTable('organisasi', {
   updated_at: timestamp('updated_at').defaultNow(),
 });
 
-export type Organisasi = typeof organisasi.$inferSelect;
-export type InsertOrganisasi = typeof organisasi.$inferInsert;
+export type MstOrganisasi = typeof mstOrganisasi.$inferSelect;
+export type InsertMstOrganisasi = typeof mstOrganisasi.$inferInsert;

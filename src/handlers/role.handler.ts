@@ -1,4 +1,5 @@
 import { RoleRepository } from '../repositories/role.repository';
+import { successResponse, successResponseWithPagination } from '../utils/response';
 import type { CreateRoleDTO, UpdateRoleDTO } from '../types/role';
 
 const roleRepo = new RoleRepository();
@@ -11,10 +12,11 @@ export const roleHandlers = {
       const search = query.search;
 
       const result = await roleRepo.findAll(page, limit, search);
-      return { 
-        success: true,
-        ...result
-      };
+      return successResponseWithPagination(
+        "Data role berhasil diambil",
+        result.data,
+        result.pagination
+      );
     } catch (error) {
       console.error('Error fetching roles:', error);
       throw error;
@@ -26,16 +28,10 @@ export const roleHandlers = {
       const role = await roleRepo.findById(params.id);
       
       if (!role) {
-        return {
-          success: false,
-          message: 'Role not found',
-        };
+        throw new Error("Role not found");
       }
 
-      return {
-        success: true,
-        data: role,
-      };
+      return successResponse("Data role berhasil diambil", role);
     } catch (error) {
       console.error('Error fetching role:', error);
       throw error;
@@ -46,11 +42,7 @@ export const roleHandlers = {
     try {
       const role = await roleRepo.create(body);
       
-      return {
-        success: true,
-        data: role,
-        message: 'Role created successfully',
-      };
+      return successResponse("Role berhasil ditambahkan", role);
     } catch (error) {
       console.error('Error creating role:', error);
       throw error;
@@ -62,17 +54,10 @@ export const roleHandlers = {
       const role = await roleRepo.update(params.id, body);
       
       if (!role) {
-        return {
-          success: false,
-          message: 'Role not found',
-        };
+        throw new Error("Role not found");
       }
 
-      return {
-        success: true,
-        data: role,
-        message: 'Role updated successfully',
-      };
+      return successResponse("Role berhasil diupdate", role);
     } catch (error) {
       console.error('Error updating role:', error);
       throw error;
@@ -84,16 +69,10 @@ export const roleHandlers = {
       const role = await roleRepo.delete(params.id);
       
       if (!role) {
-        return {
-          success: false,
-          message: 'Role not found',
-        };
+        throw new Error("Role not found");
       }
 
-      return {
-        success: true,
-        message: 'Role deleted successfully',
-      };
+      return successResponse("Role berhasil dihapus");
     } catch (error) {
       console.error('Error deleting role:', error);
       throw error;

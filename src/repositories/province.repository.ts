@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { provinces } from "../db/schema";
+import { mstProvinsi } from "../db/schema";
 import { asc, count, eq, like, ilike } from "drizzle-orm";
 import { getCache, setCache } from "../redis";
 import { ProvinceResponse } from "../types/province";
@@ -21,14 +21,14 @@ export class ProvinceRepository {
 
     const result = await db
       .select({
-        id: provinces.id,
-        name: provinces.name,
-        alt_name: provinces.alt_name,
-        latitude: provinces.latitude,
-        longitude: provinces.longitude,
+        id: mstProvinsi.id,
+        name: mstProvinsi.name,
+        alt_name: mstProvinsi.alt_name,
+        latitude: mstProvinsi.latitude,
+        longitude: mstProvinsi.longitude,
       })
-      .from(provinces)
-      .orderBy(asc(provinces.name));
+      .from(mstProvinsi)
+      .orderBy(asc(mstProvinsi.name));
 
     const transformedData = result.map((row) => ({
       id: row.id,
@@ -56,14 +56,14 @@ export class ProvinceRepository {
 
     const result = await db
       .select({
-        id: provinces.id,
-        name: provinces.name,
-        alt_name: provinces.alt_name,
-        latitude: provinces.latitude,
-        longitude: provinces.longitude,
+        id: mstProvinsi.id,
+        name: mstProvinsi.name,
+        alt_name: mstProvinsi.alt_name,
+        latitude: mstProvinsi.latitude,
+        longitude: mstProvinsi.longitude,
       })
-      .from(provinces)
-      .where(eq(provinces.id, id))
+      .from(mstProvinsi)
+      .where(eq(mstProvinsi.id, id))
       .limit(1);
 
     if (result.length === 0) {
@@ -83,7 +83,7 @@ export class ProvinceRepository {
   }
 
   async countProvinces(): Promise<number> {
-    const result = await db.select({ count: count() }).from(provinces);
+    const result = await db.select({ count: count() }).from(mstProvinsi);
     return result[0].count;
   }
 
@@ -103,15 +103,15 @@ export class ProvinceRepository {
     
     const result = await db
       .select({
-        id: provinces.id,
-        name: provinces.name,
-        alt_name: provinces.alt_name,
-        latitude: provinces.latitude,
-        longitude: provinces.longitude,
+        id: mstProvinsi.id,
+        name: mstProvinsi.name,
+        alt_name: mstProvinsi.alt_name,
+        latitude: mstProvinsi.latitude,
+        longitude: mstProvinsi.longitude,
       })
-      .from(provinces)
-      .where(ilike(provinces.name, searchPattern))
-      .orderBy(asc(provinces.name));
+      .from(mstProvinsi)
+      .where(ilike(mstProvinsi.name, searchPattern))
+      .orderBy(asc(mstProvinsi.name));
 
     const transformedData = result.map((row) => ({
       id: row.id,

@@ -1,10 +1,6 @@
 import { eq, and, or, ilike, sql, desc } from 'drizzle-orm';
 import { db } from '../db';
-import { kelompokNelayan } from '../db/schema/kelompok_nelayan';
-import { unitPelaksanaanTeknis } from '../db/schema/unit_pelaksanaan_teknis';
-import { provinces } from '../db/schema/provinces';
-import { penyuluh } from '../db/schema/penyuluh';
-import { pegawai } from '../db/schema/pegawai';
+import { mstKelompokNelayan, mstUpt, mstProvinsi, mstPenyuluh, mstPegawai } from '../db/schema';
 import type { CreateKelompokNelayanType, UpdateKelompokNelayanType, KelompokNelayanQueryType } from '../types/kelompok-nelayan';
 
 export class KelompokNelayanRepository {
@@ -18,29 +14,29 @@ export class KelompokNelayanRepository {
     if (query.search) {
       conditions.push(
         or(
-          ilike(kelompokNelayan.nib_kelompok, `%${query.search}%`),
-          ilike(kelompokNelayan.no_registrasi, `%${query.search}%`),
-          ilike(kelompokNelayan.nama_kelompok, `%${query.search}%`),
-          ilike(kelompokNelayan.nik_ketua, `%${query.search}%`),
-          ilike(kelompokNelayan.nama_ketua, `%${query.search}%`)
+          ilike(mstKelompokNelayan.nib_kelompok, `%${query.search}%`),
+          ilike(mstKelompokNelayan.no_registrasi, `%${query.search}%`),
+          ilike(mstKelompokNelayan.nama_kelompok, `%${query.search}%`),
+          ilike(mstKelompokNelayan.nik_ketua, `%${query.search}%`),
+          ilike(mstKelompokNelayan.nama_ketua, `%${query.search}%`)
         )
       );
     }
 
     if (query.upt_id) {
-      conditions.push(eq(kelompokNelayan.upt_id, query.upt_id));
+      conditions.push(eq(mstKelompokNelayan.upt_id, query.upt_id));
     }
 
     if (query.province_id) {
-      conditions.push(eq(kelompokNelayan.province_id, query.province_id));
+      conditions.push(eq(mstKelompokNelayan.province_id, query.province_id));
     }
 
     if (query.penyuluh_id) {
-      conditions.push(eq(kelompokNelayan.penyuluh_id, query.penyuluh_id));
+      conditions.push(eq(mstKelompokNelayan.penyuluh_id, query.penyuluh_id));
     }
 
     if (query.gabungan_kelompok_id) {
-      conditions.push(eq(kelompokNelayan.gabungan_kelompok_id, query.gabungan_kelompok_id));
+      conditions.push(eq(mstKelompokNelayan.gabungan_kelompok_id, query.gabungan_kelompok_id));
     }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
@@ -48,35 +44,43 @@ export class KelompokNelayanRepository {
     const [data, countResult] = await Promise.all([
       db
         .select({
-          id: kelompokNelayan.id,
-          nib_kelompok: kelompokNelayan.nib_kelompok,
-          no_registrasi: kelompokNelayan.no_registrasi,
-          nama_kelompok: kelompokNelayan.nama_kelompok,
-          nik_ketua: kelompokNelayan.nik_ketua,
-          nama_ketua: kelompokNelayan.nama_ketua,
-          upt_id: kelompokNelayan.upt_id,
-          upt_nama: unitPelaksanaanTeknis.nama_organisasi,
-          province_id: kelompokNelayan.province_id,
-          province_name: provinces.name,
-          penyuluh_id: kelompokNelayan.penyuluh_id,
-          penyuluh_nama: pegawai.nama,
-          gabungan_kelompok_id: kelompokNelayan.gabungan_kelompok_id,
-          jumlah_anggota: kelompokNelayan.jumlah_anggota,
-          created_at: kelompokNelayan.created_at,
-          updated_at: kelompokNelayan.updated_at,
+          id: mstKelompokNelayan.id,
+          nib_kelompok: mstKelompokNelayan.nib_kelompok,
+          no_registrasi: mstKelompokNelayan.no_registrasi,
+          nama_kelompok: mstKelompokNelayan.nama_kelompok,
+          nik_ketua: mstKelompokNelayan.nik_ketua,
+          nama_ketua: mstKelompokNelayan.nama_ketua,
+          upt_id: mstKelompokNelayan.upt_id,
+          upt_nama: mstUpt.nama_organisasi,
+          province_id: mstKelompokNelayan.province_id,
+          province_name: mstProvinsi.name,
+          penyuluh_id: mstKelompokNelayan.penyuluh_id,
+          penyuluh_nama: mstPegawai.nama,
+          gabungan_kelompok_id: mstKelompokNelayan.gabungan_kelompok_id,
+          jumlah_anggota: mstKelompokNelayan.jumlah_anggota,
+          jenis_usaha_id: mstKelompokNelayan.jenis_usaha_id,
+          alamat: mstKelompokNelayan.alamat,
+          no_hp_ketua: mstKelompokNelayan.no_hp_ketua,
+          tahun_berdiri: mstKelompokNelayan.tahun_berdiri,
+          status_kelompok: mstKelompokNelayan.status_kelompok,
+          luas_lahan: mstKelompokNelayan.luas_lahan,
+          koordinat_latitude: mstKelompokNelayan.koordinat_latitude,
+          koordinat_longitude: mstKelompokNelayan.koordinat_longitude,
+          created_at: mstKelompokNelayan.created_at,
+          updated_at: mstKelompokNelayan.updated_at,
         })
-        .from(kelompokNelayan)
-        .leftJoin(unitPelaksanaanTeknis, eq(kelompokNelayan.upt_id, unitPelaksanaanTeknis.id))
-        .leftJoin(provinces, eq(kelompokNelayan.province_id, provinces.id))
-        .leftJoin(penyuluh, eq(kelompokNelayan.penyuluh_id, penyuluh.id))
-        .leftJoin(pegawai, eq(penyuluh.pegawai_id, pegawai.id))
+        .from(mstKelompokNelayan)
+        .leftJoin(mstUpt, eq(mstKelompokNelayan.upt_id, mstUpt.id))
+        .leftJoin(mstProvinsi, eq(mstKelompokNelayan.province_id, mstProvinsi.id))
+        .leftJoin(mstPenyuluh, eq(mstKelompokNelayan.penyuluh_id, mstPenyuluh.id))
+        .leftJoin(mstPegawai, eq(mstPenyuluh.pegawai_id, mstPegawai.id))
         .where(whereClause)
-        .orderBy(desc(kelompokNelayan.created_at))
+        .orderBy(desc(mstKelompokNelayan.created_at))
         .limit(limit)
         .offset(offset),
       db
         .select({ count: sql<number>`count(*)::int` })
-        .from(kelompokNelayan)
+        .from(mstKelompokNelayan)
         .where(whereClause),
     ]);
 
@@ -97,31 +101,39 @@ export class KelompokNelayanRepository {
   async findById(id: number) {
     const result = await db
       .select({
-        id: kelompokNelayan.id,
-        nib_kelompok: kelompokNelayan.nib_kelompok,
-        no_registrasi: kelompokNelayan.no_registrasi,
-        nama_kelompok: kelompokNelayan.nama_kelompok,
-        nik_ketua: kelompokNelayan.nik_ketua,
-        nama_ketua: kelompokNelayan.nama_ketua,
-        upt_id: kelompokNelayan.upt_id,
-        upt_nama: unitPelaksanaanTeknis.nama_organisasi,
-        upt_pimpinan: unitPelaksanaanTeknis.pimpinan,
-        province_id: kelompokNelayan.province_id,
-        province_name: provinces.name,
-        penyuluh_id: kelompokNelayan.penyuluh_id,
-        penyuluh_nama: pegawai.nama,
-        penyuluh_nip: pegawai.nip,
-        gabungan_kelompok_id: kelompokNelayan.gabungan_kelompok_id,
-        jumlah_anggota: kelompokNelayan.jumlah_anggota,
-        created_at: kelompokNelayan.created_at,
-        updated_at: kelompokNelayan.updated_at,
+        id: mstKelompokNelayan.id,
+        nib_kelompok: mstKelompokNelayan.nib_kelompok,
+        no_registrasi: mstKelompokNelayan.no_registrasi,
+        nama_kelompok: mstKelompokNelayan.nama_kelompok,
+        nik_ketua: mstKelompokNelayan.nik_ketua,
+        nama_ketua: mstKelompokNelayan.nama_ketua,
+        upt_id: mstKelompokNelayan.upt_id,
+        upt_nama: mstUpt.nama_organisasi,
+        upt_pimpinan: mstUpt.pimpinan,
+        province_id: mstKelompokNelayan.province_id,
+        province_name: mstProvinsi.name,
+        penyuluh_id: mstKelompokNelayan.penyuluh_id,
+        penyuluh_nama: mstPegawai.nama,
+        penyuluh_nip: mstPegawai.nip,
+        gabungan_kelompok_id: mstKelompokNelayan.gabungan_kelompok_id,
+        jumlah_anggota: mstKelompokNelayan.jumlah_anggota,
+        jenis_usaha_id: mstKelompokNelayan.jenis_usaha_id,
+        alamat: mstKelompokNelayan.alamat,
+        no_hp_ketua: mstKelompokNelayan.no_hp_ketua,
+        tahun_berdiri: mstKelompokNelayan.tahun_berdiri,
+        status_kelompok: mstKelompokNelayan.status_kelompok,
+        luas_lahan: mstKelompokNelayan.luas_lahan,
+        koordinat_latitude: mstKelompokNelayan.koordinat_latitude,
+        koordinat_longitude: mstKelompokNelayan.koordinat_longitude,
+        created_at: mstKelompokNelayan.created_at,
+        updated_at: mstKelompokNelayan.updated_at,
       })
-      .from(kelompokNelayan)
-      .leftJoin(unitPelaksanaanTeknis, eq(kelompokNelayan.upt_id, unitPelaksanaanTeknis.id))
-      .leftJoin(provinces, eq(kelompokNelayan.province_id, provinces.id))
-      .leftJoin(penyuluh, eq(kelompokNelayan.penyuluh_id, penyuluh.id))
-      .leftJoin(pegawai, eq(penyuluh.pegawai_id, pegawai.id))
-      .where(eq(kelompokNelayan.id, id))
+      .from(mstKelompokNelayan)
+      .leftJoin(mstUpt, eq(mstKelompokNelayan.upt_id, mstUpt.id))
+      .leftJoin(mstProvinsi, eq(mstKelompokNelayan.province_id, mstProvinsi.id))
+      .leftJoin(mstPenyuluh, eq(mstKelompokNelayan.penyuluh_id, mstPenyuluh.id))
+      .leftJoin(mstPegawai, eq(mstPenyuluh.pegawai_id, mstPegawai.id))
+      .where(eq(mstKelompokNelayan.id, id))
       .limit(1);
 
     if (!result[0]) return null;
@@ -129,9 +141,9 @@ export class KelompokNelayanRepository {
     // Get gabungan kelompok name if exists
     if (result[0].gabungan_kelompok_id) {
       const gabungan = await db
-        .select({ nama_kelompok: kelompokNelayan.nama_kelompok })
-        .from(kelompokNelayan)
-        .where(eq(kelompokNelayan.id, result[0].gabungan_kelompok_id))
+        .select({ nama_kelompok: mstKelompokNelayan.nama_kelompok })
+        .from(mstKelompokNelayan)
+        .where(eq(mstKelompokNelayan.id, result[0].gabungan_kelompok_id))
         .limit(1);
 
       return {
@@ -149,8 +161,8 @@ export class KelompokNelayanRepository {
   async findByNibKelompok(nibKelompok: string) {
     const result = await db
       .select()
-      .from(kelompokNelayan)
-      .where(eq(kelompokNelayan.nib_kelompok, nibKelompok))
+      .from(mstKelompokNelayan)
+      .where(eq(mstKelompokNelayan.nib_kelompok, nibKelompok))
       .limit(1);
 
     return result[0] || null;
@@ -159,16 +171,16 @@ export class KelompokNelayanRepository {
   async findByNoRegistrasi(noRegistrasi: string) {
     const result = await db
       .select()
-      .from(kelompokNelayan)
-      .where(eq(kelompokNelayan.no_registrasi, noRegistrasi))
+      .from(mstKelompokNelayan)
+      .where(eq(mstKelompokNelayan.no_registrasi, noRegistrasi))
       .limit(1);
 
     return result[0] || null;
   }
 
   async create(data: CreateKelompokNelayanType) {
-    const result = await db
-      .insert(kelompokNelayan)
+    const result: any = await db
+      .insert(mstKelompokNelayan)
       .values(data)
       .returning();
 
@@ -176,22 +188,22 @@ export class KelompokNelayanRepository {
   }
 
   async update(id: number, data: UpdateKelompokNelayanType) {
-    const result = await db
-      .update(kelompokNelayan)
+    const result: any = await db
+      .update(mstKelompokNelayan)
       .set({
         ...data,
         updated_at: new Date(),
       })
-      .where(eq(kelompokNelayan.id, id))
+      .where(eq(mstKelompokNelayan.id, id))
       .returning();
 
     return result[0] || null;
   }
 
   async delete(id: number) {
-    const result = await db
-      .delete(kelompokNelayan)
-      .where(eq(kelompokNelayan.id, id))
+    const result: any = await db
+      .delete(mstKelompokNelayan)
+      .where(eq(mstKelompokNelayan.id, id))
       .returning();
 
     return result[0] || null;

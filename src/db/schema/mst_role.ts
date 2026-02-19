@@ -1,6 +1,6 @@
 import { pgTable, serial, varchar, text, timestamp } from 'drizzle-orm/pg-core';
 
-export const roles = pgTable('roles', {
+export const mstRole = pgTable('mst_role', {
   id: serial('id').primaryKey(),
   level_role: varchar('level_role', { length: 100 }).notNull(),
   nama_role: varchar('nama_role', { length: 255 }).notNull(),
@@ -9,5 +9,5 @@ export const roles = pgTable('roles', {
   updated_at: timestamp('updated_at').defaultNow(),
 });
 
-export type Role = typeof roles.$inferSelect;
-export type InsertRole = typeof roles.$inferInsert;
+export type MstRole = typeof mstRole.$inferSelect;
+export type InsertMstRole = typeof mstRole.$inferInsert;

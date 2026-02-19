@@ -1,4 +1,5 @@
 import { RegencyRepository } from "../repositories/regency.repository";
+import { successResponse, successResponseWithPagination } from "../utils/response";
 
 const regencyRepo = new RegencyRepository();
 
@@ -8,7 +9,11 @@ export const regencyHandlers = {
       const regencies = await regencyRepo.getAllRegencies();
       const total = await regencyRepo.countRegencies();
 
-      return { data: regencies, total };
+      return successResponseWithPagination(
+        "Data kabupaten berhasil diambil",
+        regencies,
+        { total, page: 1, limit: total }
+      );
     } catch (error) {
       console.error("Error fetching regencies:", error);
       throw error;
@@ -23,7 +28,7 @@ export const regencyHandlers = {
         throw new Error("Regency not found");
       }
 
-      return { data: regency };
+      return successResponse("Data kabupaten berhasil diambil", regency);
     } catch (error) {
       console.error("Error fetching regency:", error);
       throw error;
@@ -34,7 +39,11 @@ export const regencyHandlers = {
     try {
       const regencies = await regencyRepo.getRegenciesByProvinceId(params.province_id);
 
-      return { data: regencies, total: regencies.length };
+      return successResponseWithPagination(
+        "Data kabupaten berhasil diambil",
+        regencies,
+        { total: regencies.length, page: 1, limit: regencies.length }
+      );
     } catch (error) {
       console.error("Error fetching regencies by province:", error);
       throw error;
@@ -49,7 +58,11 @@ export const regencyHandlers = {
 
       const results = await regencyRepo.searchRegencies(query.q);
 
-      return { data: Array.isArray(results) ? results : [], total: results.length };
+      return successResponseWithPagination(
+        "Data kabupaten berhasil diambil",
+        Array.isArray(results) ? results : [],
+        { total: results.length, page: 1, limit: results.length }
+      );
     } catch (error) {
       console.error("Error searching regencies:", error);
       throw error;

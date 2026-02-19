@@ -4,7 +4,32 @@ import { cors } from "@elysiajs/cors";
 import { pool } from "./db";
 import { connectRedis, disconnectRedis } from "./redis";
 import { warmupCache } from "./utils/cache-warmer";
-import { provinceRoutes, regencyRoutes, districtRoutes, villageRoutes, authRoutes, cacheRoutes, unitPelaksanaanTeknisRoutes, roleRoutes, organisasiRoutes, pegawaiRoutes, kelompokNelayanRoutes, penyuluhRoutes, absensiRoutes } from "./routes";
+import { 
+  provinceRoutes, 
+  regencyRoutes, 
+  districtRoutes, 
+  villageRoutes, 
+  authRoutes, 
+  cacheRoutes, 
+  unitPelaksanaanTeknisRoutes, 
+  roleRoutes, 
+  organisasiRoutes, 
+  pegawaiRoutes, 
+  kelompokNelayanRoutes, 
+  penyuluhRoutes, 
+  absensiRoutes,
+  jenisUsahaRoute,
+  komoditasRoute,
+  alatTangkapRoute,
+  kapalRoute,
+  jenisBantuanRoute,
+  jenisPelatihanRoute,
+  jenisSertifikasiRoute,
+  produksiHasilTangkapanRoute,
+  bantuanRoute,
+  pelatihanRoute,
+  sertifikasiRoute
+} from "./routes";
 const port = process.env.PORT || 3000;
 await connectRedis();
 warmupCache().catch(console.error);
@@ -78,6 +103,17 @@ const app = new Elysia()
         { name: "Kelompok Nelayan", description: "Kelompok Nelayan management" },
         { name: "Penyuluh", description: "Penyuluh management" },
         { name: "Absensi", description: "Absensi management" },
+        { name: "Jenis Usaha", description: "Jenis Usaha master data" },
+        { name: "Komoditas", description: "Komoditas master data" },
+        { name: "Alat Tangkap", description: "Alat Tangkap master data" },
+        { name: "Kapal", description: "Kapal master data" },
+        { name: "Jenis Bantuan", description: "Jenis Bantuan master data" },
+        { name: "Jenis Pelatihan", description: "Jenis Pelatihan master data" },
+        { name: "Jenis Sertifikasi", description: "Jenis Sertifikasi master data" },
+        { name: "Produksi Hasil Tangkapan", description: "Produksi Hasil Tangkapan transactions" },
+        { name: "Bantuan", description: "Bantuan transactions" },
+        { name: "Pelatihan", description: "Pelatihan transactions" },
+        { name: "Sertifikasi", description: "Sertifikasi transactions" },
       ],
       components: {
         securitySchemes: {
@@ -109,6 +145,21 @@ const app = new Elysia()
   .use(kelompokNelayanRoutes)
   .use(penyuluhRoutes)
   .use(absensiRoutes)
+  
+  // New master table routes
+  .use(jenisUsahaRoute)
+  .use(komoditasRoute)
+  .use(alatTangkapRoute)
+  .use(kapalRoute)
+  .use(jenisBantuanRoute)
+  .use(jenisPelatihanRoute)
+  .use(jenisSertifikasiRoute)
+  
+  // New transaction table routes
+  .use(produksiHasilTangkapanRoute)
+  .use(bantuanRoute)
+  .use(pelatihanRoute)
+  .use(sertifikasiRoute)
   .listen(port);
   console.log(
     `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`

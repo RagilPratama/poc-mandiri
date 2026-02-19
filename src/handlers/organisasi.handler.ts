@@ -1,4 +1,5 @@
 import { OrganisasiRepository } from '../repositories/organisasi.repository';
+import { successResponse, successResponseWithPagination } from '../utils/response';
 import type { CreateOrganisasiDTO, UpdateOrganisasiDTO } from '../types/organisasi';
 
 const organisasiRepo = new OrganisasiRepository();
@@ -11,10 +12,11 @@ export const organisasiHandlers = {
       const search = query.search;
 
       const result = await organisasiRepo.findAll(page, limit, search);
-      return { 
-        success: true,
-        ...result
-      };
+      return successResponseWithPagination(
+        "Data organisasi berhasil diambil",
+        result.data,
+        result.pagination
+      );
     } catch (error) {
       console.error('Error fetching organisasi:', error);
       throw error;
@@ -26,16 +28,10 @@ export const organisasiHandlers = {
       const org = await organisasiRepo.findById(params.id);
       
       if (!org) {
-        return {
-          success: false,
-          message: 'Organisasi not found',
-        };
+        throw new Error("Organisasi not found");
       }
 
-      return {
-        success: true,
-        data: org,
-      };
+      return successResponse("Data organisasi berhasil diambil", org);
     } catch (error) {
       console.error('Error fetching organisasi:', error);
       throw error;
@@ -46,11 +42,7 @@ export const organisasiHandlers = {
     try {
       const org = await organisasiRepo.create(body);
       
-      return {
-        success: true,
-        data: org,
-        message: 'Organisasi created successfully',
-      };
+      return successResponse("Organisasi berhasil ditambahkan", org);
     } catch (error) {
       console.error('Error creating organisasi:', error);
       throw error;
@@ -62,17 +54,10 @@ export const organisasiHandlers = {
       const org = await organisasiRepo.update(params.id, body);
       
       if (!org) {
-        return {
-          success: false,
-          message: 'Organisasi not found',
-        };
+        throw new Error("Organisasi not found");
       }
 
-      return {
-        success: true,
-        data: org,
-        message: 'Organisasi updated successfully',
-      };
+      return successResponse("Organisasi berhasil diupdate", org);
     } catch (error) {
       console.error('Error updating organisasi:', error);
       throw error;
@@ -84,16 +69,10 @@ export const organisasiHandlers = {
       const org = await organisasiRepo.delete(params.id);
       
       if (!org) {
-        return {
-          success: false,
-          message: 'Organisasi not found',
-        };
+        throw new Error("Organisasi not found");
       }
 
-      return {
-        success: true,
-        message: 'Organisasi deleted successfully',
-      };
+      return successResponse("Organisasi berhasil dihapus");
     } catch (error) {
       console.error('Error deleting organisasi:', error);
       throw error;

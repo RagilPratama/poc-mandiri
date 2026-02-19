@@ -23,6 +23,7 @@ export interface UpdateAbsensiType {
   checkout?: Date | string;
   co_latitude?: string;
   co_longitude?: string;
+  keterangan?: string;
 }
 
 export interface AbsensiQueryType {

@@ -1,7 +1,6 @@
 import { eq, and, gte, lte, sql, desc, or, ilike } from 'drizzle-orm';
 import { db } from '../db';
-import { absensi } from '../db/schema/absensi';
-import { pegawai } from '../db/schema/pegawai';
+import { trxAbsensi, mstPegawai } from '../db/schema';
 import type { CreateAbsensiType, CheckoutAbsensiType, UpdateAbsensiType, AbsensiQueryType } from '../types/absensi';
 
 export class AbsensiRepository {
@@ -13,17 +12,17 @@ export class AbsensiRepository {
     const conditions = [];
 
     if (query.date_from) {
-      conditions.push(gte(absensi.date, query.date_from));
+      conditions.push(gte(trxAbsensi.date, query.date_from));
     }
 
     if (query.date_to) {
-      conditions.push(lte(absensi.date, query.date_to));
+      conditions.push(lte(trxAbsensi.date, query.date_to));
     }
 
     if (query.search) {
       const searchCondition = or(
-        ilike(pegawai.nama, `%${query.search}%`),
-        ilike(absensi.nip, `%${query.search}%`)
+        ilike(mstPegawai.nama, `%${query.search}%`),
+        ilike(trxAbsensi.nip, `%${query.search}%`)
       );
       conditions.push(searchCondition);
     }
@@ -33,32 +32,35 @@ export class AbsensiRepository {
     const [data, countResult] = await Promise.all([
       db
         .select({
-          id: absensi.id,
-          date: absensi.date,
-          nip: absensi.nip,
-          nama: pegawai.nama,
-          checkin: absensi.checkin,
-          ci_latitude: absensi.ci_latitude,
-          ci_longitude: absensi.ci_longitude,
-          checkout: absensi.checkout,
-          co_latitude: absensi.co_latitude,
-          co_longitude: absensi.co_longitude,
-          working_hours: absensi.working_hours,
-          status: absensi.status,
-          total_overtime: absensi.total_overtime,
-          created_at: absensi.created_at,
-          updated_at: absensi.updated_at,
+          id: trxAbsensi.id,
+          date: trxAbsensi.date,
+          nip: trxAbsensi.nip,
+          nama: mstPegawai.nama,
+          checkin: trxAbsensi.checkin,
+          ci_latitude: trxAbsensi.ci_latitude,
+          ci_longitude: trxAbsensi.ci_longitude,
+          checkin_photo_url: trxAbsensi.checkin_photo_url,
+          checkin_photo_id: trxAbsensi.checkin_photo_id,
+          checkout: trxAbsensi.checkout,
+          co_latitude: trxAbsensi.co_latitude,
+          co_longitude: trxAbsensi.co_longitude,
+          working_hours: trxAbsensi.working_hours,
+          status: trxAbsensi.status,
+          total_overtime: trxAbsensi.total_overtime,
+          keterangan: trxAbsensi.keterangan,
+          created_at: trxAbsensi.created_at,
+          updated_at: trxAbsensi.updated_at,
         })
-        .from(absensi)
-        .leftJoin(pegawai, eq(absensi.nip, pegawai.nip))
+        .from(trxAbsensi)
+        .leftJoin(mstPegawai, eq(trxAbsensi.nip, mstPegawai.nip))
         .where(whereClause)
-        .orderBy(desc(absensi.date), desc(absensi.checkin))
+        .orderBy(desc(trxAbsensi.date), desc(trxAbsensi.checkin))
         .limit(limit)
         .offset(offset),
       db
         .select({ count: sql<number>`count(*)::int` })
-        .from(absensi)
-        .leftJoin(pegawai, eq(absensi.nip, pegawai.nip))
+        .from(trxAbsensi)
+        .leftJoin(mstPegawai, eq(trxAbsensi.nip, mstPegawai.nip))
         .where(whereClause),
     ]);
 
@@ -79,25 +81,28 @@ export class AbsensiRepository {
   async findById(id: number) {
     const result = await db
       .select({
-        id: absensi.id,
-        date: absensi.date,
-        nip: absensi.nip,
-        nama: pegawai.nama,
-        checkin: absensi.checkin,
-        ci_latitude: absensi.ci_latitude,
-        ci_longitude: absensi.ci_longitude,
-        checkout: absensi.checkout,
-        co_latitude: absensi.co_latitude,
-        co_longitude: absensi.co_longitude,
-        working_hours: absensi.working_hours,
-        status: absensi.status,
-        total_overtime: absensi.total_overtime,
-        created_at: absensi.created_at,
-        updated_at: absensi.updated_at,
+        id: trxAbsensi.id,
+        date: trxAbsensi.date,
+        nip: trxAbsensi.nip,
+        nama: mstPegawai.nama,
+        checkin: trxAbsensi.checkin,
+        ci_latitude: trxAbsensi.ci_latitude,
+        ci_longitude: trxAbsensi.ci_longitude,
+        checkin_photo_url: trxAbsensi.checkin_photo_url,
+        checkin_photo_id: trxAbsensi.checkin_photo_id,
+        checkout: trxAbsensi.checkout,
+        co_latitude: trxAbsensi.co_latitude,
+        co_longitude: trxAbsensi.co_longitude,
+        working_hours: trxAbsensi.working_hours,
+        status: trxAbsensi.status,
+        total_overtime: trxAbsensi.total_overtime,
+        keterangan: trxAbsensi.keterangan,
+        created_at: trxAbsensi.created_at,
+        updated_at: trxAbsensi.updated_at,
       })
-      .from(absensi)
-      .leftJoin(pegawai, eq(absensi.nip, pegawai.nip))
-      .where(eq(absensi.id, id))
+      .from(trxAbsensi)
+      .leftJoin(mstPegawai, eq(trxAbsensi.nip, mstPegawai.nip))
+      .where(eq(trxAbsensi.id, id))
       .limit(1);
 
     return result[0] || null;
@@ -106,8 +111,8 @@ export class AbsensiRepository {
   async findByNipAndDate(nip: string, date: string) {
     const result = await db
       .select()
-      .from(absensi)
-      .where(and(eq(absensi.nip, nip), eq(absensi.date, date)))
+      .from(trxAbsensi)
+      .where(and(eq(trxAbsensi.nip, nip), eq(trxAbsensi.date, date)))
       .limit(1);
 
     return result[0] || null;
@@ -115,7 +120,7 @@ export class AbsensiRepository {
 
   async create(data: CreateAbsensiType & { checkin_photo_url?: string; checkin_photo_id?: string }) {
     const result = await db
-      .insert(absensi)
+      .insert(trxAbsensi)
       .values({
         date: data.date,
         nip: data.nip,
@@ -134,9 +139,9 @@ export class AbsensiRepository {
   async checkout(id: number, data: CheckoutAbsensiType) {
     // Get checkin time first
     const record = await db
-      .select({ checkin: absensi.checkin })
-      .from(absensi)
-      .where(eq(absensi.id, id))
+      .select({ checkin: trxAbsensi.checkin })
+      .from(trxAbsensi)
+      .where(eq(trxAbsensi.id, id))
       .limit(1);
 
     if (!record[0]) return null;
@@ -164,7 +169,7 @@ export class AbsensiRepository {
     }
 
     const result = await db
-      .update(absensi)
+      .update(trxAbsensi)
       .set({
         checkout: checkoutTime,
         co_latitude: data.co_latitude,
@@ -174,7 +179,7 @@ export class AbsensiRepository {
         total_overtime: totalOvertime,
         updated_at: new Date(),
       })
-      .where(eq(absensi.id, id))
+      .where(eq(trxAbsensi.id, id))
       .returning();
 
     return result[0] || null;
@@ -196,11 +201,12 @@ export class AbsensiRepository {
     }
     if (data.co_latitude !== undefined) updateData.co_latitude = data.co_latitude;
     if (data.co_longitude !== undefined) updateData.co_longitude = data.co_longitude;
+    if (data.keterangan !== undefined) updateData.keterangan = data.keterangan;
 
     const result = await db
-      .update(absensi)
+      .update(trxAbsensi)
       .set(updateData)
-      .where(eq(absensi.id, id))
+      .where(eq(trxAbsensi.id, id))
       .returning();
 
     return result[0] || null;
@@ -208,8 +214,8 @@ export class AbsensiRepository {
 
   async delete(id: number) {
     const result = await db
-      .delete(absensi)
-      .where(eq(absensi.id, id))
+      .delete(trxAbsensi)
+      .where(eq(trxAbsensi.id, id))
       .returning();
 
     return result[0] || null;
@@ -217,8 +223,8 @@ export class AbsensiRepository {
 
   async deleteByDate(nip: string, date: string) {
     const result = await db
-      .delete(absensi)
-      .where(and(eq(absensi.nip, nip), eq(absensi.date, date)))
+      .delete(trxAbsensi)
+      .where(and(eq(trxAbsensi.nip, nip), eq(trxAbsensi.date, date)))
       .returning();
 
     return result;
@@ -226,8 +232,8 @@ export class AbsensiRepository {
 
   async deleteAllByDate(date: string) {
     const result = await db
-      .delete(absensi)
-      .where(eq(absensi.date, date))
+      .delete(trxAbsensi)
+      .where(eq(trxAbsensi.date, date))
       .returning();
 
     return result;

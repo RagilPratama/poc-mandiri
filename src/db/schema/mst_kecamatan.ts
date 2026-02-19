@@ -1,8 +1,8 @@
 import { pgTable, text, bigint, numeric, foreignKey, index } from "drizzle-orm/pg-core";
-import { regencies } from "./regencies";
+import { mstKabupaten } from "./mst_kabupaten";
 
-export const districts = pgTable(
-  "districts",
+export const mstKecamatan = pgTable(
+  "mst_kecamatan",
   {
     id: bigint({ mode: "number" }).primaryKey(),
     regency_id: bigint({ mode: "number" }).notNull(),
@@ -14,17 +14,17 @@ export const districts = pgTable(
   (table) => [
     foreignKey({
       columns: [table.regency_id],
-      foreignColumns: [regencies.id],
+      foreignColumns: [mstKabupaten.id],
     }).onDelete("cascade").onUpdate("cascade"),
     
     // Index untuk foreign key lookup
-    index("idx_districts_regency_id").on(table.regency_id),
+    index("idx_mst_kecamatan_regency_id").on(table.regency_id),
     // Index untuk search by name (case-insensitive)
-    index("idx_districts_name_lower").on(table.name),
+    index("idx_mst_kecamatan_name_lower").on(table.name),
     // Composite index untuk filter + sort
-    index("idx_districts_regency_name").on(table.regency_id, table.name),
+    index("idx_mst_kecamatan_regency_name").on(table.regency_id, table.name),
   ]
 );
 
-export type District = typeof districts.$inferSelect;
-export type InsertDistrict = typeof districts.$inferInsert;
+export type MstKecamatan = typeof mstKecamatan.$inferSelect;
+export type InsertMstKecamatan = typeof mstKecamatan.$inferInsert;

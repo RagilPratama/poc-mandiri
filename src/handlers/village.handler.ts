@@ -1,4 +1,5 @@
 import { VillageRepository } from "../repositories/village.repository";
+import { successResponse, successResponseWithPagination } from "../utils/response";
 
 const villageRepo = new VillageRepository();
 
@@ -8,7 +9,11 @@ export const villageHandlers = {
       const villages = await villageRepo.getAllVillages();
       const total = await villageRepo.countVillages();
 
-      return { data: villages, total };
+      return successResponseWithPagination(
+        "Data desa berhasil diambil",
+        villages,
+        { total, page: 1, limit: total }
+      );
     } catch (error) {
       console.error("Error fetching villages:", error);
       throw error;
@@ -23,7 +28,7 @@ export const villageHandlers = {
         throw new Error("Village not found");
       }
 
-      return { data: village };
+      return successResponse("Data desa berhasil diambil", village);
     } catch (error) {
       console.error("Error fetching village:", error);
       throw error;
@@ -34,7 +39,11 @@ export const villageHandlers = {
     try {
       const villages = await villageRepo.getVillagesByDistrictId(params.district_id);
 
-      return { data: villages, total: villages.length };
+      return successResponseWithPagination(
+        "Data desa berhasil diambil",
+        villages,
+        { total: villages.length, page: 1, limit: villages.length }
+      );
     } catch (error) {
       console.error("Error fetching villages by district:", error);
       throw error;
@@ -50,7 +59,11 @@ export const villageHandlers = {
       const district_id = query.district_id ? Number(query.district_id) : undefined;
       const results = await villageRepo.searchVillages(query.q, district_id);
 
-      return { data: Array.isArray(results) ? results : [], total: results.length };
+      return successResponseWithPagination(
+        "Data desa berhasil diambil",
+        Array.isArray(results) ? results : [],
+        { total: results.length, page: 1, limit: results.length }
+      );
     } catch (error) {
       console.error("Error searching villages:", error);
       throw error;
@@ -64,10 +77,11 @@ export const villageHandlers = {
       const limit = query.limit ? parseInt(query.limit) : 10;
 
       const result = await villageRepo.getAllVillagesWithRelations(page, limit);
-      return { 
-        success: true,
-        ...result
-      };
+      return successResponseWithPagination(
+        "Data desa berhasil diambil",
+        result.data,
+        result.pagination
+      );
     } catch (error) {
       console.error("Error fetching villages with relations:", error);
       throw error;
@@ -81,10 +95,11 @@ export const villageHandlers = {
       const limit = query.limit ? parseInt(query.limit) : 10;
 
       const result = await villageRepo.searchVillagesWithRelations(query.q, page, limit);
-      return { 
-        success: true,
-        ...result
-      };
+      return successResponseWithPagination(
+        "Data desa berhasil diambil",
+        result.data,
+        result.pagination
+      );
     } catch (error) {
       console.error("Error searching villages with relations:", error);
       throw error;

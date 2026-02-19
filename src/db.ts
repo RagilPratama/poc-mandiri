@@ -25,10 +25,10 @@ pool.on("error", (err: any) => {
   console.error("Unexpected error on idle client:", err);
 });
 
-// Handle pool connection
-pool.on("connect", () => {
-  console.log("✅ New client connected to the pool");
-});
+// // Handle pool connection
+// pool.on("connect", () => {
+//   console.log("✅ New client connected to the pool");
+// });
 
 // Warm up pool and verify connection
 ;(async () => {

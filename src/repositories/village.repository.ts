@@ -1,8 +1,5 @@
 import { db } from "../db";
-import { villages } from "../db/schema/villages";
-import { districts } from "../db/schema/districts";
-import { regencies } from "../db/schema/regencies";
-import { provinces } from "../db/schema/provinces";
+import { mstDesa, mstKecamatan, mstKabupaten, mstProvinsi } from "../db/schema";
 import { asc, count, eq, ilike, and } from "drizzle-orm";
 import { getCache, setCache } from "../redis";
 import { VillageResponse } from "../types/village";
@@ -24,15 +21,15 @@ export class VillageRepository {
 
     const result = await db
       .select({
-        id: villages.id,
-        district_id: villages.district_id,
-        name: villages.name,
-        alt_name: villages.alt_name,
-        latitude: villages.latitude,
-        longitude: villages.longitude,
+        id: mstDesa.id,
+        district_id: mstDesa.district_id,
+        name: mstDesa.name,
+        alt_name: mstDesa.alt_name,
+        latitude: mstDesa.latitude,
+        longitude: mstDesa.longitude,
       })
-      .from(villages)
-      .orderBy(asc(villages.name));
+      .from(mstDesa)
+      .orderBy(asc(mstDesa.name));
 
     const transformedData = result.map((row) => ({
       id: row.id,
@@ -61,16 +58,16 @@ export class VillageRepository {
 
     const result = await db
       .select({
-        id: villages.id,
-        district_id: villages.district_id,
-        name: villages.name,
-        alt_name: villages.alt_name,
-        latitude: villages.latitude,
-        longitude: villages.longitude,
+        id: mstDesa.id,
+        district_id: mstDesa.district_id,
+        name: mstDesa.name,
+        alt_name: mstDesa.alt_name,
+        latitude: mstDesa.latitude,
+        longitude: mstDesa.longitude,
       })
-      .from(villages)
-      .where(eq(villages.district_id, district_id))
-      .orderBy(asc(villages.name));
+      .from(mstDesa)
+      .where(eq(mstDesa.district_id, district_id))
+      .orderBy(asc(mstDesa.name));
 
     const transformedData = result.map((row) => ({
       id: row.id,
@@ -99,15 +96,15 @@ export class VillageRepository {
 
     const result = await db
       .select({
-        id: villages.id,
-        district_id: villages.district_id,
-        name: villages.name,
-        alt_name: villages.alt_name,
-        latitude: villages.latitude,
-        longitude: villages.longitude,
+        id: mstDesa.id,
+        district_id: mstDesa.district_id,
+        name: mstDesa.name,
+        alt_name: mstDesa.alt_name,
+        latitude: mstDesa.latitude,
+        longitude: mstDesa.longitude,
       })
-      .from(villages)
-      .where(eq(villages.id, id))
+      .from(mstDesa)
+      .where(eq(mstDesa.id, id))
       .limit(1);
 
     if (result.length === 0) {
@@ -128,7 +125,7 @@ export class VillageRepository {
   }
 
   async countVillages(): Promise<number> {
-    const result = await db.select({ count: count() }).from(villages);
+    const result = await db.select({ count: count() }).from(mstDesa);
     return result[0].count;
   }
 
@@ -148,23 +145,23 @@ export class VillageRepository {
 
     const searchPattern = `%${searchTerm}%`;
 
-    const conditions = [ilike(villages.name, searchPattern)];
+    const conditions = [ilike(mstDesa.name, searchPattern)];
     if (district_id) {
-      conditions.push(eq(villages.district_id, district_id));
+      conditions.push(eq(mstDesa.district_id, district_id));
     }
 
     const result = await db
       .select({
-        id: villages.id,
-        district_id: villages.district_id,
-        name: villages.name,
-        alt_name: villages.alt_name,
-        latitude: villages.latitude,
-        longitude: villages.longitude,
+        id: mstDesa.id,
+        district_id: mstDesa.district_id,
+        name: mstDesa.name,
+        alt_name: mstDesa.alt_name,
+        latitude: mstDesa.latitude,
+        longitude: mstDesa.longitude,
       })
-      .from(villages)
+      .from(mstDesa)
       .where(and(...conditions))
-      .orderBy(asc(villages.name));
+      .orderBy(asc(mstDesa.name));
 
     const transformedData = result.map((row) => ({
       id: row.id,
@@ -194,30 +191,30 @@ export class VillageRepository {
     }
 
     // Get total count
-    const totalResult = await db.select({ count: count() }).from(villages);
+    const totalResult = await db.select({ count: count() }).from(mstDesa);
     const total = totalResult[0].count;
 
     // Get paginated data
     const result = await db
       .select({
         // Village data
-        village_id: villages.id,
-        village_name: villages.name,
+        village_id: mstDesa.id,
+        village_name: mstDesa.name,
         // District data
-        district_id: districts.id,
-        district_name: districts.name,
+        district_id: mstKecamatan.id,
+        district_name: mstKecamatan.name,
         // Regency data
-        regency_id: regencies.id,
-        regency_name: regencies.name,
+        regency_id: mstKabupaten.id,
+        regency_name: mstKabupaten.name,
         // Province data
-        province_id: provinces.id,
-        province_name: provinces.name,
+        province_id: mstProvinsi.id,
+        province_name: mstProvinsi.name,
       })
-      .from(villages)
-      .leftJoin(districts, eq(villages.district_id, districts.id))
-      .leftJoin(regencies, eq(districts.regency_id, regencies.id))
-      .leftJoin(provinces, eq(regencies.province_id, provinces.id))
-      .orderBy(asc(villages.name))
+      .from(mstDesa)
+      .leftJoin(mstKecamatan, eq(mstDesa.district_id, mstKecamatan.id))
+      .leftJoin(mstKabupaten, eq(mstKecamatan.regency_id, mstKabupaten.id))
+      .leftJoin(mstProvinsi, eq(mstKabupaten.province_id, mstProvinsi.id))
+      .orderBy(asc(mstDesa.name))
       .limit(limit)
       .offset(offset);
 
@@ -252,13 +249,13 @@ export class VillageRepository {
     }
 
     const conditions = searchTerm 
-      ? [ilike(villages.name, `%${searchTerm}%`)]
+      ? [ilike(mstDesa.name, `%${searchTerm}%`)]
       : [];
 
     // Get total count
     const totalResult = await db
       .select({ count: count() })
-      .from(villages)
+      .from(mstDesa)
       .where(conditions.length > 0 ? and(...conditions) : undefined);
     const total = totalResult[0].count;
 
@@ -266,24 +263,24 @@ export class VillageRepository {
     const result = await db
       .select({
         // Village data
-        village_id: villages.id,
-        village_name: villages.name,
+        village_id: mstDesa.id,
+        village_name: mstDesa.name,
         // District data
-        district_id: districts.id,
-        district_name: districts.name,
+        district_id: mstKecamatan.id,
+        district_name: mstKecamatan.name,
         // Regency data
-        regency_id: regencies.id,
-        regency_name: regencies.name,
+        regency_id: mstKabupaten.id,
+        regency_name: mstKabupaten.name,
         // Province data
-        province_id: provinces.id,
-        province_name: provinces.name,
+        province_id: mstProvinsi.id,
+        province_name: mstProvinsi.name,
       })
-      .from(villages)
-      .leftJoin(districts, eq(villages.district_id, districts.id))
-      .leftJoin(regencies, eq(districts.regency_id, regencies.id))
-      .leftJoin(provinces, eq(regencies.province_id, provinces.id))
+      .from(mstDesa)
+      .leftJoin(mstKecamatan, eq(mstDesa.district_id, mstKecamatan.id))
+      .leftJoin(mstKabupaten, eq(mstKecamatan.regency_id, mstKabupaten.id))
+      .leftJoin(mstProvinsi, eq(mstKabupaten.province_id, mstProvinsi.id))
       .where(conditions.length > 0 ? and(...conditions) : undefined)
-      .orderBy(asc(villages.name))
+      .orderBy(asc(mstDesa.name))
       .limit(limit)
       .offset(offset);
 

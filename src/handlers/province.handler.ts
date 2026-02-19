@@ -1,4 +1,5 @@
 import { ProvinceRepository } from "../repositories/province.repository";
+import { successResponse, successResponseWithPagination } from "../utils/response";
 
 const provinceRepo = new ProvinceRepository();
 
@@ -8,7 +9,11 @@ export const provinceHandlers = {
       const provinces = await provinceRepo.getAllProvinces();
       const total = await provinceRepo.countProvinces();
 
-      return { data: provinces, total };
+      return successResponseWithPagination(
+        "Data provinsi berhasil diambil",
+        provinces,
+        { total, page: 1, limit: total }
+      );
     } catch (error) {
       console.error("Error fetching provinces:", error);
       throw error;
@@ -23,7 +28,7 @@ export const provinceHandlers = {
         throw new Error("Province not found");
       }
 
-      return { data: province };
+      return successResponse("Data provinsi berhasil diambil", province);
     } catch (error) {
       console.error("Error fetching province:", error);
       throw error;
@@ -38,7 +43,11 @@ export const provinceHandlers = {
 
       const results = await provinceRepo.searchProvinces(query.q);
 
-      return { data: results, total: results.length };
+      return successResponseWithPagination(
+        "Data provinsi berhasil diambil",
+        results,
+        { total: results.length, page: 1, limit: results.length }
+      );
     } catch (error) {
       console.error("Error searching provinces:", error);
       throw error;

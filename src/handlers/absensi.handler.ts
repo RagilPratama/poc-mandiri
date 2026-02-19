@@ -1,6 +1,6 @@
 import { sql, eq } from 'drizzle-orm';
 import { db } from '../db';
-import { absensi } from '../db/schema/absensi';
+import { trxAbsensi } from '../db/schema';
 import { AbsensiRepository } from '../repositories/absensi.repository';
 import { uploadImage } from '../utils/imagekit';
 import { successResponse, successResponseWithPagination } from '../utils/response';
@@ -223,8 +223,8 @@ export const absensiHandler = {
       // Check if any records exist for this date
       const existing = await db
         .select({ count: sql<number>`count(*)::int` })
-        .from(absensi)
-        .where(eq(absensi.date, date));
+        .from(trxAbsensi)
+        .where(eq(trxAbsensi.date, date));
 
       const count = existing[0]?.count || 0;
       

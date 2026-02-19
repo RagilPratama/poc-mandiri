@@ -1,4 +1,5 @@
 import { DistrictRepository } from "../repositories/district.repository";
+import { successResponse, successResponseWithPagination } from "../utils/response";
 
 const districtRepo = new DistrictRepository();
 
@@ -8,7 +9,11 @@ export const districtHandlers = {
       const districts = await districtRepo.getAllDistricts();
       const total = await districtRepo.countDistricts();
 
-      return { data: districts, total };
+      return successResponseWithPagination(
+        "Data kecamatan berhasil diambil",
+        districts,
+        { total, page: 1, limit: total }
+      );
     } catch (error) {
       console.error("Error fetching districts:", error);
       throw error;
@@ -23,7 +28,7 @@ export const districtHandlers = {
         throw new Error("District not found");
       }
 
-      return { data: district };
+      return successResponse("Data kecamatan berhasil diambil", district);
     } catch (error) {
       console.error("Error fetching district:", error);
       throw error;
@@ -34,7 +39,11 @@ export const districtHandlers = {
     try {
       const districts = await districtRepo.getDistrictsByRegencyId(params.regency_id);
 
-      return { data: districts, total: districts.length };
+      return successResponseWithPagination(
+        "Data kecamatan berhasil diambil",
+        districts,
+        { total: districts.length, page: 1, limit: districts.length }
+      );
     } catch (error) {
       console.error("Error fetching districts by regency:", error);
       throw error;
@@ -49,7 +58,11 @@ export const districtHandlers = {
 
       const results = await districtRepo.searchDistricts(query.q);
 
-      return { data: results, total: results.length };
+      return successResponseWithPagination(
+        "Data kecamatan berhasil diambil",
+        results,
+        { total: results.length, page: 1, limit: results.length }
+      );
     } catch (error) {
       console.error("Error searching districts:", error);
       throw error;

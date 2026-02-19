@@ -1,19 +1,15 @@
 import { unitPelaksanaanTeknisRepository } from '../repositories/unit-pelaksanaan-teknis.repository';
+import { successResponse } from '../utils/response';
 import type { CreateUnitPelaksanaanTeknisDTO, UpdateUnitPelaksanaanTeknisDTO } from '../types/unit-pelaksanaan-teknis';
 
 export const unitPelaksanaanTeknisHandler = {
   async getAll() {
     try {
       const data = await unitPelaksanaanTeknisRepository.findAll();
-      return {
-        success: true,
-        data,
-      };
+      return successResponse("Data UPT berhasil diambil", data);
     } catch (error) {
-      return {
-        success: false,
-        message: 'Failed to fetch unit pelaksanaan teknis',
-      };
+      console.error('Error fetching unit pelaksanaan teknis:', error);
+      throw new Error('Failed to fetch unit pelaksanaan teknis');
     }
   },
 
@@ -22,21 +18,13 @@ export const unitPelaksanaanTeknisHandler = {
       const data = await unitPelaksanaanTeknisRepository.findById(params.id);
       
       if (!data) {
-        return {
-          success: false,
-          message: 'Unit pelaksanaan teknis not found',
-        };
+        throw new Error("Unit pelaksanaan teknis not found");
       }
 
-      return {
-        success: true,
-        data,
-      };
+      return successResponse("Data UPT berhasil diambil", data);
     } catch (error) {
-      return {
-        success: false,
-        message: 'Failed to fetch unit pelaksanaan teknis',
-      };
+      console.error('Error fetching unit pelaksanaan teknis:', error);
+      throw error;
     }
   },
 
@@ -44,15 +32,10 @@ export const unitPelaksanaanTeknisHandler = {
     try {
       const data = await unitPelaksanaanTeknisRepository.create(body);
       
-      return {
-        success: true,
-        data,
-      };
+      return successResponse("UPT berhasil ditambahkan", data);
     } catch (error) {
-      return {
-        success: false,
-        message: 'Failed to create unit pelaksanaan teknis',
-      };
+      console.error('Error creating unit pelaksanaan teknis:', error);
+      throw new Error('Failed to create unit pelaksanaan teknis');
     }
   },
 
@@ -61,21 +44,13 @@ export const unitPelaksanaanTeknisHandler = {
       const data = await unitPelaksanaanTeknisRepository.update(params.id, body);
       
       if (!data) {
-        return {
-          success: false,
-          message: 'Unit pelaksanaan teknis not found',
-        };
+        throw new Error("Unit pelaksanaan teknis not found");
       }
 
-      return {
-        success: true,
-        data,
-      };
+      return successResponse("UPT berhasil diupdate", data);
     } catch (error) {
-      return {
-        success: false,
-        message: 'Failed to update unit pelaksanaan teknis',
-      };
+      console.error('Error updating unit pelaksanaan teknis:', error);
+      throw error;
     }
   },
 
@@ -84,21 +59,13 @@ export const unitPelaksanaanTeknisHandler = {
       const data = await unitPelaksanaanTeknisRepository.delete(params.id);
       
       if (!data) {
-        return {
-          success: false,
-          message: 'Unit pelaksanaan teknis not found',
-        };
+        throw new Error("Unit pelaksanaan teknis not found");
       }
 
-      return {
-        success: true,
-        message: 'Unit pelaksanaan teknis deleted successfully',
-      };
+      return successResponse("UPT berhasil dihapus");
     } catch (error) {
-      return {
-        success: false,
-        message: 'Failed to delete unit pelaksanaan teknis',
-      };
+      console.error('Error deleting unit pelaksanaan teknis:', error);
+      throw error;
     }
   },
 };

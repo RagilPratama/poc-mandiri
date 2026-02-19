@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { regencies } from "../db/schema";
+import { mstKabupaten } from "../db/schema";
 import { asc, count, eq, ilike } from "drizzle-orm";
 import { getCache, setCache } from "../redis";
 import { RegencyResponse } from "../types/regency";
@@ -21,15 +21,15 @@ export class RegencyRepository {
 
     const result = await db
       .select({
-        id: regencies.id,
-        province_id: regencies.province_id,
-        name: regencies.name,
-        alt_name: regencies.alt_name,
-        latitude: regencies.latitude,
-        longitude: regencies.longitude,
+        id: mstKabupaten.id,
+        province_id: mstKabupaten.province_id,
+        name: mstKabupaten.name,
+        alt_name: mstKabupaten.alt_name,
+        latitude: mstKabupaten.latitude,
+        longitude: mstKabupaten.longitude,
       })
-      .from(regencies)
-      .orderBy(asc(regencies.name));
+      .from(mstKabupaten)
+      .orderBy(asc(mstKabupaten.name));
 
     const transformedData = result.map((row) => ({
       id: row.id,
@@ -58,16 +58,16 @@ export class RegencyRepository {
 
     const result = await db
       .select({
-        id: regencies.id,
-        province_id: regencies.province_id,
-        name: regencies.name,
-        alt_name: regencies.alt_name,
-        latitude: regencies.latitude,
-        longitude: regencies.longitude,
+        id: mstKabupaten.id,
+        province_id: mstKabupaten.province_id,
+        name: mstKabupaten.name,
+        alt_name: mstKabupaten.alt_name,
+        latitude: mstKabupaten.latitude,
+        longitude: mstKabupaten.longitude,
       })
-      .from(regencies)
-      .where(eq(regencies.province_id, province_id))
-      .orderBy(asc(regencies.name));
+      .from(mstKabupaten)
+      .where(eq(mstKabupaten.province_id, province_id))
+      .orderBy(asc(mstKabupaten.name));
 
     const transformedData = result.map((row) => ({
       id: row.id,
@@ -96,15 +96,15 @@ export class RegencyRepository {
 
     const result = await db
       .select({
-        id: regencies.id,
-        province_id: regencies.province_id,
-        name: regencies.name,
-        alt_name: regencies.alt_name,
-        latitude: regencies.latitude,
-        longitude: regencies.longitude,
+        id: mstKabupaten.id,
+        province_id: mstKabupaten.province_id,
+        name: mstKabupaten.name,
+        alt_name: mstKabupaten.alt_name,
+        latitude: mstKabupaten.latitude,
+        longitude: mstKabupaten.longitude,
       })
-      .from(regencies)
-      .where(eq(regencies.id, id))
+      .from(mstKabupaten)
+      .where(eq(mstKabupaten.id, id))
       .limit(1);
 
     if (result.length === 0) {
@@ -125,7 +125,7 @@ export class RegencyRepository {
   }
 
   async countRegencies(): Promise<number> {
-    const result = await db.select({ count: count() }).from(regencies);
+    const result = await db.select({ count: count() }).from(mstKabupaten);
     return result[0].count;
   }
 
@@ -147,16 +147,16 @@ export class RegencyRepository {
 
     const result = await db
       .select({
-        id: regencies.id,
-        province_id: regencies.province_id,
-        name: regencies.name,
-        alt_name: regencies.alt_name,
-        latitude: regencies.latitude,
-        longitude: regencies.longitude,
+        id: mstKabupaten.id,
+        province_id: mstKabupaten.province_id,
+        name: mstKabupaten.name,
+        alt_name: mstKabupaten.alt_name,
+        latitude: mstKabupaten.latitude,
+        longitude: mstKabupaten.longitude,
       })
-      .from(regencies)
-      .where(ilike(regencies.name, searchPattern))
-      .orderBy(asc(regencies.name));
+      .from(mstKabupaten)
+      .where(ilike(mstKabupaten.name, searchPattern))
+      .orderBy(asc(mstKabupaten.name));
 
     const transformedData = result.map((row) => ({
       id: row.id,

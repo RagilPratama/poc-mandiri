@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { districts } from "../db/schema";
+import { mstKecamatan } from "../db/schema";
 import { asc, count, eq, ilike } from "drizzle-orm";
 import { getCache, setCache } from "../redis";
 import { DistrictResponse } from "../types/district";
@@ -21,15 +21,15 @@ export class DistrictRepository {
 
     const result = await db
       .select({
-        id: districts.id,
-        regency_id: districts.regency_id,
-        name: districts.name,
-        alt_name: districts.alt_name,
-        latitude: districts.latitude,
-        longitude: districts.longitude,
+        id: mstKecamatan.id,
+        regency_id: mstKecamatan.regency_id,
+        name: mstKecamatan.name,
+        alt_name: mstKecamatan.alt_name,
+        latitude: mstKecamatan.latitude,
+        longitude: mstKecamatan.longitude,
       })
-      .from(districts)
-      .orderBy(asc(districts.name));
+      .from(mstKecamatan)
+      .orderBy(asc(mstKecamatan.name));
 
     const transformedData = result.map((row) => ({
       id: row.id,
@@ -58,16 +58,16 @@ export class DistrictRepository {
 
     const result = await db
       .select({
-        id: districts.id,
-        regency_id: districts.regency_id,
-        name: districts.name,
-        alt_name: districts.alt_name,
-        latitude: districts.latitude,
-        longitude: districts.longitude,
+        id: mstKecamatan.id,
+        regency_id: mstKecamatan.regency_id,
+        name: mstKecamatan.name,
+        alt_name: mstKecamatan.alt_name,
+        latitude: mstKecamatan.latitude,
+        longitude: mstKecamatan.longitude,
       })
-      .from(districts)
-      .where(eq(districts.regency_id, regency_id))
-      .orderBy(asc(districts.name));
+      .from(mstKecamatan)
+      .where(eq(mstKecamatan.regency_id, regency_id))
+      .orderBy(asc(mstKecamatan.name));
 
     const transformedData = result.map((row) => ({
       id: row.id,
@@ -96,15 +96,15 @@ export class DistrictRepository {
 
     const result = await db
       .select({
-        id: districts.id,
-        regency_id: districts.regency_id,
-        name: districts.name,
-        alt_name: districts.alt_name,
-        latitude: districts.latitude,
-        longitude: districts.longitude,
+        id: mstKecamatan.id,
+        regency_id: mstKecamatan.regency_id,
+        name: mstKecamatan.name,
+        alt_name: mstKecamatan.alt_name,
+        latitude: mstKecamatan.latitude,
+        longitude: mstKecamatan.longitude,
       })
-      .from(districts)
-      .where(eq(districts.id, id))
+      .from(mstKecamatan)
+      .where(eq(mstKecamatan.id, id))
       .limit(1);
 
     if (result.length === 0) {
@@ -125,7 +125,7 @@ export class DistrictRepository {
   }
 
   async countDistricts(): Promise<number> {
-    const result = await db.select({ count: count() }).from(districts);
+    const result = await db.select({ count: count() }).from(mstKecamatan);
     return result[0].count;
   }
 
@@ -145,16 +145,16 @@ export class DistrictRepository {
 
     const result = await db
       .select({
-        id: districts.id,
-        regency_id: districts.regency_id,
-        name: districts.name,
-        alt_name: districts.alt_name,
-        latitude: districts.latitude,
-        longitude: districts.longitude,
+        id: mstKecamatan.id,
+        regency_id: mstKecamatan.regency_id,
+        name: mstKecamatan.name,
+        alt_name: mstKecamatan.alt_name,
+        latitude: mstKecamatan.latitude,
+        longitude: mstKecamatan.longitude,
       })
-      .from(districts)
-      .where(ilike(districts.name, searchPattern))
-      .orderBy(asc(districts.name));
+      .from(mstKecamatan)
+      .where(ilike(mstKecamatan.name, searchPattern))
+      .orderBy(asc(mstKecamatan.name));
 
     const transformedData = result.map((row) => ({
       id: row.id,
