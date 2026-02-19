@@ -29,3 +29,4 @@ export * from "./trx_produksi_hasil_tangkapan";
 export * from "./trx_bantuan";
 export * from "./trx_pelatihan";
 export * from "./trx_sertifikasi";
+export * from "./trx_log_aktivitas";

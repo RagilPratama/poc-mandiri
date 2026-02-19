@@ -64,6 +64,13 @@
       "when": 1771483612870,
       "tag": "0008_abandoned_shriek",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1771485975104,
+      "tag": "0009_crazy_leech",
+      "breakpoints": true
     }
   ]
 }

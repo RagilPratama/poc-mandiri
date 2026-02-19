@@ -28,7 +28,8 @@ import {
   produksiHasilTangkapanRoute,
   bantuanRoute,
   pelatihanRoute,
-  sertifikasiRoute
+  sertifikasiRoute,
+  logAktivitasRoute
 } from "./routes";
 const port = process.env.PORT || 3000;
 await connectRedis();
@@ -160,6 +161,7 @@ const app = new Elysia()
   .use(bantuanRoute)
   .use(pelatihanRoute)
   .use(sertifikasiRoute)
+  .use(logAktivitasRoute)
   .listen(port);
   console.log(
     `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`

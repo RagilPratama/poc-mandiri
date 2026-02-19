@@ -5,7 +5,7 @@ import { successResponse, successResponseWithPagination } from '../utils/respons
 const komoditasRepo = new KomoditasRepository();
 
 export const komoditasHandler = {
-  async getAll({ query }: Context<{ query: any }>) {
+  async getAll({ query }: Context<{ query: { page?: number; limit?: number; search?: string; kategori?: string } }>) {
     try {
       const result = await komoditasRepo.findAll(query);
       return successResponseWithPagination(
@@ -19,14 +19,9 @@ export const komoditasHandler = {
     }
   },
 
-  async getById({ params }: Context<{ params: { id: string } }>) {
+  async getById({ params }: Context<{ params: { id: number } }>) {
     try {
-      const id = parseInt(params.id);
-      if (isNaN(id)) {
-        return {
-          message: 'ID tidak valid',
-        };
-      }
+      const id = params.id;
 
       const komoditas = await komoditasRepo.findById(id);
       if (!komoditas) {
@@ -59,14 +54,9 @@ export const komoditasHandler = {
     }
   },
 
-  async update({ params, body }: Context<{ params: { id: string }; body: any }>) {
+  async update({ params, body }: Context<{ params: { id: number }; body: any }>) {
     try {
-      const id = parseInt(params.id);
-      if (isNaN(id)) {
-        return {
-          message: 'ID tidak valid',
-        };
-      }
+      const id = params.id;
 
       const existing = await komoditasRepo.findById(id);
       if (!existing) {
@@ -83,14 +73,9 @@ export const komoditasHandler = {
     }
   },
 
-  async delete({ params }: Context<{ params: { id: string } }>) {
+  async delete({ params }: Context<{ params: { id: number } }>) {
     try {
-      const id = parseInt(params.id);
-      if (isNaN(id)) {
-        return {
-          message: 'ID tidak valid',
-        };
-      }
+      const id = params.id;
 
       const existing = await komoditasRepo.findById(id);
       if (!existing) {

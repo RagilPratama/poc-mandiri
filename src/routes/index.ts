@@ -26,3 +26,4 @@ export { produksiHasilTangkapanRoute } from "./produksi-hasil-tangkapan.route";
 export { bantuanRoute } from "./bantuan.route";
 export { pelatihanRoute } from "./pelatihan.route";
 export { sertifikasiRoute } from "./sertifikasi.route";
+export { logAktivitasRoute } from "./log-aktivitas.route";

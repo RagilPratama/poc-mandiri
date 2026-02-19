@@ -27,10 +27,12 @@ export const komoditasRoute = new Elysia({ prefix: '/komoditas' })
   })
   .post('/', komoditasHandler.create, {
     body: t.Object({
+      kode_komoditas: t.String(),
       nama_komoditas: t.String(),
       kategori: t.String(),
+      satuan: t.String(),
       nama_ilmiah: t.Optional(t.String()),
-      deskripsi: t.Optional(t.String()),
+      keterangan: t.Optional(t.String()),
     }),
     detail: {
       tags: ['Komoditas'],
@@ -43,10 +45,12 @@ export const komoditasRoute = new Elysia({ prefix: '/komoditas' })
       id: t.Numeric()
     }),
     body: t.Object({
+      kode_komoditas: t.Optional(t.String()),
       nama_komoditas: t.Optional(t.String()),
       kategori: t.Optional(t.String()),
+      satuan: t.Optional(t.String()),
       nama_ilmiah: t.Optional(t.String()),
-      deskripsi: t.Optional(t.String()),
+      keterangan: t.Optional(t.String()),
     }),
     detail: {
       tags: ['Komoditas'],
