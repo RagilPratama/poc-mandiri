@@ -1,6 +1,7 @@
 import { Context } from 'elysia';
 import { PegawaiRepository } from '../repositories/pegawai.repository';
 import { successResponse, successResponseWithPagination } from '../utils/response';
+import { logActivitySimple } from '../utils/activity-logger';
 import type { CreatePegawaiType, UpdatePegawaiType, PegawaiQueryType } from '../types/pegawai';
 
 const pegawaiRepo = new PegawaiRepository();
@@ -61,7 +62,7 @@ export const pegawaiHandler = {
     }
   },
 
-  async create({ body }: Context<{ body: CreatePegawaiType }>) {
+  async create({ body, headers, request, path }: Context<{ body: CreatePegawaiType }>) {
     try {
       // Check if NIP already exists
       const existingNip = await pegawaiRepo.findByNip(body.nip);
@@ -80,14 +81,33 @@ export const pegawaiHandler = {
       }
 
       const pegawai = await pegawaiRepo.create(body);
+
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'CREATE',
+        modul: 'PEGAWAI',
+        deskripsi: `Membuat pegawai baru: ${body.nama} (${body.nip})`,
+        data_baru: pegawai,
+      });
+
       return successResponse('Pegawai berhasil ditambahkan', pegawai);
     } catch (error) {
       console.error('Error creating pegawai:', error);
+      
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'CREATE',
+        modul: 'PEGAWAI',
+        deskripsi: `Gagal membuat pegawai: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        status: 'ERROR',
+        error_message: error instanceof Error ? error.message : 'Unknown error',
+      });
+      
       throw new Error('Gagal menambahkan pegawai');
     }
   },
 
-  async update({ params, body }: Context<{ params: { id: string }; body: UpdatePegawaiType }>) {
+  async update({ params, body, headers, request, path }: Context<{ params: { id: string }; body: UpdatePegawaiType }>) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {
@@ -124,14 +144,34 @@ export const pegawaiHandler = {
       }
 
       const pegawai = await pegawaiRepo.update(id, body);
+
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'UPDATE',
+        modul: 'PEGAWAI',
+        deskripsi: `Mengupdate pegawai: ${existing.nama} (${existing.nip})`,
+        data_lama: existing,
+        data_baru: pegawai,
+      });
+
       return successResponse('Pegawai berhasil diupdate', pegawai);
     } catch (error) {
       console.error('Error updating pegawai:', error);
+      
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'UPDATE',
+        modul: 'PEGAWAI',
+        deskripsi: `Gagal mengupdate pegawai: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        status: 'ERROR',
+        error_message: error instanceof Error ? error.message : 'Unknown error',
+      });
+      
       throw new Error('Gagal mengupdate pegawai');
     }
   },
 
-  async delete({ params }: Context<{ params: { id: string } }>) {
+  async delete({ params, headers, request, path }: Context<{ params: { id: string } }>) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {
@@ -148,9 +188,28 @@ export const pegawaiHandler = {
       }
 
       await pegawaiRepo.delete(id);
+
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'DELETE',
+        modul: 'PEGAWAI',
+        deskripsi: `Menghapus pegawai: ${existing.nama} (${existing.nip})`,
+        data_lama: existing,
+      });
+
       return successResponse('Pegawai berhasil dihapus');
     } catch (error) {
       console.error('Error deleting pegawai:', error);
+      
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'DELETE',
+        modul: 'PEGAWAI',
+        deskripsi: `Gagal menghapus pegawai: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        status: 'ERROR',
+        error_message: error instanceof Error ? error.message : 'Unknown error',
+      });
+      
       throw new Error('Gagal menghapus pegawai');
     }
   },

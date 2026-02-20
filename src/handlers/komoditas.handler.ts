@@ -40,17 +40,14 @@ export const komoditasHandler = {
 
   async create({ body, headers, request, path }: Context<{ body: any }>) {
     try {
-      // Validate required fields
       if (!body.kode_komoditas || !body.nama_komoditas || !body.kategori || !body.satuan) {
         return {
           message: 'Kode komoditas, nama komoditas, kategori, dan satuan wajib diisi',
         };
       }
 
-      // Create komoditas
       const komoditas = await komoditasRepo.create(body);
 
-      // Log activity - SUCCESS (simplified)
       await logActivitySimple({
         context: { headers, request, path },
         aktivitas: 'CREATE',
@@ -62,8 +59,6 @@ export const komoditasHandler = {
       return successResponse('Komoditas berhasil ditambahkan', komoditas);
     } catch (error) {
       console.error('Error creating komoditas:', error);
-      
-      // Log activity - ERROR (simplified)
       await logActivitySimple({
         context: { headers, request, path },
         aktivitas: 'CREATE',
@@ -81,7 +76,6 @@ export const komoditasHandler = {
     try {
       const id = params.id;
 
-      // Get old data untuk tracking
       const oldData = await komoditasRepo.findById(id);
       if (!oldData) {
         return {
@@ -89,10 +83,8 @@ export const komoditasHandler = {
         };
       }
 
-      // Update komoditas
       const newData = await komoditasRepo.update(id, body);
 
-      // Log activity - SUCCESS (simplified)
       await logActivitySimple({
         context: { headers, request, path },
         aktivitas: 'UPDATE',
@@ -106,7 +98,6 @@ export const komoditasHandler = {
     } catch (error) {
       console.error('Error updating komoditas:', error);
       
-      // Log activity - ERROR (simplified)
       await logActivitySimple({
         context: { headers, request, path },
         aktivitas: 'UPDATE',
@@ -124,7 +115,6 @@ export const komoditasHandler = {
     try {
       const id = params.id;
 
-      // Get data yang akan dihapus untuk tracking
       const dataToDelete = await komoditasRepo.findById(id);
       if (!dataToDelete) {
         return {
@@ -132,10 +122,8 @@ export const komoditasHandler = {
         };
       }
 
-      // Delete komoditas
       await komoditasRepo.delete(id);
 
-      // Log activity - SUCCESS (simplified)
       await logActivitySimple({
         context: { headers, request, path },
         aktivitas: 'DELETE',
@@ -148,7 +136,6 @@ export const komoditasHandler = {
     } catch (error) {
       console.error('Error deleting komoditas:', error);
       
-      // Log activity - ERROR (simplified)
       await logActivitySimple({
         context: { headers, request, path },
         aktivitas: 'DELETE',
