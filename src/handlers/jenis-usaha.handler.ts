@@ -46,9 +46,9 @@ export const jenisUsahaHandler = {
   async create({ body, headers, request, path }: Context<{ body: any }>) {
     try {
       // Validate required fields
-      if (!body.nama_jenis_usaha || !body.kategori) {
+      if (!body.kode_jenis_usaha || !body.nama_jenis_usaha || !body.kategori) {
         return {
-          message: 'Nama jenis usaha dan kategori wajib diisi',
+          message: 'Kode jenis usaha, nama jenis usaha, dan kategori wajib diisi',
         };
       }
 
@@ -58,7 +58,7 @@ export const jenisUsahaHandler = {
         context: { headers, request, path },
         aktivitas: 'CREATE',
         modul: 'JENIS_USAHA',
-        deskripsi: `Membuat jenis usaha baru: ${body.nama_jenis_usaha}`,
+        deskripsi: `Membuat jenis usaha baru: ${body.nama_jenis_usaha} (${body.kode_jenis_usaha})`,
         data_baru: jenisUsaha,
       });
 
@@ -101,7 +101,7 @@ export const jenisUsahaHandler = {
         context: { headers, request, path },
         aktivitas: 'UPDATE',
         modul: 'JENIS_USAHA',
-        deskripsi: `Mengupdate jenis usaha: ${existing.nama_jenis_usaha}`,
+        deskripsi: `Mengupdate jenis usaha: ${existing.nama_jenis_usaha} (${existing.kode_jenis_usaha})`,
         data_lama: existing,
         data_baru: jenisUsaha,
       });
@@ -145,7 +145,7 @@ export const jenisUsahaHandler = {
         context: { headers, request, path },
         aktivitas: 'DELETE',
         modul: 'JENIS_USAHA',
-        deskripsi: `Menghapus jenis usaha: ${existing.nama_jenis_usaha}`,
+        deskripsi: `Menghapus jenis usaha: ${existing.nama_jenis_usaha} (${existing.kode_jenis_usaha})`,
         data_lama: existing,
       });
 

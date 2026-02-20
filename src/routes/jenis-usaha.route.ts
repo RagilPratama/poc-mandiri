@@ -27,9 +27,10 @@ export const jenisUsahaRoute = new Elysia({ prefix: '/jenis-usaha' })
   })
   .post('/', jenisUsahaHandler.create, {
     body: t.Object({
+      kode_jenis_usaha: t.String(),
       nama_jenis_usaha: t.String(),
       kategori: t.String(),
-      deskripsi: t.Optional(t.String()),
+      keterangan: t.Optional(t.String()),
     }),
     detail: {
       tags: ['Jenis Usaha'],
@@ -42,9 +43,10 @@ export const jenisUsahaRoute = new Elysia({ prefix: '/jenis-usaha' })
       id: t.Numeric()
     }),
     body: t.Object({
+      kode_jenis_usaha: t.Optional(t.String()),
       nama_jenis_usaha: t.Optional(t.String()),
       kategori: t.Optional(t.String()),
-      deskripsi: t.Optional(t.String()),
+      keterangan: t.Optional(t.String()),
     }),
     detail: {
       tags: ['Jenis Usaha'],
