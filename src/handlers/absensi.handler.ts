@@ -206,7 +206,7 @@ export const absensiHandler = {
     }
   },
 
-  async update({ params, body }: any) {
+  async update({ params, body, headers, request, path }: any) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {
@@ -223,14 +223,34 @@ export const absensiHandler = {
       }
 
       const absensi = await absensiRepo.update(id, body);
+
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'UPDATE',
+        modul: 'ABSENSI',
+        deskripsi: `Mengupdate absensi pegawai ${existing.nip} pada ${existing.date}`,
+        data_lama: existing,
+        data_baru: absensi,
+      });
+
       return successResponse('Data absensi berhasil diupdate', absensi);
     } catch (error) {
       console.error('Error updating absensi:', error);
+      
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'UPDATE',
+        modul: 'ABSENSI',
+        deskripsi: `Gagal mengupdate absensi: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        status: 'ERROR',
+        error_message: error instanceof Error ? error.message : 'Unknown error',
+      });
+      
       throw new Error('Gagal mengupdate data absensi');
     }
   },
 
-  async delete({ params }: any) {
+  async delete({ params, headers, request, path }: any) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {
@@ -247,9 +267,28 @@ export const absensiHandler = {
       }
 
       await absensiRepo.delete(id);
+
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'DELETE',
+        modul: 'ABSENSI',
+        deskripsi: `Menghapus absensi pegawai ${existing.nip} pada ${existing.date}`,
+        data_lama: existing,
+      });
+
       return successResponse('Data absensi berhasil dihapus');
     } catch (error) {
       console.error('Error deleting absensi:', error);
+      
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'DELETE',
+        modul: 'ABSENSI',
+        deskripsi: `Gagal menghapus absensi: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        status: 'ERROR',
+        error_message: error instanceof Error ? error.message : 'Unknown error',
+      });
+      
       throw new Error('Gagal menghapus data absensi');
     }
   },
