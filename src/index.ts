@@ -29,7 +29,10 @@ import {
   bantuanRoute,
   pelatihanRoute,
   sertifikasiRoute,
-  logAktivitasRoute
+  logAktivitasRoute,
+  kegiatanHarianRoute,
+  kegiatanPrioritasRoute,
+  kegiatanGabunganRoute
 } from "./routes";
 const port = process.env.PORT || 3000;
 await connectRedis();
@@ -115,6 +118,9 @@ const app = new Elysia()
         { name: "Bantuan", description: "Bantuan transactions" },
         { name: "Pelatihan", description: "Pelatihan transactions" },
         { name: "Sertifikasi", description: "Sertifikasi transactions" },
+        { name: "Kegiatan Harian", description: "Kegiatan Harian daily activities" },
+        { name: "Kegiatan Prioritas", description: "Kegiatan Prioritas priority activities" },
+        { name: "Kegiatan Gabungan", description: "Combined Kegiatan Harian and Prioritas" },
       ],
       components: {
         securitySchemes: {
@@ -162,6 +168,9 @@ const app = new Elysia()
   .use(pelatihanRoute)
   .use(sertifikasiRoute)
   .use(logAktivitasRoute)
+  .use(kegiatanHarianRoute)
+  .use(kegiatanPrioritasRoute)
+  .use(kegiatanGabunganRoute)
   .listen(port);
   console.log(
     `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`

@@ -27,3 +27,6 @@ export { bantuanRoute } from "./bantuan.route";
 export { pelatihanRoute } from "./pelatihan.route";
 export { sertifikasiRoute } from "./sertifikasi.route";
 export { logAktivitasRoute } from "./log-aktivitas.route";
+export { kegiatanHarianRoute } from "./kegiatan-harian.route";
+export { kegiatanPrioritasRoute } from "./kegiatan-prioritas.route";
+export { kegiatanGabunganRoute } from "./kegiatan-gabungan.route";

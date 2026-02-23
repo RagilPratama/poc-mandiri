@@ -30,3 +30,5 @@ export * from "./trx_bantuan";
 export * from "./trx_pelatihan";
 export * from "./trx_sertifikasi";
 export * from "./trx_log_aktivitas";
+export * from "./trx_kegiatan_harian";
+export * from "./trx_kegiatan_prioritas";
