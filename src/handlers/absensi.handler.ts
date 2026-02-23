@@ -4,6 +4,7 @@ import { trxAbsensi } from '../db/schema';
 import { AbsensiRepository } from '../repositories/absensi.repository';
 import { uploadImage } from '../utils/imagekit';
 import { successResponse, successResponseWithPagination } from '../utils/response';
+import { logActivitySimple } from '../utils/activity-logger';
 import type { CreateAbsensiType, CheckoutAbsensiType, UpdateAbsensiType, AbsensiQueryType } from '../types/absensi';
 
 const absensiRepo = new AbsensiRepository();
@@ -46,7 +47,7 @@ export const absensiHandler = {
     }
   },
 
-  async checkin({ body }: any) {
+  async checkin({ body, headers, request, path }: any) {
     try {
       // Check if already checked in today
       const existing = await absensiRepo.findByNipAndDate(body.nip, body.date);
@@ -89,17 +90,35 @@ export const absensiHandler = {
         hour12: false 
       });
 
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'CREATE',
+        modul: 'ABSENSI',
+        deskripsi: `Check-in pegawai ${body.nip} pada ${body.date} jam ${checkinTime}`,
+        data_baru: absensi,
+      });
+
       return successResponse('Check-in berhasil', {
         ...absensi,
         checkin_time: checkinTime,
       });
     } catch (error) {
       console.error('Error check-in:', error);
+      
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'CREATE',
+        modul: 'ABSENSI',
+        deskripsi: `Gagal check-in: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        status: 'ERROR',
+        error_message: error instanceof Error ? error.message : 'Unknown error',
+      });
+      
       throw new Error('Gagal melakukan check-in');
     }
   },
 
-  async checkout({ params, body }: any) {
+  async checkout({ params, body, headers, request, path }: any) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {
@@ -155,6 +174,15 @@ export const absensiHandler = {
         overtimeFormatted = `${overtimeHours} jam ${overtimeMinutes} menit`;
       }
 
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'UPDATE',
+        modul: 'ABSENSI',
+        deskripsi: `Check-out pegawai ${existing.nip} pada ${existing.date} jam ${checkoutTime}`,
+        data_lama: existing,
+        data_baru: absensi,
+      });
+
       return successResponse('Check-out berhasil', {
         ...absensi,
         checkin_time: checkinTime,
@@ -164,6 +192,16 @@ export const absensiHandler = {
       });
     } catch (error) {
       console.error('Error check-out:', error);
+      
+      await logActivitySimple({
+        context: { headers, request, path },
+        aktivitas: 'UPDATE',
+        modul: 'ABSENSI',
+        deskripsi: `Gagal check-out: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        status: 'ERROR',
+        error_message: error instanceof Error ? error.message : 'Unknown error',
+      });
+      
       throw new Error('Gagal melakukan check-out');
     }
   },
