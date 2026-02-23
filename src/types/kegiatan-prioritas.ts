@@ -6,7 +6,7 @@ export interface CreateKegiatanPrioritasType {
   iki?: string;
   rencana_kerja?: string;
   detail_keterangan?: string;
-  foto_kegiatan?: string[];
+  foto_kegiatan?: any[]; // File[] or string[]
 }
 
 export interface UpdateKegiatanPrioritasType {
@@ -17,7 +17,7 @@ export interface UpdateKegiatanPrioritasType {
   iki?: string;
   rencana_kerja?: string;
   detail_keterangan?: string;
-  foto_kegiatan?: string[];
+  foto_kegiatan?: any[]; // File[] or string[]
   is_active?: boolean;
 }
 

@@ -50,12 +50,12 @@ export const kegiatanPrioritasRoute = new Elysia({ prefix: '/kegiatan-prioritas'
       iki: t.Optional(t.String()),
       rencana_kerja: t.Optional(t.String({ maxLength: 1000 })),
       detail_keterangan: t.Optional(t.String()),
-      foto_kegiatan: t.Optional(t.Array(t.String(), { maxItems: 5 })),
+      foto_kegiatan: t.Optional(t.Files({ maxItems: 5 })),
     }),
     detail: {
       tags: ['Kegiatan Prioritas'],
       summary: 'Create new kegiatan prioritas',
-      description: 'Create a new kegiatan prioritas record',
+      description: 'Create a new kegiatan prioritas record with photo upload support (max 5 photos)',
     },
   })
   .put('/:id', kegiatanPrioritasHandler.update, {
@@ -70,13 +70,13 @@ export const kegiatanPrioritasRoute = new Elysia({ prefix: '/kegiatan-prioritas'
       iki: t.Optional(t.String()),
       rencana_kerja: t.Optional(t.String({ maxLength: 1000 })),
       detail_keterangan: t.Optional(t.String()),
-      foto_kegiatan: t.Optional(t.Array(t.String(), { maxItems: 5 })),
+      foto_kegiatan: t.Optional(t.Files({ maxItems: 5 })),
       is_active: t.Optional(t.Boolean()),
     }),
     detail: {
       tags: ['Kegiatan Prioritas'],
       summary: 'Update kegiatan prioritas',
-      description: 'Update kegiatan prioritas by ID',
+      description: 'Update kegiatan prioritas by ID with photo upload support',
     },
   })
   .delete('/:id', kegiatanPrioritasHandler.delete, {

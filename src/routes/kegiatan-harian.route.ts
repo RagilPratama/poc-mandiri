@@ -50,12 +50,12 @@ export const kegiatanHarianRoute = new Elysia({ prefix: '/kegiatan-harian' })
       iki: t.Optional(t.String()),
       rencana_kerja: t.Optional(t.String({ maxLength: 1000 })),
       detail_keterangan: t.Optional(t.String()),
-      foto_kegiatan: t.Optional(t.Array(t.String(), { maxItems: 5 })),
+      foto_kegiatan: t.Optional(t.Files({ maxItems: 5 })),
     }),
     detail: {
       tags: ['Kegiatan Harian'],
       summary: 'Create new kegiatan harian',
-      description: 'Create a new kegiatan harian record',
+      description: 'Create a new kegiatan harian record with photo upload support (max 5 photos)',
     },
   })
   .put('/:id', kegiatanHarianHandler.update, {
@@ -70,13 +70,13 @@ export const kegiatanHarianRoute = new Elysia({ prefix: '/kegiatan-harian' })
       iki: t.Optional(t.String()),
       rencana_kerja: t.Optional(t.String({ maxLength: 1000 })),
       detail_keterangan: t.Optional(t.String()),
-      foto_kegiatan: t.Optional(t.Array(t.String(), { maxItems: 5 })),
+      foto_kegiatan: t.Optional(t.Files({ maxItems: 5 })),
       is_active: t.Optional(t.Boolean()),
     }),
     detail: {
       tags: ['Kegiatan Harian'],
       summary: 'Update kegiatan harian',
-      description: 'Update kegiatan harian by ID',
+      description: 'Update kegiatan harian by ID with photo upload support',
     },
   })
   .delete('/:id', kegiatanHarianHandler.delete, {

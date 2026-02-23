@@ -2,6 +2,7 @@ import { Context } from 'elysia';
 import { KegiatanPrioritasRepository } from '../repositories/kegiatan-prioritas.repository';
 import { successResponse, successResponseWithPagination } from '../utils/response';
 import { logActivitySimple } from '../utils/activity-logger';
+import { uploadImage } from '../utils/imagekit';
 import type { CreateKegiatanPrioritasType, UpdateKegiatanPrioritasType, KegiatanPrioritasQueryType } from '../types/kegiatan-prioritas';
 
 const kegiatanPrioritasRepo = new KegiatanPrioritasRepository();
@@ -62,14 +63,39 @@ export const kegiatanPrioritasHandler = {
         };
       }
 
-      // Validate max 5 photos
-      if (body.foto_kegiatan && body.foto_kegiatan.length > 5) {
-        return {
-          message: 'Maksimal 5 foto kegiatan',
-        };
+      // Handle photo uploads
+      let photoUrls: string[] = [];
+      if (body.foto_kegiatan && Array.isArray(body.foto_kegiatan)) {
+        // Validate max 5 photos
+        if (body.foto_kegiatan.length > 5) {
+          return {
+            message: 'Maksimal 5 foto kegiatan',
+          };
+        }
+
+        // Upload each photo to ImageKit
+        for (let i = 0; i < body.foto_kegiatan.length; i++) {
+          const photoFile = body.foto_kegiatan[i];
+          
+          // Check if it's a File object
+          if (photoFile && typeof photoFile === 'object' && 'arrayBuffer' in photoFile) {
+            const photoBuffer = Buffer.from(await photoFile.arrayBuffer());
+            const fileName = `kegiatan_harian_${body.pegawai_id}_${body.tanggal}_${Date.now()}_${i + 1}.jpg`;
+            const folder = `/kegiatan-prioritas/${body.pegawai_id}/${body.tanggal}`;
+
+            const uploadResult = await uploadImage(photoBuffer, fileName, folder);
+            photoUrls.push(uploadResult.url);
+          }
+        }
       }
 
-      const kegiatan = await kegiatanPrioritasRepo.create(body);
+      // Create kegiatan with uploaded photo URLs
+      const kegiatanData = {
+        ...body,
+        foto_kegiatan: photoUrls.length > 0 ? photoUrls : undefined,
+      };
+
+      const kegiatan = await kegiatanPrioritasRepo.create(kegiatanData);
 
       await logActivitySimple({
         context: { headers, request, path },
@@ -112,14 +138,44 @@ export const kegiatanPrioritasHandler = {
         };
       }
 
-      // Validate max 5 photos
-      if (body.foto_kegiatan && body.foto_kegiatan.length > 5) {
-        return {
-          message: 'Maksimal 5 foto kegiatan',
-        };
+      // Handle photo uploads if provided
+      let photoUrls: string[] | undefined = undefined;
+      if (body.foto_kegiatan && Array.isArray(body.foto_kegiatan)) {
+        // Validate max 5 photos
+        if (body.foto_kegiatan.length > 5) {
+          return {
+            message: 'Maksimal 5 foto kegiatan',
+          };
+        }
+
+        photoUrls = [];
+        // Upload each photo to ImageKit
+        for (let i = 0; i < body.foto_kegiatan.length; i++) {
+          const photoFile = body.foto_kegiatan[i];
+          
+          // Check if it's a File object (new upload) or string (existing URL)
+          if (typeof photoFile === 'string') {
+            // Keep existing URL
+            photoUrls.push(photoFile);
+          } else if (photoFile && typeof photoFile === 'object' && 'arrayBuffer' in photoFile) {
+            // Upload new photo
+            const photoBuffer = Buffer.from(await photoFile.arrayBuffer());
+            const fileName = `kegiatan_harian_${existing.pegawai_id}_${existing.tanggal}_${Date.now()}_${i + 1}.jpg`;
+            const folder = `/kegiatan-prioritas/${existing.pegawai_id}/${existing.tanggal}`;
+
+            const uploadResult = await uploadImage(photoBuffer, fileName, folder);
+            photoUrls.push(uploadResult.url);
+          }
+        }
       }
 
-      const kegiatan = await kegiatanPrioritasRepo.update(params.id, body);
+      // Update kegiatan with uploaded photo URLs
+      const updateData = {
+        ...body,
+        foto_kegiatan: photoUrls !== undefined ? photoUrls : body.foto_kegiatan,
+      };
+
+      const kegiatan = await kegiatanPrioritasRepo.update(params.id, updateData);
 
       await logActivitySimple({
         context: { headers, request, path },
