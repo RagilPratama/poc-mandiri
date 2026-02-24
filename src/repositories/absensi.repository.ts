@@ -1,6 +1,7 @@
 import { eq, and, gte, lte, sql, desc, or, ilike } from 'drizzle-orm';
 import { db } from '../db';
-import { trxAbsensi, mstPegawai } from '../db/schema';
+import { trxAbsensi, mstPegawai, mstKabupaten } from '../db/schema';
+import { findNearestKabupaten } from '../utils/reverse-geocoding';
 import type { CreateAbsensiType, CheckoutAbsensiType, UpdateAbsensiType, AbsensiQueryType } from '../types/absensi';
 
 export class AbsensiRepository {
@@ -64,11 +65,33 @@ export class AbsensiRepository {
         .where(whereClause),
     ]);
 
+    // Add lokasi_checkin (kabupaten name) for each record
+    const dataWithLokasi = await Promise.all(
+      data.map(async (record) => {
+        const nearest = await findNearestKabupaten(
+          parseFloat(record.ci_latitude as any),
+          parseFloat(record.ci_longitude as any)
+        );
+        const nearestCheckout = record.co_latitude && record.co_longitude
+          ? await findNearestKabupaten(
+              parseFloat(record.co_latitude as any),
+              parseFloat(record.co_longitude as any)
+            )
+          : null;
+        
+        return {
+          ...record,
+          lokasi_checkin: nearest?.name || null,
+          lokasi_checkout: nearestCheckout?.name || null,
+        };
+      })
+    );
+
     const total = countResult[0]?.count || 0;
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data,
+      data: dataWithLokasi,
       pagination: {
         page,
         limit,
@@ -105,7 +128,26 @@ export class AbsensiRepository {
       .where(eq(trxAbsensi.id, id))
       .limit(1);
 
-    return result[0] || null;
+    if (!result[0]) return null;
+
+    const record = result[0];
+    const nearest = await findNearestKabupaten(
+      parseFloat(record.ci_latitude as any),
+      parseFloat(record.ci_longitude as any)
+    );
+
+    const nearestCheckout = record.co_latitude && record.co_longitude
+      ? await findNearestKabupaten(
+          parseFloat(record.co_latitude as any),
+          parseFloat(record.co_longitude as any)
+        )
+      : null;
+
+    return {
+      ...record,
+      lokasi_checkin: nearest?.name || null,
+      lokasi_checkout: nearestCheckout?.name || null,
+    };
   }
 
   async findByNipAndDate(nip: string, date: string) {
