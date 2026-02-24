@@ -13,6 +13,8 @@ export { penyuluhRoute as penyuluhRoutes } from "./penyuluh.route";
 export { absensiRoute as absensiRoutes } from "./absensi.route";
 
 // New master table routes
+export { ikuRoute } from "./iku.route";
+export { ikiRoute } from "./iki.route";
 export { jenisUsahaRoute } from "./jenis-usaha.route";
 export { komoditasRoute } from "./komoditas.route";
 export { alatTangkapRoute } from "./alat-tangkap.route";

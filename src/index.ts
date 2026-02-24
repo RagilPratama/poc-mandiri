@@ -18,6 +18,8 @@ import {
   kelompokNelayanRoutes, 
   penyuluhRoutes, 
   absensiRoutes,
+  ikuRoute,
+  ikiRoute,
   jenisUsahaRoute,
   komoditasRoute,
   alatTangkapRoute,
@@ -107,6 +109,8 @@ const app = new Elysia()
         { name: "Kelompok Nelayan", description: "Kelompok Nelayan management" },
         { name: "Penyuluh", description: "Penyuluh management" },
         { name: "Absensi", description: "Absensi management" },
+        { name: "IKU", description: "Indikator Kinerja Utama master data" },
+        { name: "IKI", description: "Indikator Kinerja Individu master data" },
         { name: "Jenis Usaha", description: "Jenis Usaha master data" },
         { name: "Komoditas", description: "Komoditas master data" },
         { name: "Alat Tangkap", description: "Alat Tangkap master data" },
@@ -154,6 +158,8 @@ const app = new Elysia()
   .use(absensiRoutes)
   
   // New master table routes
+  .use(ikuRoute)
+  .use(ikiRoute)
   .use(jenisUsahaRoute)
   .use(komoditasRoute)
   .use(alatTangkapRoute)

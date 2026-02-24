@@ -47,7 +47,7 @@ export const kegiatanPrioritasRoute = new Elysia({ prefix: '/kegiatan-prioritas'
       kelompok_nelayan_id: t.Optional(t.Numeric()),
       tanggal: t.String(), // YYYY-MM-DD
       lokasi_kegiatan: t.Optional(t.String()),
-      iki: t.Optional(t.String()),
+      iki_id: t.Optional(t.Numeric()),
       rencana_kerja: t.Optional(t.String({ maxLength: 1000 })),
       detail_keterangan: t.Optional(t.String()),
       foto_kegiatan: t.Optional(t.Files({ maxItems: 5 })),
@@ -67,7 +67,7 @@ export const kegiatanPrioritasRoute = new Elysia({ prefix: '/kegiatan-prioritas'
       kelompok_nelayan_id: t.Optional(t.Numeric()),
       tanggal: t.Optional(t.String()),
       lokasi_kegiatan: t.Optional(t.String()),
-      iki: t.Optional(t.String()),
+      iki_id: t.Optional(t.Numeric()),
       rencana_kerja: t.Optional(t.String({ maxLength: 1000 })),
       detail_keterangan: t.Optional(t.String()),
       foto_kegiatan: t.Optional(t.Files({ maxItems: 5 })),

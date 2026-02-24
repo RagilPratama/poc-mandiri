@@ -1,6 +1,7 @@
 import { pgTable, serial, varchar, text, date, timestamp, integer, boolean, json, index } from 'drizzle-orm/pg-core';
 import { mstPegawai } from './mst_pegawai';
 import { mstKelompokNelayan } from './mst_kelompok_nelayan';
+import { mstIki } from './mst_iki';
 
 export const trxKegiatanPrioritas = pgTable('trx_kegiatan_prioritas', {
   id: serial('id').primaryKey(),
@@ -8,7 +9,7 @@ export const trxKegiatanPrioritas = pgTable('trx_kegiatan_prioritas', {
   kelompok_nelayan_id: integer('kelompok_nelayan_id').references(() => mstKelompokNelayan.id),
   tanggal: date('tanggal').notNull(),
   lokasi_kegiatan: varchar('lokasi_kegiatan', { length: 255 }),
-  iki: varchar('iki', { length: 255 }), // IKI (Indikator Kinerja Individu)
+  iki_id: integer('iki_id').references(() => mstIki.id), // FK ke mst_iki
   rencana_kerja: text('rencana_kerja'), // max 1000 chars
   detail_keterangan: text('detail_keterangan'),
   foto_kegiatan: json('foto_kegiatan').$type<string[]>(), // Array of photo URLs (max 5)

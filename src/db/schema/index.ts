@@ -16,6 +16,8 @@ export * from "./mst_kelompok_nelayan";
 export * from "./trx_absensi";
 
 // New Master Tables
+export * from "./mst_iku";
+export * from "./mst_iki";
 export * from "./mst_jenis_usaha";
 export * from "./mst_komoditas";
 export * from "./mst_alat_tangkap";

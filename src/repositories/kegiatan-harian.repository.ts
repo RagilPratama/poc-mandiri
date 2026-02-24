@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { trxKegiatanHarian, mstPegawai, mstKelompokNelayan } from '../db/schema';
+import { trxKegiatanHarian, mstPegawai, mstKelompokNelayan, mstIki, mstIku } from '../db/schema';
 import { eq, and, gte, lte, like, sql, desc, or } from 'drizzle-orm';
 import type { CreateKegiatanHarianType, UpdateKegiatanHarianType, KegiatanHarianQueryType } from '../types/kegiatan-harian';
 
@@ -64,7 +64,12 @@ export class KegiatanHarianRepository {
         kelompok_nelayan_nama: mstKelompokNelayan.nama_kelompok,
         tanggal: trxKegiatanHarian.tanggal,
         lokasi_kegiatan: trxKegiatanHarian.lokasi_kegiatan,
-        iki: trxKegiatanHarian.iki,
+        iki_id: trxKegiatanHarian.iki_id,
+        iki_kode: mstIki.kode_iki,
+        iki_nama: mstIki.nama_iki,
+        iku_id: mstIki.iku_id,
+        iku_kode: mstIku.kode_iku,
+        iku_nama: mstIku.nama_iku,
         rencana_kerja: trxKegiatanHarian.rencana_kerja,
         detail_keterangan: trxKegiatanHarian.detail_keterangan,
         foto_kegiatan: trxKegiatanHarian.foto_kegiatan,
@@ -75,6 +80,8 @@ export class KegiatanHarianRepository {
       .from(trxKegiatanHarian)
       .leftJoin(mstPegawai, eq(trxKegiatanHarian.pegawai_id, mstPegawai.id))
       .leftJoin(mstKelompokNelayan, eq(trxKegiatanHarian.kelompok_nelayan_id, mstKelompokNelayan.id))
+      .leftJoin(mstIki, eq(trxKegiatanHarian.iki_id, mstIki.id))
+      .leftJoin(mstIku, eq(mstIki.iku_id, mstIku.id))
       .where(whereClause)
       .orderBy(desc(trxKegiatanHarian.tanggal), desc(trxKegiatanHarian.created_at))
       .limit(limit)
@@ -109,7 +116,12 @@ export class KegiatanHarianRepository {
         kelompok_nelayan_nama: mstKelompokNelayan.nama_kelompok,
         tanggal: trxKegiatanHarian.tanggal,
         lokasi_kegiatan: trxKegiatanHarian.lokasi_kegiatan,
-        iki: trxKegiatanHarian.iki,
+        iki_id: trxKegiatanHarian.iki_id,
+        iki_kode: mstIki.kode_iki,
+        iki_nama: mstIki.nama_iki,
+        iku_id: mstIki.iku_id,
+        iku_kode: mstIku.kode_iku,
+        iku_nama: mstIku.nama_iku,
         rencana_kerja: trxKegiatanHarian.rencana_kerja,
         detail_keterangan: trxKegiatanHarian.detail_keterangan,
         foto_kegiatan: trxKegiatanHarian.foto_kegiatan,
@@ -120,6 +132,8 @@ export class KegiatanHarianRepository {
       .from(trxKegiatanHarian)
       .leftJoin(mstPegawai, eq(trxKegiatanHarian.pegawai_id, mstPegawai.id))
       .leftJoin(mstKelompokNelayan, eq(trxKegiatanHarian.kelompok_nelayan_id, mstKelompokNelayan.id))
+      .leftJoin(mstIki, eq(trxKegiatanHarian.iki_id, mstIki.id))
+      .leftJoin(mstIku, eq(mstIki.iku_id, mstIku.id))
       .where(eq(trxKegiatanHarian.id, id))
       .limit(1);
 

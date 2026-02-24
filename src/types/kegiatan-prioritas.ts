@@ -3,7 +3,7 @@ export interface CreateKegiatanPrioritasType {
   kelompok_nelayan_id?: number;
   tanggal: string; // YYYY-MM-DD
   lokasi_kegiatan?: string;
-  iki?: string;
+  iki_id?: number;
   rencana_kerja?: string;
   detail_keterangan?: string;
   foto_kegiatan?: any[]; // File[] or string[]
@@ -14,7 +14,7 @@ export interface UpdateKegiatanPrioritasType {
   kelompok_nelayan_id?: number;
   tanggal?: string;
   lokasi_kegiatan?: string;
-  iki?: string;
+  iki_id?: number;
   rencana_kerja?: string;
   detail_keterangan?: string;
   foto_kegiatan?: any[]; // File[] or string[]
