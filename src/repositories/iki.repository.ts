@@ -1,14 +1,7 @@
-import { eq, ilike, and, or, sql, desc } from 'drizzle-orm';
 import { db } from '../db';
-import { mstIki, mstIku } from '../db/schema';
-
-export interface IkiQueryType {
-  page?: number;
-  limit?: number;
-  search?: string;
-  iku_id?: number;
-  is_active?: boolean;
-}
+import { mstIki } from '../db/schema';
+import { eq, and, like, sql, or } from 'drizzle-orm';
+import type { CreateIkiType, UpdateIkiType, IkiQueryType } from '../types/iki';
 
 export class IkiRepository {
   async findAll(query: IkiQueryType) {
@@ -18,52 +11,35 @@ export class IkiRepository {
 
     const conditions = [];
 
+    if (query.kategori_iki) {
+      conditions.push(eq(mstIki.kategori_iki, query.kategori_iki));
+    }
+
     if (query.search) {
-      conditions.push(
-        or(
-          ilike(mstIki.kode_iki, `%${query.search}%`),
-          ilike(mstIki.nama_iki, `%${query.search}%`)
-        )
-      );
+      const searchConditions = [];
+      searchConditions.push(like(mstIki.kategori_iki, `%${query.search}%`));
+      searchConditions.push(like(mstIki.detail_iki, `%${query.search}%`));
+      if (searchConditions.length > 0) {
+        conditions.push(or(...searchConditions));
+      }
     }
 
-    if (query.iku_id) {
-      conditions.push(eq(mstIki.iku_id, query.iku_id));
-    }
-
-    if (query.is_active !== undefined) {
-      conditions.push(eq(mstIki.is_active, query.is_active));
-    }
+    conditions.push(eq(mstIki.is_active, true));
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-    const [data, countResult] = await Promise.all([
-      db
-        .select({
-          id: mstIki.id,
-          iku_id: mstIki.iku_id,
-          iku_kode: mstIku.kode_iku,
-          iku_nama: mstIku.nama_iku,
-          kode_iki: mstIki.kode_iki,
-          nama_iki: mstIki.nama_iki,
-          deskripsi: mstIki.deskripsi,
-          target: mstIki.target,
-          satuan: mstIki.satuan,
-          is_active: mstIki.is_active,
-          created_at: mstIki.created_at,
-          updated_at: mstIki.updated_at,
-        })
-        .from(mstIki)
-        .leftJoin(mstIku, eq(mstIki.iku_id, mstIku.id))
-        .where(whereClause)
-        .orderBy(mstIki.kode_iki)
-        .limit(limit)
-        .offset(offset),
-      db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(mstIki)
-        .where(whereClause),
-    ]);
+    const data = await db
+      .select()
+      .from(mstIki)
+      .where(whereClause)
+      .orderBy(mstIki.kategori_iki)
+      .limit(limit)
+      .offset(offset);
+
+    const countResult = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(mstIki)
+      .where(whereClause);
 
     const total = countResult[0]?.count || 0;
 
@@ -80,51 +56,24 @@ export class IkiRepository {
 
   async findById(id: number) {
     const result = await db
-      .select({
-        id: mstIki.id,
-        iku_id: mstIki.iku_id,
-        iku_kode: mstIku.kode_iku,
-        iku_nama: mstIku.nama_iku,
-        kode_iki: mstIki.kode_iki,
-        nama_iki: mstIki.nama_iki,
-        deskripsi: mstIki.deskripsi,
-        target: mstIki.target,
-        satuan: mstIki.satuan,
-        is_active: mstIki.is_active,
-        created_at: mstIki.created_at,
-        updated_at: mstIki.updated_at,
-      })
+      .select()
       .from(mstIki)
-      .leftJoin(mstIku, eq(mstIki.iku_id, mstIku.id))
       .where(eq(mstIki.id, id))
       .limit(1);
 
     return result[0] || null;
   }
 
-  async findByKode(kode: string) {
-    const result = await db
-      .select()
-      .from(mstIki)
-      .where(eq(mstIki.kode_iki, kode))
-      .limit(1);
-
-    return result[0] || null;
-  }
-
-  async create(data: typeof mstIki.$inferInsert) {
+  async create(data: CreateIkiType) {
     const result = await db
       .insert(mstIki)
-      .values({
-        ...data,
-        is_active: data.is_active ?? true,
-      })
+      .values(data)
       .returning();
 
     return result[0];
   }
 
-  async update(id: number, data: Partial<typeof mstIki.$inferInsert>) {
+  async update(id: number, data: UpdateIkiType) {
     const result = await db
       .update(mstIki)
       .set({
@@ -134,15 +83,19 @@ export class IkiRepository {
       .where(eq(mstIki.id, id))
       .returning();
 
-    return result[0] || null;
+    return result[0];
   }
 
   async delete(id: number) {
     const result = await db
-      .delete(mstIki)
+      .update(mstIki)
+      .set({
+        is_active: false,
+        updated_at: new Date(),
+      })
       .where(eq(mstIki.id, id))
       .returning();
 
-    return result[0] || null;
+    return result[0];
   }
 }

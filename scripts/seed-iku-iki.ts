@@ -1,301 +1,166 @@
 import { db } from '../src/db';
 import { mstIku, mstIki } from '../src/db/schema';
+import { sql } from 'drizzle-orm';
 
 async function seedIkuIki() {
   try {
-    console.log('🌱 Starting seed mst_iku & mst_iki...\n');
+    console.log('🚀 Starting IKU and IKI seeding...');
 
-    // ─── 1. Seed mst_iku ───────────────────────────────────────────────────────
-    console.log('📝 Seeding mst_iku...');
-    const existingIku = await db.select().from(mstIku).limit(1);
+    // Drop existing tables if they exist
+    await db.execute(sql`DROP TABLE IF EXISTS mst_iki CASCADE;`);
+    await db.execute(sql`DROP TABLE IF EXISTS mst_iku CASCADE;`);
 
-    if (existingIku.length > 0) {
-      console.log('⏭️  Skipped - mst_iku already has data\n');
-    } else {
-      const ikuData = [
-        {
-          kode_iku: 'IKU-01',
-          nama_iku: 'Peningkatan Produksi Perikanan Tangkap',
-          deskripsi:
-            'Meningkatkan volume produksi hasil tangkapan nelayan binaan di wilayah kerja',
-          tahun: 2026,
-          target: '1500.00',
-          satuan: 'ton',
-          is_active: true,
-        },
-        {
-          kode_iku: 'IKU-02',
-          nama_iku: 'Peningkatan Produksi Perikanan Budidaya',
-          deskripsi:
-            'Meningkatkan volume produksi hasil budidaya pembudidaya ikan binaan',
-          tahun: 2026,
-          target: '2000.00',
-          satuan: 'ton',
-          is_active: true,
-        },
-        {
-          kode_iku: 'IKU-03',
-          nama_iku: 'Peningkatan Pendapatan Pelaku Usaha Perikanan',
-          deskripsi:
-            'Meningkatkan rata-rata pendapatan nelayan dan pembudidaya ikan binaan',
-          tahun: 2026,
-          target: '5000000.00',
-          satuan: 'rupiah/bulan',
-          is_active: true,
-        },
-        {
-          kode_iku: 'IKU-04',
-          nama_iku: 'Penguatan Kelembagaan Kelompok Nelayan',
-          deskripsi:
-            'Meningkatkan jumlah kelompok nelayan yang aktif dan berdaya saing',
-          tahun: 2026,
-          target: '25.00',
-          satuan: 'kelompok',
-          is_active: true,
-        },
-        {
-          kode_iku: 'IKU-05',
-          nama_iku: 'Peningkatan Adopsi Teknologi Perikanan',
-          deskripsi:
-            'Meningkatkan persentase nelayan dan pembudidaya yang mengadopsi teknologi baru',
-          tahun: 2026,
-          target: '70.00',
-          satuan: '%',
-          is_active: true,
-        },
-        {
-          kode_iku: 'IKU-06',
-          nama_iku: 'Peningkatan Kualitas SDM Perikanan',
-          deskripsi:
-            'Meningkatkan kompetensi pelaku usaha perikanan melalui pelatihan dan sertifikasi',
-          tahun: 2026,
-          target: '200.00',
-          satuan: 'orang',
-          is_active: true,
-        },
-      ];
+    console.log('✅ Dropped existing tables');
 
-      const insertedIku = await db.insert(mstIku).values(ikuData).returning();
-      console.log(`✅ Seeded ${insertedIku.length} IKU\n`);
+    // Create tables
+    await db.execute(sql`
+      CREATE TABLE mst_iku (
+        id SERIAL PRIMARY KEY,
+        tahun INTEGER NOT NULL,
+        level VARCHAR(100) NOT NULL,
+        satuan VARCHAR(100),
+        target VARCHAR(100),
+        deskripsi TEXT,
+        is_active BOOLEAN NOT NULL DEFAULT true,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
 
-      // ─── 2. Seed mst_iki ─────────────────────────────────────────────────────
-      console.log('📝 Seeding mst_iki...');
+    await db.execute(sql`
+      CREATE TABLE mst_iki (
+        id SERIAL PRIMARY KEY,
+        kategori_iki VARCHAR(50) NOT NULL,
+        detail_iki TEXT NOT NULL,
+        is_active BOOLEAN NOT NULL DEFAULT true,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
 
-      // Petakan kode_iku → id hasil insert
-      const ikuMap = new Map(insertedIku.map((r) => [r.kode_iku, r.id]));
+    console.log('✅ Tables created successfully');
 
-      const ikiData = [
-        // ── IKU-01: Produksi Tangkap ──────────────────────────────────────────
-        {
-          iku_id: ikuMap.get('IKU-01')!,
-          kode_iki: 'IKI-01-01',
-          nama_iki: 'Jumlah Kunjungan ke Kelompok Nelayan Tangkap',
-          deskripsi:
-            'Frekuensi kunjungan penyuluh ke kelompok nelayan tangkap per bulan',
-          target: '8.00',
-          satuan: 'kunjungan/bulan',
-          is_active: true,
-        },
-        {
-          iku_id: ikuMap.get('IKU-01')!,
-          kode_iki: 'IKI-01-02',
-          nama_iki: 'Jumlah Demonstrasi Teknologi Penangkapan',
-          deskripsi:
-            'Jumlah kegiatan demonstrasi teknik dan alat tangkap yang lebih produktif',
-          target: '4.00',
-          satuan: 'kegiatan/semester',
-          is_active: true,
-        },
-        {
-          iku_id: ikuMap.get('IKU-01')!,
-          kode_iki: 'IKI-01-03',
-          nama_iki: 'Jumlah Nelayan yang Menerima Rekomendasi Daerah Penangkapan',
-          deskripsi:
-            'Jumlah nelayan yang mendapatkan informasi fishing ground dari penyuluh',
-          target: '50.00',
-          satuan: 'nelayan',
-          is_active: true,
-        },
+    await db.execute(sql`
+      CREATE INDEX idx_mst_iki_kategori ON mst_iki(kategori_iki);
+    `);
 
-        // ── IKU-02: Produksi Budidaya ─────────────────────────────────────────
-        {
-          iku_id: ikuMap.get('IKU-02')!,
-          kode_iki: 'IKI-02-01',
-          nama_iki: 'Jumlah Kunjungan ke Kelompok Pembudidaya Ikan',
-          deskripsi:
-            'Frekuensi kunjungan penyuluh ke kelompok pembudidaya ikan per bulan',
-          target: '10.00',
-          satuan: 'kunjungan/bulan',
-          is_active: true,
-        },
-        {
-          iku_id: ikuMap.get('IKU-02')!,
-          kode_iki: 'IKI-02-02',
-          nama_iki: 'Jumlah Demonstrasi Teknik Budidaya Intensif',
-          deskripsi:
-            'Jumlah kegiatan demonstrasi cara budidaya ikan yang baik (CBIB)',
-          target: '6.00',
-          satuan: 'kegiatan/semester',
-          is_active: true,
-        },
-        {
-          iku_id: ikuMap.get('IKU-02')!,
-          kode_iki: 'IKI-02-03',
-          nama_iki: 'Jumlah Pendampingan Pembenihan',
-          deskripsi:
-            'Jumlah kegiatan pendampingan teknik pembenihan ikan kepada pembudidaya',
-          target: '12.00',
-          satuan: 'kegiatan/tahun',
-          is_active: true,
-        },
-        {
-          iku_id: ikuMap.get('IKU-02')!,
-          kode_iki: 'IKI-02-04',
-          nama_iki: 'Jumlah Rekomendasi Pakan dan Obat Ikan',
-          deskripsi:
-            'Jumlah rekomendasi penggunaan pakan, pupuk, dan obat ikan yang diberikan',
-          target: '24.00',
-          satuan: 'rekomendasi/tahun',
-          is_active: true,
-        },
+    // Seed IKU data
+    const ikuData = [
+      {
+        tahun: 2024,
+        level: 'Level 1',
+        satuan: 'Persen',
+        target: '85',
+        deskripsi: 'Indikator Kinerja Utama Level 1 untuk tahun 2024',
+      },
+      {
+        tahun: 2024,
+        level: 'Level 2',
+        satuan: 'Persen',
+        target: '90',
+        deskripsi: 'Indikator Kinerja Utama Level 2 untuk tahun 2024',
+      },
+      {
+        tahun: 2025,
+        level: 'Level 1',
+        satuan: 'Persen',
+        target: '88',
+        deskripsi: 'Indikator Kinerja Utama Level 1 untuk tahun 2025',
+      },
+    ];
 
-        // ── IKU-03: Pendapatan ────────────────────────────────────────────────
-        {
-          iku_id: ikuMap.get('IKU-03')!,
-          kode_iki: 'IKI-03-01',
-          nama_iki: 'Jumlah Fasilitasi Akses Permodalan',
-          deskripsi:
-            'Jumlah pelaku usaha yang difasilitasi mengakses KUR atau bantuan modal',
-          target: '15.00',
-          satuan: 'pelaku usaha/tahun',
-          is_active: true,
-        },
-        {
-          iku_id: ikuMap.get('IKU-03')!,
-          kode_iki: 'IKI-03-02',
-          nama_iki: 'Jumlah Fasilitasi Akses Pasar',
-          deskripsi:
-            'Jumlah kegiatan temu usaha atau fasilitasi pemasaran hasil perikanan',
-          target: '4.00',
-          satuan: 'kegiatan/tahun',
-          is_active: true,
-        },
-        {
-          iku_id: ikuMap.get('IKU-03')!,
-          kode_iki: 'IKI-03-03',
-          nama_iki: 'Jumlah Pendampingan Diversifikasi Produk Olahan',
-          deskripsi:
-            'Jumlah pendampingan pengolahan hasil perikanan menjadi produk bernilai tambah',
-          target: '6.00',
-          satuan: 'kegiatan/tahun',
-          is_active: true,
-        },
-
-        // ── IKU-04: Kelembagaan ───────────────────────────────────────────────
-        {
-          iku_id: ikuMap.get('IKU-04')!,
-          kode_iki: 'IKI-04-01',
-          nama_iki: 'Jumlah Kelompok Nelayan yang Dibentuk/Dikukuhkan',
-          deskripsi:
-            'Jumlah kelompok nelayan baru yang berhasil dibentuk dan dikukuhkan',
-          target: '3.00',
-          satuan: 'kelompok/tahun',
-          is_active: true,
-        },
-        {
-          iku_id: ikuMap.get('IKU-04')!,
-          kode_iki: 'IKI-04-02',
-          nama_iki: 'Jumlah Kelompok Nelayan Naik Kelas',
-          deskripsi:
-            'Jumlah kelompok nelayan yang kelas kelompoknya meningkat (Pemula→Madya→Utama)',
-          target: '5.00',
-          satuan: 'kelompok/tahun',
-          is_active: true,
-        },
-        {
-          iku_id: ikuMap.get('IKU-04')!,
-          kode_iki: 'IKI-04-03',
-          nama_iki: 'Jumlah Musyawarah Kelompok yang Difasilitasi',
-          deskripsi:
-            'Jumlah kegiatan musyawarah atau rapat kelompok yang difasilitasi penyuluh',
-          target: '24.00',
-          satuan: 'kegiatan/tahun',
-          is_active: true,
-        },
-
-        // ── IKU-05: Adopsi Teknologi ──────────────────────────────────────────
-        {
-          iku_id: ikuMap.get('IKU-05')!,
-          kode_iki: 'IKI-05-01',
-          nama_iki: 'Jumlah Demonstrasi Penggunaan Alat Modern',
-          deskripsi:
-            'Jumlah demo penggunaan GPS, fish finder, atau teknologi modern lainnya',
-          target: '6.00',
-          satuan: 'kegiatan/tahun',
-          is_active: true,
-        },
-        {
-          iku_id: ikuMap.get('IKU-05')!,
-          kode_iki: 'IKI-05-02',
-          nama_iki: 'Jumlah Penyebaran Informasi Teknologi',
-          deskripsi:
-            'Jumlah leaflet, brosur, atau konten digital teknologi yang disebarkan',
-          target: '100.00',
-          satuan: 'materi/tahun',
-          is_active: true,
-        },
-        {
-          iku_id: ikuMap.get('IKU-05')!,
-          kode_iki: 'IKI-05-03',
-          nama_iki: 'Jumlah Nelayan yang Menggunakan Teknologi Baru',
-          deskripsi:
-            'Jumlah nelayan/pembudidaya yang terbukti mengadopsi teknologi baru setelah penyuluhan',
-          target: '40.00',
-          satuan: 'orang/tahun',
-          is_active: true,
-        },
-
-        // ── IKU-06: SDM ───────────────────────────────────────────────────────
-        {
-          iku_id: ikuMap.get('IKU-06')!,
-          kode_iki: 'IKI-06-01',
-          nama_iki: 'Jumlah Peserta Pelatihan Teknis yang Difasilitasi',
-          deskripsi:
-            'Jumlah pelaku usaha perikanan yang mengikuti pelatihan teknis atas fasilitasi penyuluh',
-          target: '80.00',
-          satuan: 'orang/tahun',
-          is_active: true,
-        },
-        {
-          iku_id: ikuMap.get('IKU-06')!,
-          kode_iki: 'IKI-06-02',
-          nama_iki: 'Jumlah Peserta yang Mendapat Sertifikasi',
-          deskripsi:
-            'Jumlah pelaku usaha perikanan yang berhasil memperoleh sertifikat kompetensi',
-          target: '30.00',
-          satuan: 'orang/tahun',
-          is_active: true,
-        },
-        {
-          iku_id: ikuMap.get('IKU-06')!,
-          kode_iki: 'IKI-06-03',
-          nama_iki: 'Jumlah Magang/Studi Banding yang Difasilitasi',
-          deskripsi:
-            'Jumlah kegiatan magang atau studi banding ke lokasi percontohan yang difasilitasi',
-          target: '2.00',
-          satuan: 'kegiatan/tahun',
-          is_active: true,
-        },
-      ];
-
-      const insertedIki = await db.insert(mstIki).values(ikiData).returning();
-      console.log(`✅ Seeded ${insertedIki.length} IKI\n`);
+    for (const iku of ikuData) {
+      await db.insert(mstIku).values(iku);
     }
 
-    console.log('🎉 Seed mst_iku & mst_iki selesai!');
+    console.log(`✅ Seeded ${ikuData.length} IKU records`);
+
+    // Seed IKI data
+    const ikiData = [
+      {
+        kategori_iki: 'IKI 1',
+        detail_iki: 'Pelaksanaan penyuluhan perikanan kepada kelompok nelayan',
+      },
+      {
+        kategori_iki: 'IKI 2',
+        detail_iki: 'Monitoring dan evaluasi kegiatan kelompok nelayan',
+      },
+      {
+        kategori_iki: 'IKI 3',
+        detail_iki: 'Pendampingan teknis budidaya perikanan',
+      },
+      {
+        kategori_iki: 'IKI 4',
+        detail_iki: 'Pelatihan dan sertifikasi nelayan',
+      },
+      {
+        kategori_iki: 'IKI 5',
+        detail_iki: 'Pengembangan usaha perikanan berkelanjutan',
+      },
+    ];
+
+    for (const iki of ikiData) {
+      await db.insert(mstIki).values(iki);
+    }
+
+    console.log(`✅ Seeded ${ikiData.length} IKI records`);
+
+    // Update kegiatan tables to add iki_id column if not exists
+    await db.execute(sql`
+      DO $$ 
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_name = 'trx_kegiatan_harian' AND column_name = 'iki_id'
+        ) THEN
+          ALTER TABLE trx_kegiatan_harian ADD COLUMN iki_id INTEGER REFERENCES mst_iki(id);
+        END IF;
+      END $$;
+    `);
+
+    await db.execute(sql`
+      DO $$ 
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_name = 'trx_kegiatan_prioritas' AND column_name = 'iki_id'
+        ) THEN
+          ALTER TABLE trx_kegiatan_prioritas ADD COLUMN iki_id INTEGER REFERENCES mst_iki(id);
+        END IF;
+      END $$;
+    `);
+
+    // Drop old iki column if exists
+    await db.execute(sql`
+      DO $$ 
+      BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_name = 'trx_kegiatan_harian' AND column_name = 'iki' AND data_type = 'character varying'
+        ) THEN
+          ALTER TABLE trx_kegiatan_harian DROP COLUMN iki;
+        END IF;
+      END $$;
+    `);
+
+    await db.execute(sql`
+      DO $$ 
+      BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_name = 'trx_kegiatan_prioritas' AND column_name = 'iki' AND data_type = 'character varying'
+        ) THEN
+          ALTER TABLE trx_kegiatan_prioritas DROP COLUMN iki;
+        END IF;
+      END $$;
+    `);
+
+    console.log('✅ Updated kegiatan tables with iki_id foreign key');
+
+    console.log('🎉 IKU and IKI seeding completed successfully!');
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error seeding IKU/IKI:', error);
+    console.error('❌ Error seeding IKU and IKI:', error);
     process.exit(1);
   }
 }

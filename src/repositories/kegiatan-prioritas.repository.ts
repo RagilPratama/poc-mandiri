@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { trxKegiatanPrioritas, mstPegawai, mstKelompokNelayan, mstIki, mstIku } from '../db/schema';
+import { trxKegiatanPrioritas, mstPegawai, mstKelompokNelayan, mstIki } from '../db/schema';
 import { eq, and, gte, lte, like, sql, desc, or } from 'drizzle-orm';
 import type { CreateKegiatanPrioritasType, UpdateKegiatanPrioritasType, KegiatanPrioritasQueryType } from '../types/kegiatan-prioritas';
 
@@ -65,11 +65,8 @@ export class KegiatanPrioritasRepository {
         tanggal: trxKegiatanPrioritas.tanggal,
         lokasi_kegiatan: trxKegiatanPrioritas.lokasi_kegiatan,
         iki_id: trxKegiatanPrioritas.iki_id,
-        iki_kode: mstIki.kode_iki,
-        iki_nama: mstIki.nama_iki,
-        iku_id: mstIki.iku_id,
-        iku_kode: mstIku.kode_iku,
-        iku_nama: mstIku.nama_iku,
+        iki_kategori: mstIki.kategori_iki,
+        iki_detail: mstIki.detail_iki,
         rencana_kerja: trxKegiatanPrioritas.rencana_kerja,
         detail_keterangan: trxKegiatanPrioritas.detail_keterangan,
         foto_kegiatan: trxKegiatanPrioritas.foto_kegiatan,
@@ -81,7 +78,6 @@ export class KegiatanPrioritasRepository {
       .leftJoin(mstPegawai, eq(trxKegiatanPrioritas.pegawai_id, mstPegawai.id))
       .leftJoin(mstKelompokNelayan, eq(trxKegiatanPrioritas.kelompok_nelayan_id, mstKelompokNelayan.id))
       .leftJoin(mstIki, eq(trxKegiatanPrioritas.iki_id, mstIki.id))
-      .leftJoin(mstIku, eq(mstIki.iku_id, mstIku.id))
       .where(whereClause)
       .orderBy(desc(trxKegiatanPrioritas.tanggal), desc(trxKegiatanPrioritas.created_at))
       .limit(limit)
@@ -117,11 +113,8 @@ export class KegiatanPrioritasRepository {
         tanggal: trxKegiatanPrioritas.tanggal,
         lokasi_kegiatan: trxKegiatanPrioritas.lokasi_kegiatan,
         iki_id: trxKegiatanPrioritas.iki_id,
-        iki_kode: mstIki.kode_iki,
-        iki_nama: mstIki.nama_iki,
-        iku_id: mstIki.iku_id,
-        iku_kode: mstIku.kode_iku,
-        iku_nama: mstIku.nama_iku,
+        iki_kategori: mstIki.kategori_iki,
+        iki_detail: mstIki.detail_iki,
         rencana_kerja: trxKegiatanPrioritas.rencana_kerja,
         detail_keterangan: trxKegiatanPrioritas.detail_keterangan,
         foto_kegiatan: trxKegiatanPrioritas.foto_kegiatan,
@@ -133,7 +126,6 @@ export class KegiatanPrioritasRepository {
       .leftJoin(mstPegawai, eq(trxKegiatanPrioritas.pegawai_id, mstPegawai.id))
       .leftJoin(mstKelompokNelayan, eq(trxKegiatanPrioritas.kelompok_nelayan_id, mstKelompokNelayan.id))
       .leftJoin(mstIki, eq(trxKegiatanPrioritas.iki_id, mstIki.id))
-      .leftJoin(mstIku, eq(mstIki.iku_id, mstIku.id))
       .where(eq(trxKegiatanPrioritas.id, id))
       .limit(1);
 

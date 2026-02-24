@@ -1,14 +1,7 @@
-import { eq, ilike, and, or, sql, desc } from 'drizzle-orm';
 import { db } from '../db';
 import { mstIku } from '../db/schema';
-
-export interface IkuQueryType {
-  page?: number;
-  limit?: number;
-  search?: string;
-  tahun?: number;
-  is_active?: boolean;
-}
+import { eq, and, like, sql, desc, or } from 'drizzle-orm';
+import type { CreateIkuType, UpdateIkuType, IkuQueryType } from '../types/iku';
 
 export class IkuRepository {
   async findAll(query: IkuQueryType) {
@@ -18,38 +11,35 @@ export class IkuRepository {
 
     const conditions = [];
 
-    if (query.search) {
-      conditions.push(
-        or(
-          ilike(mstIku.kode_iku, `%${query.search}%`),
-          ilike(mstIku.nama_iku, `%${query.search}%`)
-        )
-      );
-    }
-
     if (query.tahun) {
       conditions.push(eq(mstIku.tahun, query.tahun));
     }
 
-    if (query.is_active !== undefined) {
-      conditions.push(eq(mstIku.is_active, query.is_active));
+    if (query.search) {
+      const searchConditions = [];
+      searchConditions.push(like(mstIku.level, `%${query.search}%`));
+      searchConditions.push(like(mstIku.deskripsi, `%${query.search}%`));
+      if (searchConditions.length > 0) {
+        conditions.push(or(...searchConditions));
+      }
     }
+
+    conditions.push(eq(mstIku.is_active, true));
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-    const [data, countResult] = await Promise.all([
-      db
-        .select()
-        .from(mstIku)
-        .where(whereClause)
-        .orderBy(desc(mstIku.tahun), mstIku.kode_iku)
-        .limit(limit)
-        .offset(offset),
-      db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(mstIku)
-        .where(whereClause),
-    ]);
+    const data = await db
+      .select()
+      .from(mstIku)
+      .where(whereClause)
+      .orderBy(desc(mstIku.tahun), mstIku.level)
+      .limit(limit)
+      .offset(offset);
+
+    const countResult = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(mstIku)
+      .where(whereClause);
 
     const total = countResult[0]?.count || 0;
 
@@ -74,29 +64,16 @@ export class IkuRepository {
     return result[0] || null;
   }
 
-  async findByKode(kode: string) {
-    const result = await db
-      .select()
-      .from(mstIku)
-      .where(eq(mstIku.kode_iku, kode))
-      .limit(1);
-
-    return result[0] || null;
-  }
-
-  async create(data: typeof mstIku.$inferInsert) {
+  async create(data: CreateIkuType) {
     const result = await db
       .insert(mstIku)
-      .values({
-        ...data,
-        is_active: data.is_active ?? true,
-      })
+      .values(data)
       .returning();
 
     return result[0];
   }
 
-  async update(id: number, data: Partial<typeof mstIku.$inferInsert>) {
+  async update(id: number, data: UpdateIkuType) {
     const result = await db
       .update(mstIku)
       .set({
@@ -106,15 +83,19 @@ export class IkuRepository {
       .where(eq(mstIku.id, id))
       .returning();
 
-    return result[0] || null;
+    return result[0];
   }
 
   async delete(id: number) {
     const result = await db
-      .delete(mstIku)
+      .update(mstIku)
+      .set({
+        is_active: false,
+        updated_at: new Date(),
+      })
       .where(eq(mstIku.id, id))
       .returning();
 
-    return result[0] || null;
+    return result[0];
   }
 }

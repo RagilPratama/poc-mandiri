@@ -1,165 +1,70 @@
-import { Context } from 'elysia';
+import { Elysia, t } from 'elysia';
 import { IkuRepository } from '../repositories/iku.repository';
-import { successResponse, successResponseWithPagination } from '../utils/response';
+import type { CreateIkuType, UpdateIkuType, IkuQueryType } from '../types/iku';
+import { successResponse, errorResponse } from '../utils/response';
 import { logActivitySimple } from '../utils/activity-logger';
 
-const ikuRepo = new IkuRepository();
+const ikuRepository = new IkuRepository();
 
-export const ikuHandler = {
-  async getAll({ query }: Context<{ query: any }>) {
+export const ikuHandler = new Elysia({ prefix: '/iku' })
+  .get('/', async ({ query, request }) => {
     try {
-      const result = await ikuRepo.findAll(query);
-      return successResponseWithPagination(
-        'Data IKU berhasil diambil',
-        result.data,
-        result.pagination
-      );
-    } catch (error) {
-      console.error('Error getting IKU:', error);
-      throw new Error('Gagal mengambil data IKU');
+      const result = await ikuRepository.findAll(query as IkuQueryType);
+      return successResponse(result);
+    } catch (error: any) {
+      await logActivitySimple(request, 'ERROR', 'GET', '/iku', null, null, error.message);
+      return errorResponse(error.message);
     }
-  },
-
-  async getById({ params }: Context<{ params: { id: string } }>) {
+  })
+  .get('/:id', async ({ params, request }) => {
     try {
-      const id = parseInt(params.id);
-      if (isNaN(id)) {
-        return { message: 'ID tidak valid' };
-      }
-
-      const iku = await ikuRepo.findById(id);
+      const iku = await ikuRepository.findById(Number(params.id));
       if (!iku) {
-        return { message: 'IKU tidak ditemukan' };
+        return errorResponse('IKU tidak ditemukan');
       }
-
-      return successResponse('Data IKU berhasil diambil', iku);
-    } catch (error) {
-      console.error('Error getting IKU by id:', error);
-      throw new Error('Gagal mengambil data IKU');
+      return successResponse(iku);
+    } catch (error: any) {
+      await logActivitySimple(request, 'ERROR', 'GET', `/iku/${params.id}`, null, null, error.message);
+      return errorResponse(error.message);
     }
-  },
-
-  async create({ body, headers, request, path }: Context<{ body: any }>) {
+  })
+  .post('/', async ({ body, request }) => {
     try {
-      if (!body.kode_iku || !body.nama_iku || !body.tahun) {
-        return { message: 'Kode IKU, nama IKU, dan tahun wajib diisi' };
-      }
-
-      const existing = await ikuRepo.findByKode(body.kode_iku);
-      if (existing) {
-        return { message: `Kode IKU ${body.kode_iku} sudah digunakan` };
-      }
-
-      const iku = await ikuRepo.create(body);
-
-      await logActivitySimple({
-        context: { headers, request, path },
-        aktivitas: 'CREATE',
-        modul: 'IKU',
-        deskripsi: `Membuat IKU baru: ${body.nama_iku} (${body.kode_iku})`,
-        data_baru: iku,
-      });
-
-      return successResponse('IKU berhasil ditambahkan', iku);
-    } catch (error) {
-      console.error('Error creating IKU:', error);
-
-      await logActivitySimple({
-        context: { headers, request, path },
-        aktivitas: 'CREATE',
-        modul: 'IKU',
-        deskripsi: `Gagal membuat IKU: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        status: 'ERROR',
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-      });
-
-      throw new Error('Gagal menambahkan IKU');
+      const iku = await ikuRepository.create(body as CreateIkuType);
+      await logActivitySimple(request, 'SUCCESS', 'POST', '/iku', null, iku);
+      return successResponse(iku);
+    } catch (error: any) {
+      await logActivitySimple(request, 'ERROR', 'POST', '/iku', null, null, error.message);
+      return errorResponse(error.message);
     }
-  },
-
-  async update({ params, body, headers, request, path }: Context<{ params: { id: string }; body: any }>) {
+  })
+  .put('/:id', async ({ params, body, request }) => {
     try {
-      const id = parseInt(params.id);
-      if (isNaN(id)) {
-        return { message: 'ID tidak valid' };
+      const oldData = await ikuRepository.findById(Number(params.id));
+      if (!oldData) {
+        return errorResponse('IKU tidak ditemukan');
       }
 
-      const existing = await ikuRepo.findById(id);
-      if (!existing) {
-        return { message: 'IKU tidak ditemukan' };
-      }
-
-      if (body.kode_iku && body.kode_iku !== existing.kode_iku) {
-        const duplicate = await ikuRepo.findByKode(body.kode_iku);
-        if (duplicate) {
-          return { message: `Kode IKU ${body.kode_iku} sudah digunakan` };
-        }
-      }
-
-      const iku = await ikuRepo.update(id, body);
-
-      await logActivitySimple({
-        context: { headers, request, path },
-        aktivitas: 'UPDATE',
-        modul: 'IKU',
-        deskripsi: `Mengupdate IKU: ${existing.nama_iku} (${existing.kode_iku})`,
-        data_lama: existing,
-        data_baru: iku,
-      });
-
-      return successResponse('IKU berhasil diupdate', iku);
-    } catch (error) {
-      console.error('Error updating IKU:', error);
-
-      await logActivitySimple({
-        context: { headers, request, path },
-        aktivitas: 'UPDATE',
-        modul: 'IKU',
-        deskripsi: `Gagal mengupdate IKU: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        status: 'ERROR',
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-      });
-
-      throw new Error('Gagal mengupdate IKU');
+      const iku = await ikuRepository.update(Number(params.id), body as UpdateIkuType);
+      await logActivitySimple(request, 'SUCCESS', 'PUT', `/iku/${params.id}`, oldData, iku);
+      return successResponse(iku);
+    } catch (error: any) {
+      await logActivitySimple(request, 'ERROR', 'PUT', `/iku/${params.id}`, null, null, error.message);
+      return errorResponse(error.message);
     }
-  },
-
-  async delete({ params, headers, request, path }: Context<{ params: { id: string } }>) {
+  })
+  .delete('/:id', async ({ params, request }) => {
     try {
-      const id = parseInt(params.id);
-      if (isNaN(id)) {
-        return { message: 'ID tidak valid' };
+      const oldData = await ikuRepository.findById(Number(params.id));
+      if (!oldData) {
+        return errorResponse('IKU tidak ditemukan');
       }
 
-      const existing = await ikuRepo.findById(id);
-      if (!existing) {
-        return { message: 'IKU tidak ditemukan' };
-      }
-
-      await ikuRepo.delete(id);
-
-      await logActivitySimple({
-        context: { headers, request, path },
-        aktivitas: 'DELETE',
-        modul: 'IKU',
-        deskripsi: `Menghapus IKU: ${existing.nama_iku} (${existing.kode_iku})`,
-        data_lama: existing,
-      });
-
-      return successResponse('IKU berhasil dihapus');
-    } catch (error) {
-      console.error('Error deleting IKU:', error);
-
-      await logActivitySimple({
-        context: { headers, request, path },
-        aktivitas: 'DELETE',
-        modul: 'IKU',
-        deskripsi: `Gagal menghapus IKU: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        status: 'ERROR',
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-      });
-
-      throw new Error('Gagal menghapus IKU');
+      const iku = await ikuRepository.delete(Number(params.id));
+      await logActivitySimple(request, 'SUCCESS', 'DELETE', `/iku/${params.id}`, oldData, null);
+      return successResponse(iku);
+    } catch (error: any) {
+      await logActivitySimple(request, 'ERROR', 'DELETE', `/iku/${params.id}`, null, null, error.message);
+      return errorResponse(error.message);
     }
-  },
-};
+  });

@@ -1,179 +1,70 @@
-import { Context } from 'elysia';
+import { Elysia, t } from 'elysia';
 import { IkiRepository } from '../repositories/iki.repository';
-import { IkuRepository } from '../repositories/iku.repository';
-import { successResponse, successResponseWithPagination } from '../utils/response';
+import type { CreateIkiType, UpdateIkiType, IkiQueryType } from '../types/iki';
+import { successResponse, errorResponse } from '../utils/response';
 import { logActivitySimple } from '../utils/activity-logger';
 
-const ikiRepo = new IkiRepository();
-const ikuRepo = new IkuRepository();
+const ikiRepository = new IkiRepository();
 
-export const ikiHandler = {
-  async getAll({ query }: Context<{ query: any }>) {
+export const ikiHandler = new Elysia({ prefix: '/iki' })
+  .get('/', async ({ query, request }) => {
     try {
-      const result = await ikiRepo.findAll(query);
-      return successResponseWithPagination(
-        'Data IKI berhasil diambil',
-        result.data,
-        result.pagination
-      );
-    } catch (error) {
-      console.error('Error getting IKI:', error);
-      throw new Error('Gagal mengambil data IKI');
+      const result = await ikiRepository.findAll(query as IkiQueryType);
+      return successResponse(result);
+    } catch (error: any) {
+      await logActivitySimple(request, 'ERROR', 'GET', '/iki', null, null, error.message);
+      return errorResponse(error.message);
     }
-  },
-
-  async getById({ params }: Context<{ params: { id: string } }>) {
+  })
+  .get('/:id', async ({ params, request }) => {
     try {
-      const id = parseInt(params.id);
-      if (isNaN(id)) {
-        return { message: 'ID tidak valid' };
-      }
-
-      const iki = await ikiRepo.findById(id);
+      const iki = await ikiRepository.findById(Number(params.id));
       if (!iki) {
-        return { message: 'IKI tidak ditemukan' };
+        return errorResponse('IKI tidak ditemukan');
       }
-
-      return successResponse('Data IKI berhasil diambil', iki);
-    } catch (error) {
-      console.error('Error getting IKI by id:', error);
-      throw new Error('Gagal mengambil data IKI');
+      return successResponse(iki);
+    } catch (error: any) {
+      await logActivitySimple(request, 'ERROR', 'GET', `/iki/${params.id}`, null, null, error.message);
+      return errorResponse(error.message);
     }
-  },
-
-  async create({ body, headers, request, path }: Context<{ body: any }>) {
+  })
+  .post('/', async ({ body, request }) => {
     try {
-      if (!body.iku_id || !body.kode_iki || !body.nama_iki) {
-        return { message: 'IKU, kode IKI, dan nama IKI wajib diisi' };
-      }
-
-      const iku = await ikuRepo.findById(body.iku_id);
-      if (!iku) {
-        return { message: 'IKU tidak ditemukan' };
-      }
-
-      const existing = await ikiRepo.findByKode(body.kode_iki);
-      if (existing) {
-        return { message: `Kode IKI ${body.kode_iki} sudah digunakan` };
-      }
-
-      const iki = await ikiRepo.create(body);
-
-      await logActivitySimple({
-        context: { headers, request, path },
-        aktivitas: 'CREATE',
-        modul: 'IKI',
-        deskripsi: `Membuat IKI baru: ${body.nama_iki} (${body.kode_iki})`,
-        data_baru: iki,
-      });
-
-      return successResponse('IKI berhasil ditambahkan', iki);
-    } catch (error) {
-      console.error('Error creating IKI:', error);
-
-      await logActivitySimple({
-        context: { headers, request, path },
-        aktivitas: 'CREATE',
-        modul: 'IKI',
-        deskripsi: `Gagal membuat IKI: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        status: 'ERROR',
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-      });
-
-      throw new Error('Gagal menambahkan IKI');
+      const iki = await ikiRepository.create(body as CreateIkiType);
+      await logActivitySimple(request, 'SUCCESS', 'POST', '/iki', null, iki);
+      return successResponse(iki);
+    } catch (error: any) {
+      await logActivitySimple(request, 'ERROR', 'POST', '/iki', null, null, error.message);
+      return errorResponse(error.message);
     }
-  },
-
-  async update({ params, body, headers, request, path }: Context<{ params: { id: string }; body: any }>) {
+  })
+  .put('/:id', async ({ params, body, request }) => {
     try {
-      const id = parseInt(params.id);
-      if (isNaN(id)) {
-        return { message: 'ID tidak valid' };
+      const oldData = await ikiRepository.findById(Number(params.id));
+      if (!oldData) {
+        return errorResponse('IKI tidak ditemukan');
       }
 
-      const existing = await ikiRepo.findById(id);
-      if (!existing) {
-        return { message: 'IKI tidak ditemukan' };
-      }
-
-      if (body.iku_id) {
-        const iku = await ikuRepo.findById(body.iku_id);
-        if (!iku) {
-          return { message: 'IKU tidak ditemukan' };
-        }
-      }
-
-      if (body.kode_iki && body.kode_iki !== existing.kode_iki) {
-        const duplicate = await ikiRepo.findByKode(body.kode_iki);
-        if (duplicate) {
-          return { message: `Kode IKI ${body.kode_iki} sudah digunakan` };
-        }
-      }
-
-      const iki = await ikiRepo.update(id, body);
-
-      await logActivitySimple({
-        context: { headers, request, path },
-        aktivitas: 'UPDATE',
-        modul: 'IKI',
-        deskripsi: `Mengupdate IKI: ${existing.nama_iki} (${existing.kode_iki})`,
-        data_lama: existing,
-        data_baru: iki,
-      });
-
-      return successResponse('IKI berhasil diupdate', iki);
-    } catch (error) {
-      console.error('Error updating IKI:', error);
-
-      await logActivitySimple({
-        context: { headers, request, path },
-        aktivitas: 'UPDATE',
-        modul: 'IKI',
-        deskripsi: `Gagal mengupdate IKI: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        status: 'ERROR',
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-      });
-
-      throw new Error('Gagal mengupdate IKI');
+      const iki = await ikiRepository.update(Number(params.id), body as UpdateIkiType);
+      await logActivitySimple(request, 'SUCCESS', 'PUT', `/iki/${params.id}`, oldData, iki);
+      return successResponse(iki);
+    } catch (error: any) {
+      await logActivitySimple(request, 'ERROR', 'PUT', `/iki/${params.id}`, null, null, error.message);
+      return errorResponse(error.message);
     }
-  },
-
-  async delete({ params, headers, request, path }: Context<{ params: { id: string } }>) {
+  })
+  .delete('/:id', async ({ params, request }) => {
     try {
-      const id = parseInt(params.id);
-      if (isNaN(id)) {
-        return { message: 'ID tidak valid' };
+      const oldData = await ikiRepository.findById(Number(params.id));
+      if (!oldData) {
+        return errorResponse('IKI tidak ditemukan');
       }
 
-      const existing = await ikiRepo.findById(id);
-      if (!existing) {
-        return { message: 'IKI tidak ditemukan' };
-      }
-
-      await ikiRepo.delete(id);
-
-      await logActivitySimple({
-        context: { headers, request, path },
-        aktivitas: 'DELETE',
-        modul: 'IKI',
-        deskripsi: `Menghapus IKI: ${existing.nama_iki} (${existing.kode_iki})`,
-        data_lama: existing,
-      });
-
-      return successResponse('IKI berhasil dihapus');
-    } catch (error) {
-      console.error('Error deleting IKI:', error);
-
-      await logActivitySimple({
-        context: { headers, request, path },
-        aktivitas: 'DELETE',
-        modul: 'IKI',
-        deskripsi: `Gagal menghapus IKI: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        status: 'ERROR',
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-      });
-
-      throw new Error('Gagal menghapus IKI');
+      const iki = await ikiRepository.delete(Number(params.id));
+      await logActivitySimple(request, 'SUCCESS', 'DELETE', `/iki/${params.id}`, oldData, null);
+      return successResponse(iki);
+    } catch (error: any) {
+      await logActivitySimple(request, 'ERROR', 'DELETE', `/iki/${params.id}`, null, null, error.message);
+      return errorResponse(error.message);
     }
-  },
-};
+  });

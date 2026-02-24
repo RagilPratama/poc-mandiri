@@ -20,3 +20,12 @@ export const successResponseWithPagination = (
     pagination,
   };
 };
+
+export const errorResponse = (message: string, error?: any) => {
+  return {
+    responseCode: "4000000",
+    responseMessage: "Error",
+    message,
+    ...(error && { error }),
+  };
+};

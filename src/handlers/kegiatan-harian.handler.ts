@@ -1,6 +1,6 @@
 import { Context } from 'elysia';
 import { KegiatanHarianRepository } from '../repositories/kegiatan-harian.repository';
-import { successResponse, successResponseWithPagination } from '../utils/response';
+import { successResponse, successResponseWithPagination, errorResponse } from '../utils/response';
 import { logActivitySimple } from '../utils/activity-logger';
 import { uploadImage } from '../utils/imagekit';
 import type { CreateKegiatanHarianType, UpdateKegiatanHarianType, KegiatanHarianQueryType } from '../types/kegiatan-harian';
@@ -51,16 +51,12 @@ export const kegiatanHarianHandler = {
   async create({ body, headers, request, path }: Context<{ body: CreateKegiatanHarianType }>) {
     try {
       if (!body.pegawai_id || !body.tanggal) {
-        return {
-          message: 'Pegawai dan tanggal wajib diisi',
-        };
+        return errorResponse('Pegawai dan tanggal wajib diisi');
       }
 
       // Validate rencana_kerja max 1000 chars
       if (body.rencana_kerja && body.rencana_kerja.length > 1000) {
-        return {
-          message: 'Rencana kerja maksimal 1000 karakter',
-        };
+        return errorResponse('Rencana kerja maksimal 1000 karakter');
       }
 
       // Handle photo uploads
@@ -68,9 +64,7 @@ export const kegiatanHarianHandler = {
       if (body.foto_kegiatan && Array.isArray(body.foto_kegiatan)) {
         // Validate max 5 photos
         if (body.foto_kegiatan.length > 5) {
-          return {
-            message: 'Maksimal 5 foto kegiatan',
-          };
+          return errorResponse('Maksimal 5 foto kegiatan');
         }
 
         // Upload each photo to ImageKit
@@ -118,7 +112,7 @@ export const kegiatanHarianHandler = {
         error_message: error instanceof Error ? error.message : 'Unknown error',
       });
 
-      throw new Error('Gagal menambahkan kegiatan harian');
+      return errorResponse('Gagal menambahkan kegiatan harian', error instanceof Error ? error.message : 'Unknown error');
     }
   },
 
