@@ -1,5 +1,9 @@
 import { db } from '../db';
 import { mstKabupaten } from '../db/schema';
+import { redisClient } from '../redis';
+
+const CACHE_KEY = 'all_kabupaten';
+const CACHE_TTL = 86400; // 24 jam
 
 /**
  * Haversine formula to calculate distance between two coordinates in kilometers
@@ -19,6 +23,32 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 }
 
 /**
+ * Get all kabupaten from cache or database
+ */
+async function getAllKabupatens() {
+  try {
+    // Try to get from Redis cache
+    const cached = await redisClient.get(CACHE_KEY);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    // If not in cache, fetch from database
+    const allKabupaten = await db.select().from(mstKabupaten);
+
+    if (allKabupaten.length > 0) {
+      // Cache for 24 hours
+      await redisClient.setEx(CACHE_KEY, CACHE_TTL, JSON.stringify(allKabupaten));
+    }
+
+    return allKabupaten;
+  } catch (error) {
+    console.error('Error getting all kabupatens:', error);
+    return [];
+  }
+}
+
+/**
  * Find nearest kabupaten from given coordinates
  */
 export async function findNearestKabupaten(
@@ -26,16 +56,16 @@ export async function findNearestKabupaten(
   longitude: number
 ): Promise<{ id: number; name: string; distance: number } | null> {
   try {
-    const allKabupaten = await db.select().from(mstKabupaten);
+    const allKabupaten = await getAllKabupatens();
 
     if (allKabupaten.length === 0) {
       return null;
     }
 
     // Calculate distance to each kabupaten
-    const kabupatensWithDistance = allKabupaten.map((kab) => {
-      const kabLat = parseFloat(kab.latitude as any);
-      const kabLon = parseFloat(kab.longitude as any);
+    const kabupatensWithDistance = allKabupaten.map((kab: any) => {
+      const kabLat = parseFloat(kab.latitude);
+      const kabLon = parseFloat(kab.longitude);
       const distance = calculateDistance(latitude, longitude, kabLat, kabLon);
       return {
         id: Number(kab.id),
@@ -45,11 +75,22 @@ export async function findNearestKabupaten(
     });
 
     // Sort by distance and get the nearest one
-    const nearest = kabupatensWithDistance.sort((a, b) => a.distance - b.distance)[0];
+    const nearest = kabupatensWithDistance.sort((a: any, b: any) => a.distance - b.distance)[0];
 
     return nearest || null;
   } catch (error) {
     console.error('Error finding nearest kabupaten:', error);
     return null;
+  }
+}
+
+/**
+ * Clear kabupaten cache (call when data is updated)
+ */
+export async function clearKabupatensCache() {
+  try {
+    await redisClient.del(CACHE_KEY);
+  } catch (error) {
+    console.error('Error clearing kabupaten cache:', error);
   }
 }
