@@ -1,5 +1,6 @@
 import { Context } from 'elysia';
 import { KelompokNelayanRepository } from '../repositories/kelompok-nelayan.repository';
+import { uploadImage } from '../utils/imagekit';
 import { successResponse, successResponseWithPagination } from '../utils/response';
 import { logActivitySimple } from '../utils/activity-logger';
 import type { CreateKelompokNelayanType, UpdateKelompokNelayanType, KelompokNelayanQueryType } from '../types/kelompok-nelayan';
@@ -44,7 +45,7 @@ export const kelompokNelayanHandler = {
     }
   },
 
-  async create({ body, headers, request, path }: Context<{ body: CreateKelompokNelayanType }>) {
+  async create({ body, headers, request, path }: Context<{ body: CreateKelompokNelayanType & { profil_kelompok_photo?: File } }>) {
     try {
       // Check if NIB Kelompok already exists
       const existingNib = await kelompokNelayanRepo.findByNibKelompok(body.nib_kelompok);
@@ -62,7 +63,27 @@ export const kelompokNelayanHandler = {
         };
       }
 
-      const kelompok = await kelompokNelayanRepo.create(body);
+      // Upload photo if provided
+      let photoUrl: string | undefined;
+      let photoId: string | undefined;
+      
+      if (body.profil_kelompok_photo) {
+        const photoBuffer = Buffer.from(await body.profil_kelompok_photo.arrayBuffer());
+        const fileName = `profil_${body.nib_kelompok}_${Date.now()}.jpg`;
+        const folder = `/kelompok-nelayan/${body.nib_kelompok}`;
+
+        const uploadResult = await uploadImage(photoBuffer, fileName, folder);
+        photoUrl = uploadResult.url;
+        photoId = uploadResult.fileId;
+      }
+
+      const createData = {
+        ...body,
+        profil_kelompok_photo_url: photoUrl,
+        profil_kelompok_photo_id: photoId,
+      };
+
+      const kelompok = await kelompokNelayanRepo.create(createData);
 
       await logActivitySimple({
         context: { headers, request, path },
@@ -89,7 +110,7 @@ export const kelompokNelayanHandler = {
     }
   },
 
-  async update({ params, body, headers, request, path }: Context<{ params: { id: string }; body: UpdateKelompokNelayanType }>) {
+  async update({ params, body, headers, request, path }: Context<{ params: { id: string }; body: UpdateKelompokNelayanType & { profil_kelompok_photo?: File } }>) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {
@@ -125,7 +146,27 @@ export const kelompokNelayanHandler = {
         }
       }
 
-      const kelompok = await kelompokNelayanRepo.update(id, body);
+      // Upload photo if provided
+      let photoUrl = existing.profil_kelompok_photo_url;
+      let photoId = existing.profil_kelompok_photo_id;
+      
+      if (body.profil_kelompok_photo) {
+        const photoBuffer = Buffer.from(await body.profil_kelompok_photo.arrayBuffer());
+        const fileName = `profil_${body.nib_kelompok || existing.nib_kelompok}_${Date.now()}.jpg`;
+        const folder = `/kelompok-nelayan/${body.nib_kelompok || existing.nib_kelompok}`;
+
+        const uploadResult = await uploadImage(photoBuffer, fileName, folder);
+        photoUrl = uploadResult.url;
+        photoId = uploadResult.fileId;
+      }
+
+      const updateData = {
+        ...body,
+        profil_kelompok_photo_url: photoUrl,
+        profil_kelompok_photo_id: photoId,
+      };
+
+      const kelompok = await kelompokNelayanRepo.update(id, updateData);
 
       await logActivitySimple({
         context: { headers, request, path },
