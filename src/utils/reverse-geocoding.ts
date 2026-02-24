@@ -23,9 +23,9 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 }
 
 /**
- * Get all kabupaten from cache or database
+ * Get all kabupaten from cache or database (for batch geocoding)
  */
-async function getAllKabupatens() {
+export async function getAllKabupatensForGeocoding() {
   try {
     // Try to get from Redis cache
     const cached = await redisClient.get(CACHE_KEY);
@@ -56,7 +56,7 @@ export async function findNearestKabupaten(
   longitude: number
 ): Promise<{ id: number; name: string; distance: number } | null> {
   try {
-    const allKabupaten = await getAllKabupatens();
+    const allKabupaten = await getAllKabupatensForGeocoding();
 
     if (allKabupaten.length === 0) {
       return null;

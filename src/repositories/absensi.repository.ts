@@ -1,8 +1,42 @@
 import { eq, and, gte, lte, sql, desc, or, ilike } from 'drizzle-orm';
 import { db } from '../db';
 import { trxAbsensi, mstPegawai, mstKabupaten } from '../db/schema';
-import { findNearestKabupaten } from '../utils/reverse-geocoding';
+import { getAllKabupatensForGeocoding } from '../utils/reverse-geocoding';
 import type { CreateAbsensiType, CheckoutAbsensiType, UpdateAbsensiType, AbsensiQueryType } from '../types/absensi';
+
+/**
+ * Find nearest kabupaten from coordinates using pre-loaded kabupaten list
+ */
+function findNearestKabupatensFromList(
+  latitude: number,
+  longitude: number,
+  kabupatens: any[]
+): { id: number; name: string } | null {
+  if (kabupatens.length === 0) return null;
+
+  const R = 6371; // Earth's radius in km
+  
+  const kabupatensWithDistance = kabupatens.map((kab: any) => {
+    const kabLat = parseFloat(kab.latitude);
+    const kabLon = parseFloat(kab.longitude);
+    
+    const dLat = (kabLat - latitude) * (Math.PI / 180);
+    const dLon = (kabLon - longitude) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(latitude * (Math.PI / 180)) *
+        Math.cos(kabLat * (Math.PI / 180)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+
+    return { id: Number(kab.id), name: kab.name, distance };
+  });
+
+  const nearest = kabupatensWithDistance.sort((a: any, b: any) => a.distance - b.distance)[0];
+  return nearest ? { id: nearest.id, name: nearest.name } : null;
+}
 
 export class AbsensiRepository {
   async findAll(query: AbsensiQueryType) {
@@ -65,27 +99,29 @@ export class AbsensiRepository {
         .where(whereClause),
     ]);
 
-    // Add lokasi_checkin (kabupaten name) for each record
-    const dataWithLokasi = await Promise.all(
-      data.map(async (record) => {
-        const nearest = await findNearestKabupaten(
-          parseFloat(record.ci_latitude as any),
-          parseFloat(record.ci_longitude as any)
-        );
-        const nearestCheckout = record.co_latitude && record.co_longitude
-          ? await findNearestKabupaten(
-              parseFloat(record.co_latitude as any),
-              parseFloat(record.co_longitude as any)
-            )
-          : null;
+    // Add lokasi_checkin (kabupaten name) for each record - batch processing
+    const kabupatens = await getAllKabupatensForGeocoding();
+    
+    const dataWithLokasi = data.map((record) => {
+      const nearest = findNearestKabupatensFromList(
+        parseFloat(record.ci_latitude as any),
+        parseFloat(record.ci_longitude as any),
+        kabupatens
+      );
+      const nearestCheckout = record.co_latitude && record.co_longitude
+        ? findNearestKabupatensFromList(
+            parseFloat(record.co_latitude as any),
+            parseFloat(record.co_longitude as any),
+            kabupatens
+          )
+        : null;
         
         return {
           ...record,
           lokasi_checkin: nearest?.name || null,
           lokasi_checkout: nearestCheckout?.name || null,
         };
-      })
-    );
+      });
 
     const total = countResult[0]?.count || 0;
     const totalPages = Math.ceil(total / limit);
@@ -131,15 +167,19 @@ export class AbsensiRepository {
     if (!result[0]) return null;
 
     const record = result[0];
-    const nearest = await findNearestKabupaten(
+    const kabupatens = await getAllKabupatensForGeocoding();
+    
+    const nearest = findNearestKabupatensFromList(
       parseFloat(record.ci_latitude as any),
-      parseFloat(record.ci_longitude as any)
+      parseFloat(record.ci_longitude as any),
+      kabupatens
     );
 
     const nearestCheckout = record.co_latitude && record.co_longitude
-      ? await findNearestKabupaten(
+      ? findNearestKabupatensFromList(
           parseFloat(record.co_latitude as any),
-          parseFloat(record.co_longitude as any)
+          parseFloat(record.co_longitude as any),
+          kabupatens
         )
       : null;
 
