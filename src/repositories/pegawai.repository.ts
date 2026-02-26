@@ -112,7 +112,7 @@ export class PegawaiRepository {
 
   async findByNip(nip: string) {
     const result = await db
-      .select()
+      .select({ id: mstPegawai.id })
       .from(mstPegawai)
       .where(eq(mstPegawai.nip, nip))
       .limit(1);
@@ -122,27 +122,8 @@ export class PegawaiRepository {
 
   async findByEmail(email: string) {
     const result = await db
-      .select({
-        id: mstPegawai.id,
-        nip: mstPegawai.nip,
-        nama: mstPegawai.nama,
-        email: mstPegawai.email,
-        jabatan: mstPegawai.jabatan,
-        organisasi_id: mstPegawai.organisasi_id,
-        organisasi_nama: mstOrganisasi.nama_organisasi,
-        organisasi_kode: mstOrganisasi.kode_organisasi,
-        organisasi_level: mstOrganisasi.level_organisasi,
-        role_id: mstPegawai.role_id,
-        role_nama: mstRole.nama_role,
-        level_role: mstRole.level_role,
-        status_aktif: mstPegawai.status_aktif,
-        last_login: mstPegawai.last_login,
-        created_at: mstPegawai.created_at,
-        updated_at: mstPegawai.updated_at,
-      })
+      .select({ id: mstPegawai.id })
       .from(mstPegawai)
-      .leftJoin(mstOrganisasi, eq(mstPegawai.organisasi_id, mstOrganisasi.id))
-      .leftJoin(mstRole, eq(mstPegawai.role_id, mstRole.id))
       .where(eq(mstPegawai.email, email))
       .limit(1);
 
@@ -179,6 +160,35 @@ export class PegawaiRepository {
       .delete(mstPegawai)
       .where(eq(mstPegawai.id, id))
       .returning();
+
+    return result[0] || null;
+  }
+
+  async getByEmail(email: string) {
+    const result = await db
+      .select({
+        id: mstPegawai.id,
+        nip: mstPegawai.nip,
+        nama: mstPegawai.nama,
+        email: mstPegawai.email,
+        jabatan: mstPegawai.jabatan,
+        organisasi_id: mstPegawai.organisasi_id,
+        organisasi_nama: mstOrganisasi.nama_organisasi,
+        organisasi_kode: mstOrganisasi.kode_organisasi,
+        organisasi_level: mstOrganisasi.level_organisasi,
+        role_id: mstPegawai.role_id,
+        role_nama: mstRole.nama_role,
+        level_role: mstRole.level_role,
+        status_aktif: mstPegawai.status_aktif,
+        last_login: mstPegawai.last_login,
+        created_at: mstPegawai.created_at,
+        updated_at: mstPegawai.updated_at,
+      })
+      .from(mstPegawai)
+      .leftJoin(mstOrganisasi, eq(mstPegawai.organisasi_id, mstOrganisasi.id))
+      .leftJoin(mstRole, eq(mstPegawai.role_id, mstRole.id))
+      .where(eq(mstPegawai.email, email))
+      .limit(1);
 
     return result[0] || null;
   }

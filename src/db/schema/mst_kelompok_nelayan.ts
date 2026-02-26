@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, integer, timestamp, text, date } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, integer, timestamp, text, date, index } from 'drizzle-orm/pg-core';
 import { mstUpt } from './mst_upt';
 import { mstProvinsi } from './mst_provinsi';
 import { mstPenyuluh } from './mst_penyuluh';
@@ -29,7 +29,12 @@ export const mstKelompokNelayan = pgTable('mst_kelompok_nelayan', {
   profil_kelompok_photo_id: varchar('profil_kelompok_photo_id', { length: 100 }),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow(),
-});
+}, (table) => ({
+  upt_id_idx: index('idx_kelompok_nelayan_upt_id').on(table.upt_id),
+  province_id_idx: index('idx_kelompok_nelayan_province_id').on(table.province_id),
+  penyuluh_id_idx: index('idx_kelompok_nelayan_penyuluh_id').on(table.penyuluh_id),
+  jenis_usaha_id_idx: index('idx_kelompok_nelayan_jenis_usaha_id').on(table.jenis_usaha_id),
+}));
 
 export type MstKelompokNelayan = typeof mstKelompokNelayan.$inferSelect;
 export type InsertMstKelompokNelayan = typeof mstKelompokNelayan.$inferInsert;

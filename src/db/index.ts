@@ -12,7 +12,7 @@ console.log("Connecting to database:", DATABASE_URL.replace(/:[^:@]+@/, ':****@'
 
 export const pool = new Pool({
   connectionString: DATABASE_URL,
-  max: 3,
+  max: 15,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000
 });

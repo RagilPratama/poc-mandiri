@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, boolean, timestamp, integer, text, date } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, boolean, timestamp, integer, text, date, index } from 'drizzle-orm/pg-core';
 import { mstOrganisasi } from './mst_organisasi';
 import { mstRole } from './mst_role';
 
@@ -22,7 +22,12 @@ export const mstPegawai = pgTable('mst_pegawai', {
   tanggal_bergabung: date('tanggal_bergabung'),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow(),
-});
+}, (table) => ({
+  organisasi_id_idx: index('idx_pegawai_organisasi_id').on(table.organisasi_id),
+  role_id_idx: index('idx_pegawai_role_id').on(table.role_id),
+  status_aktif_idx: index('idx_pegawai_status_aktif').on(table.status_aktif),
+  created_at_idx: index('idx_pegawai_created_at').on(table.created_at),
+}));
 
 export type MstPegawai = typeof mstPegawai.$inferSelect;
 export type InsertMstPegawai = typeof mstPegawai.$inferInsert;

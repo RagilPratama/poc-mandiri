@@ -48,7 +48,7 @@ export const pegawaiHandler = {
     try {
       const { email } = params;
       
-      const pegawai = await pegawaiRepo.findByEmail(email);
+      const pegawai = await pegawaiRepo.getByEmail(email);
       if (!pegawai) {
         return {
           message: 'Pegawai tidak ditemukan',
@@ -64,22 +64,6 @@ export const pegawaiHandler = {
 
   async create({ body, headers, request, path }: Context<{ body: CreatePegawaiType }>) {
     try {
-      // Check if NIP already exists
-      const existingNip = await pegawaiRepo.findByNip(body.nip);
-      if (existingNip) {
-        return {
-          message: 'NIP sudah terdaftar',
-        };
-      }
-
-      // Check if email already exists
-      const existingEmail = await pegawaiRepo.findByEmail(body.email);
-      if (existingEmail) {
-        return {
-          message: 'Email sudah terdaftar',
-        };
-      }
-
       const pegawai = await pegawaiRepo.create(body);
 
       await logActivitySimple({
@@ -92,8 +76,17 @@ export const pegawaiHandler = {
 
       return successResponse('Pegawai berhasil ditambahkan', pegawai);
     } catch (error) {
-      console.error('Error creating pegawai:', error);
+      let errorMessage = 'Gagal menambahkan pegawai';
       
+      // Handle unique constraint violations
+      if (error instanceof Error) {
+        if (error.message.includes('nip')) {
+          errorMessage = 'NIP sudah terdaftar';
+        } else if (error.message.includes('email')) {
+          errorMessage = 'Email sudah terdaftar';
+        }
+      }
+
       await logActivitySimple({
         context: { headers, request, path },
         aktivitas: 'CREATE',
@@ -103,7 +96,7 @@ export const pegawaiHandler = {
         error_message: error instanceof Error ? error.message : 'Unknown error',
       });
       
-      throw new Error('Gagal menambahkan pegawai');
+      throw new Error(errorMessage);
     }
   },
 
