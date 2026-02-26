@@ -4,6 +4,7 @@ import { cors } from "@elysiajs/cors";
 import { pool } from "./db";
 import { connectRedis, disconnectRedis } from "./redis";
 import { warmupCache } from "./utils/cache-warmer";
+import { startActivityLogWorker } from "./utils/queue";
 import { 
   provinceRoutes, 
   regencyRoutes, 
@@ -181,6 +182,9 @@ const app = new Elysia()
   console.log(
     `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
   );
+
+// Start activity log queue worker
+startActivityLogWorker();
 
 
 // Graceful shutdown

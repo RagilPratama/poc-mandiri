@@ -104,3 +104,36 @@ export async function logActivitySimple(params: SimpleLogParams) {
     error_message: params.error_message,
   });
 }
+
+// Async logging function - non-blocking, fire-and-forget
+export async function logActivityAsync(params: SimpleLogParams) {
+  try {
+    const { enqueueActivityLog } = await import('./queue');
+    const userInfo = extractUserInfo(params.context);
+
+    const logData = {
+      user_id: userInfo.user_id,
+      username: userInfo.username,
+      email: userInfo.email,
+      ip_address: userInfo.ip_address,
+      user_agent: userInfo.user_agent,
+      method: userInfo.method,
+      endpoint: userInfo.endpoint,
+      aktivitas: params.aktivitas,
+      modul: params.modul,
+      deskripsi: params.deskripsi,
+      data_lama: params.data_lama ? JSON.stringify(params.data_lama) : null,
+      data_baru: params.data_baru ? JSON.stringify(params.data_baru) : null,
+      status: params.status || 'SUCCESS',
+      error_message: params.error_message,
+      created_at: new Date(),
+    };
+
+    // Enqueue - don't await, fire-and-forget
+    enqueueActivityLog(logData).catch((err) => {
+      console.error('Failed to enqueue activity log:', err);
+    });
+  } catch (error) {
+    console.error('logActivityAsync error:', error);
+  }
+}

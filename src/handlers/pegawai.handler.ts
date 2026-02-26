@@ -1,7 +1,7 @@
 import { Context } from 'elysia';
 import { PegawaiRepository } from '../repositories/pegawai.repository';
 import { successResponse, successResponseWithPagination } from '../utils/response';
-import { logActivitySimple } from '../utils/activity-logger';
+import { logActivityAsync } from '../utils/activity-logger';
 import type { CreatePegawaiType, UpdatePegawaiType, PegawaiQueryType } from '../types/pegawai';
 
 const pegawaiRepo = new PegawaiRepository();
@@ -66,7 +66,8 @@ export const pegawaiHandler = {
     try {
       const pegawai = await pegawaiRepo.create(body);
 
-      await logActivitySimple({
+      // Fire-and-forget async logging
+      logActivityAsync({
         context: { headers, request, path },
         aktivitas: 'CREATE',
         modul: 'PEGAWAI',
@@ -87,7 +88,7 @@ export const pegawaiHandler = {
         }
       }
 
-      await logActivitySimple({
+      logActivityAsync({
         context: { headers, request, path },
         aktivitas: 'CREATE',
         modul: 'PEGAWAI',
@@ -138,7 +139,8 @@ export const pegawaiHandler = {
 
       const pegawai = await pegawaiRepo.update(id, body);
 
-      await logActivitySimple({
+      // Fire-and-forget async logging
+      logActivityAsync({
         context: { headers, request, path },
         aktivitas: 'UPDATE',
         modul: 'PEGAWAI',
@@ -151,7 +153,7 @@ export const pegawaiHandler = {
     } catch (error) {
       console.error('Error updating pegawai:', error);
       
-      await logActivitySimple({
+      logActivityAsync({
         context: { headers, request, path },
         aktivitas: 'UPDATE',
         modul: 'PEGAWAI',
@@ -182,7 +184,8 @@ export const pegawaiHandler = {
 
       await pegawaiRepo.delete(id);
 
-      await logActivitySimple({
+      // Fire-and-forget async logging
+      logActivityAsync({
         context: { headers, request, path },
         aktivitas: 'DELETE',
         modul: 'PEGAWAI',
@@ -194,7 +197,7 @@ export const pegawaiHandler = {
     } catch (error) {
       console.error('Error deleting pegawai:', error);
       
-      await logActivitySimple({
+      logActivityAsync({
         context: { headers, request, path },
         aktivitas: 'DELETE',
         modul: 'PEGAWAI',

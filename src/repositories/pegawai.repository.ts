@@ -36,47 +36,42 @@ export class PegawaiRepository {
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-    const [data, countResult] = await Promise.all([
-      db
-        .select({
-          id: mstPegawai.id,
-          nip: mstPegawai.nip,
-          nama: mstPegawai.nama,
-          email: mstPegawai.email,
-          jabatan: mstPegawai.jabatan,
-          organisasi_id: mstPegawai.organisasi_id,
-          organisasi_nama: mstOrganisasi.nama_organisasi,
-          role_id: mstPegawai.role_id,
-          role_nama: mstRole.nama_role,
-          level_role: mstRole.level_role,
-          status_aktif: mstPegawai.status_aktif,
-          last_login: mstPegawai.last_login,
-          created_at: mstPegawai.created_at,
-          updated_at: mstPegawai.updated_at,
-        })
-        .from(mstPegawai)
-        .leftJoin(mstOrganisasi, eq(mstPegawai.organisasi_id, mstOrganisasi.id))
-        .leftJoin(mstRole, eq(mstPegawai.role_id, mstRole.id))
-        .where(whereClause)
-        .orderBy(desc(mstPegawai.created_at))
-        .limit(limit)
-        .offset(offset),
-      db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(mstPegawai)
-        .where(whereClause),
-    ]);
+    // Optimization: Fetch limit+1 to determine if there's a next page (avoid COUNT query)
+    const data = await db
+      .select({
+        id: mstPegawai.id,
+        nip: mstPegawai.nip,
+        nama: mstPegawai.nama,
+        email: mstPegawai.email,
+        jabatan: mstPegawai.jabatan,
+        organisasi_id: mstPegawai.organisasi_id,
+        organisasi_nama: mstOrganisasi.nama_organisasi,
+        role_id: mstPegawai.role_id,
+        role_nama: mstRole.nama_role,
+        level_role: mstRole.level_role,
+        status_aktif: mstPegawai.status_aktif,
+        last_login: mstPegawai.last_login,
+        created_at: mstPegawai.created_at,
+        updated_at: mstPegawai.updated_at,
+      })
+      .from(mstPegawai)
+      .leftJoin(mstOrganisasi, eq(mstPegawai.organisasi_id, mstOrganisasi.id))
+      .leftJoin(mstRole, eq(mstPegawai.role_id, mstRole.id))
+      .where(whereClause)
+      .orderBy(desc(mstPegawai.created_at))
+      .limit(limit + 1)  // Fetch one extra to know if there's next page
+      .offset(offset);
 
-    const total = countResult[0]?.count || 0;
-    const totalPages = Math.ceil(total / limit);
+    // Check if there's next page
+    const hasNextPage = data.length > limit;
+    const items = data.slice(0, limit); // Return only requested limit
 
     return {
-      data,
+      data: items,
       pagination: {
         page,
         limit,
-        total,
-        totalPages,
+        hasNextPage,  // Instead of exact total count
       },
     };
   }

@@ -17,7 +17,6 @@ describe("PegawaiRepository", () => {
     expect(result).toBeDefined();
     expect(Array.isArray(result.data)).toBe(true);
     expect(result.pagination).toBeDefined();
-    expect(result.pagination.total).toBeGreaterThan(0);
   });
 
   it("should search pegawai by name", async () => {
