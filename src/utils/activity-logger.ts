@@ -46,29 +46,30 @@ export async function logActivity(params: LogActivityParams) {
 
 // Helper function to extract user info from context
 export function extractUserInfo(context: any) {
-  // Get IP address with priority: x-forwarded-for > x-real-ip > direct connection
-  let ip_address = context.headers?.['x-forwarded-for'];
-  if (!ip_address) {
-    ip_address = context.headers?.['x-real-ip'];
-  }
-  if (!ip_address && context.request) {
-    // For Elysia, IP might be in different places
-    ip_address = context.request.ip || context.request.socket?.remoteAddress;
-  }
+  // Get headers properly (might be Map or object)
+  const hdrs = context.headers || {};
+  const userAgent = hdrs['user-agent'] || hdrs.get?.('user-agent') || 'unknown';
   
-  // If x-forwarded-for contains multiple IPs (proxy chain), take the first one (original client)
-  if (ip_address && ip_address.includes(',')) {
-    ip_address = ip_address.split(',')[0].trim();
+  // Get IP (try multiple places)
+  let ip = hdrs['x-forwarded-for'] || hdrs.get?.('x-forwarded-for');
+  if (!ip) ip = hdrs['x-real-ip'] || hdrs.get?.('x-real-ip');
+  if (!ip && context.request?.ip) ip = context.request.ip;
+  if (!ip && context.request?.socket?.remoteAddress) ip = context.request.socket.remoteAddress;
+  if (!ip) ip = '127.0.0.1'; // fallback untuk localhost
+  
+  // Handle proxy chain
+  if (ip && ip.includes(',')) {
+    ip = ip.split(',')[0].trim();
   }
 
   return {
-    user_id: context.user?.id || context.headers?.['x-user-id'],
-    username: context.user?.username || context.headers?.['x-username'],
-    email: context.user?.email || context.headers?.['x-user-email'],
-    ip_address: ip_address || 'unknown',
-    user_agent: context.headers?.['user-agent'] || 'unknown',
-    method: context.request?.method,
-    endpoint: context.path || context.request?.url,
+    user_id: context.user?.id || hdrs['x-user-id'] || hdrs.get?.('x-user-id'),
+    username: context.user?.username || hdrs['x-username'] || hdrs.get?.('x-username'),
+    email: context.user?.email || hdrs['x-user-email'] || hdrs.get?.('x-user-email'),
+    ip_address: ip || 'unknown',
+    user_agent: userAgent,
+    method: context.request?.method || 'UNKNOWN',
+    endpoint: context.path || context.request?.url || 'unknown',
   };
 }
 

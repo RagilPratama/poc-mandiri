@@ -23,8 +23,8 @@ export const unitPelaksanaanTeknisRoutes = new Elysia({ prefix: "/api/master" })
         description: "Menampilkan detail unit pelaksanaan teknis berdasarkan ID",
     },
     })
-    .post("/unit-pelaksanaan-teknis", async ({ body }) => {
-        return await unitPelaksanaanTeknisHandler.create({ body });
+    .post("/unit-pelaksanaan-teknis", async ({ body, headers, request, path }) => {
+        return await unitPelaksanaanTeknisHandler.create({ body, headers, request, path });
     }, {
     body: t.Object({
         nama_organisasi: t.String({ minLength: 1, description: "Nama organisasi" }),
@@ -37,8 +37,8 @@ export const unitPelaksanaanTeknisRoutes = new Elysia({ prefix: "/api/master" })
         description: "Membuat unit pelaksanaan teknis baru",
     },
     })
-    .put("/unit-pelaksanaan-teknis/:id", async ({ params, body }) => {
-        return await unitPelaksanaanTeknisHandler.update({ params: { id: Number(params.id) }, body });
+    .put("/unit-pelaksanaan-teknis/:id", async ({ params, body, headers, request, path }) => {
+        return await unitPelaksanaanTeknisHandler.update({ params: { id: Number(params.id) }, body, headers, request, path });
     }, {
     params: t.Object({
         id: t.Numeric({ minimum: 1, description: "Unit Pelaksanaan Teknis ID" }),
@@ -54,8 +54,8 @@ export const unitPelaksanaanTeknisRoutes = new Elysia({ prefix: "/api/master" })
         description: "Mengupdate unit pelaksanaan teknis berdasarkan ID",
     },
     })
-    .delete("/unit-pelaksanaan-teknis/:id", async ({ params }) => {
-        return await unitPelaksanaanTeknisHandler.delete({ params: { id: Number(params.id) } });
+    .delete("/unit-pelaksanaan-teknis/:id", async ({ params, headers, request, path }) => {
+        return await unitPelaksanaanTeknisHandler.delete({ params: { id: Number(params.id) }, headers, request, path });
     }, {
     params: t.Object({
         id: t.Numeric({ minimum: 1, description: "Unit Pelaksanaan Teknis ID" }),
