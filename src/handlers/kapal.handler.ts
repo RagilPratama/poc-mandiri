@@ -1,12 +1,12 @@
 import { Context } from 'elysia';
-import { KapalRepository } from '../repositories/kapal.repository';
+import { KapalRepository, KapalQueryType } from '../repositories/kapal.repository';
 import { successResponse, successResponseWithPagination } from '../utils/response';
 import { logActivitySimple } from '../utils/activity-logger';
 
 const kapalRepo = new KapalRepository();
 
 export const kapalHandler = {
-  async getAll({ query }: Context<{ query: any }>) {
+  async getAll({ query }: { query: KapalQueryType }) {
     try {
       const result = await kapalRepo.findAll(query);
       return successResponseWithPagination(
