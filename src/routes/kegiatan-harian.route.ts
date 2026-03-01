@@ -41,7 +41,9 @@ export const kegiatanHarianRoute = new Elysia({ prefix: '/kegiatan-harian' })
       description: 'Get kegiatan harian detail by ID',
     },
   })
-  .post('/', kegiatanHarianHandler.create, {
+  .post('/', async (context) => {
+    return await kegiatanHarianHandler.create(context);
+  }, {
     body: t.Object({
       pegawai_id: t.Numeric(),
       kelompok_nelayan_id: t.Optional(t.Numeric()),
@@ -58,7 +60,9 @@ export const kegiatanHarianRoute = new Elysia({ prefix: '/kegiatan-harian' })
       description: 'Create a new kegiatan harian record with photo upload support (max 5 photos)',
     },
   })
-  .put('/:id', kegiatanHarianHandler.update, {
+  .put('/:id', async (context) => {
+    return await kegiatanHarianHandler.update(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),
@@ -79,7 +83,9 @@ export const kegiatanHarianRoute = new Elysia({ prefix: '/kegiatan-harian' })
       description: 'Update kegiatan harian by ID with photo upload support',
     },
   })
-  .delete('/:id', kegiatanHarianHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await kegiatanHarianHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),

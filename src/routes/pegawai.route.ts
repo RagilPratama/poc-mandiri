@@ -36,7 +36,9 @@ export const pegawaiRoute = new Elysia({ prefix: '/pegawai' })
       description: 'Get pegawai detail by email with organisasi and role relations',
     },
   })
-  .post('/', pegawaiHandler.create, {
+  .post('/', async (context) => {
+    return await pegawaiHandler.create(context);
+  }, {
     body: CreatePegawaiSchema,
     detail: {
       tags: ['Pegawai'],
@@ -44,7 +46,9 @@ export const pegawaiRoute = new Elysia({ prefix: '/pegawai' })
       description: 'Create a new pegawai record',
     },
   })
-  .put('/:id', pegawaiHandler.update, {
+  .put('/:id', async (context) => {
+    return await pegawaiHandler.update(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),
@@ -55,7 +59,9 @@ export const pegawaiRoute = new Elysia({ prefix: '/pegawai' })
       description: 'Update pegawai by ID',
     },
   })
-  .delete('/:id', pegawaiHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await pegawaiHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

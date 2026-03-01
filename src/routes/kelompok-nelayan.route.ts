@@ -21,7 +21,9 @@ export const kelompokNelayanRoute = new Elysia({ prefix: '/kelompok-nelayan' })
       description: 'Get kelompok nelayan detail by ID with UPT, province, and penyuluh relations',
     },
   })
-  .post('/', kelompokNelayanHandler.create, {
+  .post('/', async (context) => {
+    return await kelompokNelayanHandler.create(context);
+  }, {
     body: t.Object({
       nib_kelompok: t.String(),
       no_registrasi: t.String(),
@@ -56,7 +58,9 @@ export const kelompokNelayanRoute = new Elysia({ prefix: '/kelompok-nelayan' })
 - profil_kelompok_photo: Optional photo file (JPG/PNG, max 5MB)`,
     },
   })
-  .put('/:id', kelompokNelayanHandler.update, {
+  .put('/:id', async (context) => {
+    return await kelompokNelayanHandler.update(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),
@@ -94,7 +98,9 @@ export const kelompokNelayanRoute = new Elysia({ prefix: '/kelompok-nelayan' })
 - profil_kelompok_photo: Optional photo file to update/replace (JPG/PNG, max 5MB)`,
     },
   })
-  .delete('/:id', kelompokNelayanHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await kelompokNelayanHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

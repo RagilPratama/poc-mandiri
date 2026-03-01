@@ -26,7 +26,9 @@ export const sertifikasiRoute = new Elysia({ prefix: '/sertifikasi' })
       description: 'Get sertifikasi detail by ID with relations',
     },
   })
-  .post('/', sertifikasiHandler.create, {
+  .post('/', async (context) => {
+    return await sertifikasiHandler.create(context);
+  }, {
     body: t.Object({
       jenis_sertifikasi_id: t.Numeric(),
       kelompok_nelayan_id: t.String(),
@@ -43,7 +45,9 @@ export const sertifikasiRoute = new Elysia({ prefix: '/sertifikasi' })
       description: 'Create a new sertifikasi record',
     },
   })
-  .put('/:id', sertifikasiHandler.update, {
+  .put('/:id', async (context) => {
+    return await sertifikasiHandler.update(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),
@@ -63,7 +67,9 @@ export const sertifikasiRoute = new Elysia({ prefix: '/sertifikasi' })
       description: 'Update sertifikasi by ID',
     },
   })
-  .delete('/:id', sertifikasiHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await sertifikasiHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),

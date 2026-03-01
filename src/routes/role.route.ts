@@ -28,8 +28,8 @@ export const roleRoutes = new Elysia({ prefix: "/api/master" })
       description: "Menampilkan detail role berdasarkan ID",
     },
   })
-  .post("/roles", async ({ body }) => {
-    return await roleHandlers.create({ body });
+  .post("/roles", async ({ body, headers, request, path }) => {
+    return await roleHandlers.create({ body, headers, request, path });
   }, {
     body: t.Object({
       level_role: t.String({ minLength: 1, description: "Level role (e.g., Kantor Pusat, UPT, Lainnya)" }),
@@ -42,8 +42,8 @@ export const roleRoutes = new Elysia({ prefix: "/api/master" })
       description: "Membuat role baru",
     },
   })
-  .put("/roles/:id", async ({ params, body }) => {
-    return await roleHandlers.update({ params: { id: Number(params.id) }, body });
+  .put("/roles/:id", async ({ params, body, headers, request, path }) => {
+    return await roleHandlers.update({ params: { id: Number(params.id) }, body, headers, request, path });
   }, {
     params: t.Object({
       id: t.Numeric({ minimum: 1, description: "Role ID" }),
@@ -59,8 +59,8 @@ export const roleRoutes = new Elysia({ prefix: "/api/master" })
       description: "Mengupdate role berdasarkan ID",
     },
   })
-  .delete("/roles/:id", async ({ params }) => {
-    return await roleHandlers.delete({ params: { id: Number(params.id) } });
+  .delete("/roles/:id", async ({ params, headers, request, path }) => {
+    return await roleHandlers.delete({ params: { id: Number(params.id) }, headers, request, path });
   }, {
     params: t.Object({
       id: t.Numeric({ minimum: 1, description: "Role ID" }),

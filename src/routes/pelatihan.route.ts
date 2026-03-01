@@ -27,7 +27,9 @@ export const pelatihanRoute = new Elysia({ prefix: '/pelatihan' })
       description: 'Get pelatihan detail by ID with relations',
     },
   })
-  .post('/', pelatihanHandler.create, {
+  .post('/', async (context) => {
+    return await pelatihanHandler.create(context);
+  }, {
     body: t.Object({
       jenis_pelatihan_id: t.Numeric(),
       penyuluh_id: t.Optional(t.String()),
@@ -45,7 +47,9 @@ export const pelatihanRoute = new Elysia({ prefix: '/pelatihan' })
       description: 'Create a new pelatihan record',
     },
   })
-  .put('/:id', pelatihanHandler.update, {
+  .put('/:id', async (context) => {
+    return await pelatihanHandler.update(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),
@@ -66,7 +70,9 @@ export const pelatihanRoute = new Elysia({ prefix: '/pelatihan' })
       description: 'Update pelatihan by ID',
     },
   })
-  .delete('/:id', pelatihanHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await pelatihanHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

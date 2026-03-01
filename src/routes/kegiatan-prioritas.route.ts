@@ -41,7 +41,9 @@ export const kegiatanPrioritasRoute = new Elysia({ prefix: '/kegiatan-prioritas'
       description: 'Get kegiatan prioritas detail by ID',
     },
   })
-  .post('/', kegiatanPrioritasHandler.create, {
+  .post('/', async (context) => {
+    return await kegiatanPrioritasHandler.create(context);
+  }, {
     body: t.Object({
       pegawai_id: t.Numeric(),
       kelompok_nelayan_id: t.Optional(t.Numeric()),
@@ -58,7 +60,9 @@ export const kegiatanPrioritasRoute = new Elysia({ prefix: '/kegiatan-prioritas'
       description: 'Create a new kegiatan prioritas record with photo upload support (max 5 photos)',
     },
   })
-  .put('/:id', kegiatanPrioritasHandler.update, {
+  .put('/:id', async (context) => {
+    return await kegiatanPrioritasHandler.update(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),
@@ -79,7 +83,9 @@ export const kegiatanPrioritasRoute = new Elysia({ prefix: '/kegiatan-prioritas'
       description: 'Update kegiatan prioritas by ID with photo upload support',
     },
   })
-  .delete('/:id', kegiatanPrioritasHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await kegiatanPrioritasHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),

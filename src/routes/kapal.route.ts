@@ -26,7 +26,9 @@ export const kapalRoute = new Elysia({ prefix: '/kapal' })
       description: 'Get kapal detail by ID with kelompok nelayan relation',
     },
   })
-  .post('/', kapalHandler.create, {
+  .post('/', async (context) => {
+    return await kapalHandler.create(context);
+  }, {
     body: t.Object({
       kelompok_nelayan_id: t.String(),
       nama_kapal: t.String(),
@@ -42,7 +44,9 @@ export const kapalRoute = new Elysia({ prefix: '/kapal' })
       description: 'Create a new kapal record',
     },
   })
-  .put('/:id', kapalHandler.update, {
+  .put('/:id', async (context) => {
+    return await kapalHandler.update(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),
@@ -61,7 +65,9 @@ export const kapalRoute = new Elysia({ prefix: '/kapal' })
       description: 'Update kapal by ID',
     },
   })
-  .delete('/:id', kapalHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await kapalHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),

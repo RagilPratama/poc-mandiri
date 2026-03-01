@@ -25,7 +25,9 @@ export const jenisUsahaRoute = new Elysia({ prefix: '/jenis-usaha' })
       description: 'Get jenis usaha detail by ID',
     },
   })
-  .post('/', jenisUsahaHandler.create, {
+  .post('/', async (context) => {
+    return await jenisUsahaHandler.create(context);
+  }, {
     body: t.Object({
       kode_jenis_usaha: t.String(),
       nama_jenis_usaha: t.String(),
@@ -38,7 +40,9 @@ export const jenisUsahaRoute = new Elysia({ prefix: '/jenis-usaha' })
       description: 'Create a new jenis usaha record',
     },
   })
-  .put('/:id', jenisUsahaHandler.update, {
+  .put('/:id', async (context) => {
+    return await jenisUsahaHandler.update(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),
@@ -54,7 +58,9 @@ export const jenisUsahaRoute = new Elysia({ prefix: '/jenis-usaha' })
       description: 'Update jenis usaha by ID',
     },
   })
-  .delete('/:id', jenisUsahaHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await jenisUsahaHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),

@@ -25,7 +25,9 @@ export const komoditasRoute = new Elysia({ prefix: '/komoditas' })
       description: 'Get komoditas detail by ID',
     },
   })
-  .post('/', komoditasHandler.create, {
+  .post('/', async (context) => {
+    return await komoditasHandler.create(context);
+  }, {
     body: t.Object({
       kode_komoditas: t.String(),
       nama_komoditas: t.String(),
@@ -40,7 +42,9 @@ export const komoditasRoute = new Elysia({ prefix: '/komoditas' })
       description: 'Create a new komoditas record',
     },
   })
-  .put('/:id', komoditasHandler.update, {
+  .put('/:id', async (context) => {
+    return await komoditasHandler.update(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),
@@ -58,7 +62,9 @@ export const komoditasRoute = new Elysia({ prefix: '/komoditas' })
       description: 'Update komoditas by ID',
     },
   })
-  .delete('/:id', komoditasHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await komoditasHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),

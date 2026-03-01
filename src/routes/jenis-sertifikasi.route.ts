@@ -25,7 +25,9 @@ export const jenisSertifikasiRoute = new Elysia({ prefix: '/jenis-sertifikasi' }
       description: 'Get jenis sertifikasi detail by ID',
     },
   })
-  .post('/', jenisSertifikasiHandler.create, {
+  .post('/', async (context) => {
+    return await jenisSertifikasiHandler.create(context);
+  }, {
     body: t.Object({
       nama_sertifikasi: t.String(),
       kategori: t.String(),
@@ -38,7 +40,9 @@ export const jenisSertifikasiRoute = new Elysia({ prefix: '/jenis-sertifikasi' }
       description: 'Create a new jenis sertifikasi record',
     },
   })
-  .put('/:id', jenisSertifikasiHandler.update, {
+  .put('/:id', async (context) => {
+    return await jenisSertifikasiHandler.update(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),
@@ -54,7 +58,9 @@ export const jenisSertifikasiRoute = new Elysia({ prefix: '/jenis-sertifikasi' }
       description: 'Update jenis sertifikasi by ID',
     },
   })
-  .delete('/:id', jenisSertifikasiHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await jenisSertifikasiHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),

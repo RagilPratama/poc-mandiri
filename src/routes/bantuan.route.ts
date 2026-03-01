@@ -27,7 +27,9 @@ export const bantuanRoute = new Elysia({ prefix: '/bantuan' })
       description: 'Get bantuan detail by ID with relations',
     },
   })
-  .post('/', bantuanHandler.create, {
+  .post('/', async (context) => {
+    return await bantuanHandler.create(context);
+  }, {
     body: t.Object({
       jenis_bantuan_id: t.Numeric(),
       kelompok_nelayan_id: t.String(),
@@ -45,7 +47,9 @@ export const bantuanRoute = new Elysia({ prefix: '/bantuan' })
       description: 'Create a new bantuan record',
     },
   })
-  .put('/:id', bantuanHandler.update, {
+  .put('/:id', async (context) => {
+    return await bantuanHandler.update(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),
@@ -66,7 +70,9 @@ export const bantuanRoute = new Elysia({ prefix: '/bantuan' })
       description: 'Update bantuan by ID',
     },
   })
-  .delete('/:id', bantuanHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await bantuanHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

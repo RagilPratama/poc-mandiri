@@ -28,7 +28,9 @@ export const produksiHasilTangkapanRoute = new Elysia({ prefix: '/produksi-hasil
       description: 'Get produksi hasil tangkapan detail by ID with relations',
     },
   })
-  .post('/', produksiHasilTangkapanHandler.create, {
+  .post('/', async (context) => {
+    return await produksiHasilTangkapanHandler.create(context);
+  }, {
     body: t.Object({
       kelompok_nelayan_id: t.String(),
       kapal_id: t.Optional(t.Numeric()),
@@ -47,7 +49,9 @@ export const produksiHasilTangkapanRoute = new Elysia({ prefix: '/produksi-hasil
       description: 'Create a new produksi hasil tangkapan record',
     },
   })
-  .put('/:id', produksiHasilTangkapanHandler.update, {
+  .put('/:id', async (context) => {
+    return await produksiHasilTangkapanHandler.update(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),
@@ -69,7 +73,9 @@ export const produksiHasilTangkapanRoute = new Elysia({ prefix: '/produksi-hasil
       description: 'Update produksi hasil tangkapan by ID',
     },
   })
-  .delete('/:id', produksiHasilTangkapanHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await produksiHasilTangkapanHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

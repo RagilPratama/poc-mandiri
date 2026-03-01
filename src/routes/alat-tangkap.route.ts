@@ -25,7 +25,9 @@ export const alatTangkapRoute = new Elysia({ prefix: '/alat-tangkap' })
       description: 'Get alat tangkap detail by ID',
     },
   })
-  .post('/', alatTangkapHandler.create, {
+  .post('/', async (context) => {
+    return await alatTangkapHandler.create(context);
+  }, {
     body: t.Object({
       nama_alat: t.String(),
       jenis: t.String(),
@@ -37,7 +39,9 @@ export const alatTangkapRoute = new Elysia({ prefix: '/alat-tangkap' })
       description: 'Create a new alat tangkap record',
     },
   })
-  .put('/:id', alatTangkapHandler.update, {
+  .put('/:id', async (context) => {
+    return await alatTangkapHandler.update(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),
@@ -52,7 +56,9 @@ export const alatTangkapRoute = new Elysia({ prefix: '/alat-tangkap' })
       description: 'Update alat tangkap by ID',
     },
   })
-  .delete('/:id', alatTangkapHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await alatTangkapHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

@@ -25,7 +25,9 @@ export const penyuluhRoute = new Elysia({ prefix: '/penyuluh' })
       description: 'Get penyuluh detail by ID with pegawai, UPT, and province relations',
     },
   })
-  .post('/', penyuluhHandler.create, {
+  .post('/', async (context) => {
+    return await penyuluhHandler.create(context);
+  }, {
     body: CreatePenyuluhSchema,
     detail: {
       tags: ['Penyuluh'],
@@ -33,7 +35,9 @@ export const penyuluhRoute = new Elysia({ prefix: '/penyuluh' })
       description: 'Create a new penyuluh record',
     },
   })
-  .put('/:id', penyuluhHandler.update, {
+  .put('/:id', async (context) => {
+    return await penyuluhHandler.update(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),
@@ -44,7 +48,9 @@ export const penyuluhRoute = new Elysia({ prefix: '/penyuluh' })
       description: 'Update penyuluh by ID',
     },
   })
-  .delete('/:id', penyuluhHandler.delete, {
+  .delete('/:id', async (context) => {
+    return await penyuluhHandler.delete(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

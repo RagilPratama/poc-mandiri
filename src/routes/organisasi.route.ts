@@ -28,8 +28,8 @@ export const organisasiRoutes = new Elysia({ prefix: "/api/master" })
       description: "Menampilkan detail organisasi berdasarkan ID",
     },
   })
-  .post("/organisasi", async ({ body }) => {
-    return await organisasiHandlers.create({ body });
+  .post("/organisasi", async ({ body, headers, request, path }) => {
+    return await organisasiHandlers.create({ body, headers, request, path });
   }, {
     body: t.Object({
       level_organisasi: t.String({ minLength: 1, description: "Level organisasi (e.g., Kantor Pusat, Unit Pelaksanaan Teknis)" }),
@@ -43,8 +43,8 @@ export const organisasiRoutes = new Elysia({ prefix: "/api/master" })
       description: "Membuat organisasi baru",
     },
   })
-  .put("/organisasi/:id", async ({ params, body }) => {
-    return await organisasiHandlers.update({ params: { id: Number(params.id) }, body });
+  .put("/organisasi/:id", async ({ params, body, headers, request, path }) => {
+    return await organisasiHandlers.update({ params: { id: Number(params.id) }, body, headers, request, path });
   }, {
     params: t.Object({
       id: t.Numeric({ minimum: 1, description: "Organisasi ID" }),
@@ -61,8 +61,8 @@ export const organisasiRoutes = new Elysia({ prefix: "/api/master" })
       description: "Mengupdate organisasi berdasarkan ID",
     },
   })
-  .delete("/organisasi/:id", async ({ params }) => {
-    return await organisasiHandlers.delete({ params: { id: Number(params.id) } });
+  .delete("/organisasi/:id", async ({ params, headers, request, path }) => {
+    return await organisasiHandlers.delete({ params: { id: Number(params.id) }, headers, request, path });
   }, {
     params: t.Object({
       id: t.Numeric({ minimum: 1, description: "Organisasi ID" }),
