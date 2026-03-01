@@ -37,7 +37,7 @@ export const unitPelaksanaanTeknisHandler = {
         context: { headers, request, path },
         aktivitas: 'CREATE',
         modul: 'UPT',
-        deskripsi: `Membuat UPT baru: ${body.nama_upt}`,
+        deskripsi: `Membuat UPT baru: ${body.nama_organisasi}`,
         data_baru: data,
       });
       
@@ -71,7 +71,7 @@ export const unitPelaksanaanTeknisHandler = {
         context: { headers, request, path },
         aktivitas: 'UPDATE',
         modul: 'UPT',
-        deskripsi: `Mengupdate UPT: ${existing.nama_upt}`,
+        deskripsi: `Mengupdate UPT: ${existing.nama_organisasi}`,
         data_lama: existing,
         data_baru: data,
       });
@@ -106,7 +106,7 @@ export const unitPelaksanaanTeknisHandler = {
         context: { headers, request, path },
         aktivitas: 'DELETE',
         modul: 'UPT',
-        deskripsi: `Menghapus UPT: ${existing.nama_upt}`,
+        deskripsi: `Menghapus UPT: ${existing.nama_organisasi}`,
         data_lama: existing,
       });
 
