@@ -2,7 +2,9 @@ import { Elysia, t } from 'elysia';
 import { sertifikasiHandler } from '../handlers/sertifikasi.handler';
 
 export const sertifikasiRoute = new Elysia({ prefix: '/sertifikasi' })
-  .get('/', sertifikasiHandler.getAll, {
+  .get('/', async (context) => {
+    return await sertifikasiHandler.getAll(context);
+  }, {
     query: t.Object({
       page: t.Optional(t.Numeric({ minimum: 1 })),
       limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100 })),
@@ -16,9 +18,11 @@ export const sertifikasiRoute = new Elysia({ prefix: '/sertifikasi' })
       description: 'Get all sertifikasi with pagination and status filtering',
     },
   })
-  .get('/:id', sertifikasiHandler.getById, {
+  .get('/:id', async (context) => {
+    return await sertifikasiHandler.getById(context);
+  }, {
     params: t.Object({
-      id: t.Numeric()
+      id: t.String()
     }),
     detail: {
       tags: ['Sertifikasi'],
@@ -49,7 +53,7 @@ export const sertifikasiRoute = new Elysia({ prefix: '/sertifikasi' })
     return await sertifikasiHandler.update(context);
   }, {
     params: t.Object({
-      id: t.Numeric()
+      id: t.String()
     }),
     body: t.Object({
       jenis_sertifikasi_id: t.Optional(t.Numeric()),
@@ -71,7 +75,7 @@ export const sertifikasiRoute = new Elysia({ prefix: '/sertifikasi' })
     return await sertifikasiHandler.delete(context);
   }, {
     params: t.Object({
-      id: t.Numeric()
+      id: t.String()
     }),
     detail: {
       tags: ['Sertifikasi'],

@@ -8,7 +8,9 @@ import {
 } from '../types/pegawai';
 
 export const pegawaiRoute = new Elysia({ prefix: '/pegawai' })
-  .get('/', pegawaiHandler.getAll, {
+  .get('/', async (context) => {
+    return await pegawaiHandler.getAll(context);
+  }, {
     query: PegawaiQuerySchema,
     detail: {
       tags: ['Pegawai'],
@@ -16,7 +18,9 @@ export const pegawaiRoute = new Elysia({ prefix: '/pegawai' })
       description: 'Get all pegawai with pagination, search, and filters',
     },
   })
-  .get('/:id', pegawaiHandler.getById, {
+  .get('/:id', async (context) => {
+    return await pegawaiHandler.getById(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),
@@ -26,7 +30,9 @@ export const pegawaiRoute = new Elysia({ prefix: '/pegawai' })
       description: 'Get pegawai detail by ID with organisasi and role relations',
     },
   })
-  .get('/email/:email', pegawaiHandler.getByEmail, {
+  .get('/email/:email', async (context) => {
+    return await pegawaiHandler.getByEmail(context);
+  }, {
     params: t.Object({
       email: t.String({ format: 'email' })
     }),

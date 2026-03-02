@@ -8,7 +8,7 @@ import type { CreateKegiatanHarianType, UpdateKegiatanHarianType, KegiatanHarian
 const kegiatanHarianRepo = new KegiatanHarianRepository();
 
 export const kegiatanHarianHandler = {
-  async getAll({ query }: Context<{ query: KegiatanHarianQueryType }>) {
+  async getAll({ query }: { query: KegiatanHarianQueryType }) {
     try {
       const result = await kegiatanHarianRepo.findAll(query);
       return successResponseWithPagination(
@@ -22,7 +22,7 @@ export const kegiatanHarianHandler = {
     }
   },
 
-  async getById({ params }: Context<{ params: { id: number } }>) {
+  async getById({ params }: { params: { id: number } }) {
     try {
       const kegiatan = await kegiatanHarianRepo.findById(params.id);
       if (!kegiatan) {
@@ -38,7 +38,7 @@ export const kegiatanHarianHandler = {
     }
   },
 
-  async getKegiatanByMonth({ query }: Context<{ query: { pegawai_id: number; year: number; month: number } }>) {
+  async getKegiatanByMonth({ query }: { query: { pegawai_id: number; year: number; month: number } }) {
     try {
       const result = await kegiatanHarianRepo.getKegiatanByMonth(query.pegawai_id, query.year, query.month);
       return successResponse('Data kegiatan harian per bulan berhasil diambil', result);
@@ -197,7 +197,7 @@ export const kegiatanHarianHandler = {
     }
   },
 
-  async delete({ params, headers, request, path }: Context<{ params: { id: number } }>) {
+  async delete({ params, headers, request, path }: { params: { id: number } }) {
     try {
       const existing = await kegiatanHarianRepo.findById(params.id);
       if (!existing) {

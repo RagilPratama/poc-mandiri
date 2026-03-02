@@ -2,7 +2,9 @@ import { Elysia, t } from 'elysia';
 import { jenisPelatihanHandler } from '../handlers/jenis-pelatihan.handler';
 
 export const jenisPelatihanRoute = new Elysia({ prefix: '/jenis-pelatihan' })
-  .get('/', jenisPelatihanHandler.getAll, {
+  .get('/', async (context) => {
+    return await jenisPelatihanHandler.getAll(context);
+  }, {
     query: t.Object({
       page: t.Optional(t.Numeric({ minimum: 1 })),
       limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100 })),
@@ -15,9 +17,11 @@ export const jenisPelatihanRoute = new Elysia({ prefix: '/jenis-pelatihan' })
       description: 'Get all jenis pelatihan with pagination and filters',
     },
   })
-  .get('/:id', jenisPelatihanHandler.getById, {
+  .get('/:id', async (context) => {
+    return await jenisPelatihanHandler.getById(context);
+  }, {
     params: t.Object({
-      id: t.Numeric()
+      id: t.String()
     }),
     detail: {
       tags: ['Jenis Pelatihan'],
@@ -44,7 +48,7 @@ export const jenisPelatihanRoute = new Elysia({ prefix: '/jenis-pelatihan' })
     return await jenisPelatihanHandler.update(context);
   }, {
     params: t.Object({
-      id: t.Numeric()
+      id: t.String()
     }),
     body: t.Object({
       nama_pelatihan: t.Optional(t.String()),
@@ -62,7 +66,7 @@ export const jenisPelatihanRoute = new Elysia({ prefix: '/jenis-pelatihan' })
     return await jenisPelatihanHandler.delete(context);
   }, {
     params: t.Object({
-      id: t.Numeric()
+      id: t.String()
     }),
     detail: {
       tags: ['Jenis Pelatihan'],

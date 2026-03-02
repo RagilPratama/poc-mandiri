@@ -2,7 +2,9 @@ import { Elysia, t } from 'elysia';
 import { logAktivitasHandler } from '../handlers/log-aktivitas.handler';
 
 export const logAktivitasRoute = new Elysia({ prefix: '/log-aktivitas' })
-  .get('/', logAktivitasHandler.getAll, {
+  .get('/', async (context) => {
+    return await logAktivitasHandler.getAll(context);
+  }, {
     query: t.Object({
       page: t.Optional(t.Numeric({ minimum: 1 })),
       limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100 })),
@@ -21,14 +23,18 @@ export const logAktivitasRoute = new Elysia({ prefix: '/log-aktivitas' })
       description: 'Get all log aktivitas with pagination and filters',
     },
   })
-  .get('/statistics', logAktivitasHandler.getStatistics, {
+  .get('/statistics', async (context) => {
+    return await logAktivitasHandler.getStatistics(context);
+  }, {
     detail: {
       tags: ['Log Aktivitas'],
       summary: 'Get log aktivitas statistics',
       description: 'Get statistics of log aktivitas by modul, aktivitas, and status',
     },
   })
-  .get('/:id', logAktivitasHandler.getById, {
+  .get('/:id', async (context) => {
+    return await logAktivitasHandler.getById(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),

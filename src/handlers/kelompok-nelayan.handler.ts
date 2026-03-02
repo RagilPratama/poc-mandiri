@@ -8,7 +8,7 @@ import type { CreateKelompokNelayanType, UpdateKelompokNelayanType, KelompokNela
 const kelompokNelayanRepo = new KelompokNelayanRepository();
 
 export const kelompokNelayanHandler = {
-  async getAll({ query }: Context<{ query: KelompokNelayanQueryType }>) {
+  async getAll({ query }: { query: KelompokNelayanQueryType }) {
     try {
       const result = await kelompokNelayanRepo.findAll(query);
       return successResponseWithPagination(
@@ -22,7 +22,7 @@ export const kelompokNelayanHandler = {
     }
   },
 
-  async getById({ params }: Context<{ params: { id: string } }>) {
+  async getById({ params }: { params: { id: string } }) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {
@@ -194,7 +194,7 @@ export const kelompokNelayanHandler = {
     }
   },
 
-  async delete({ params, headers, request, path }: Context<{ params: { id: string } }>) {
+  async delete({ params, headers, request, path }: { params: { id: string } }) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {

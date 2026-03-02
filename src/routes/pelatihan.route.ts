@@ -2,7 +2,9 @@ import { Elysia, t } from 'elysia';
 import { pelatihanHandler } from '../handlers/pelatihan.handler';
 
 export const pelatihanRoute = new Elysia({ prefix: '/pelatihan' })
-  .get('/', pelatihanHandler.getAll, {
+  .get('/', async (context) => {
+    return await pelatihanHandler.getAll(context);
+  }, {
     query: t.Object({
       page: t.Optional(t.Numeric({ minimum: 1 })),
       limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100 })),
@@ -17,7 +19,9 @@ export const pelatihanRoute = new Elysia({ prefix: '/pelatihan' })
       description: 'Get all pelatihan with pagination and date/status filtering',
     },
   })
-  .get('/:id', pelatihanHandler.getById, {
+  .get('/:id', async (context) => {
+    return await pelatihanHandler.getById(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

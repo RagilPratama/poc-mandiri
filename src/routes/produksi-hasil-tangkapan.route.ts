@@ -2,7 +2,9 @@ import { Elysia, t } from 'elysia';
 import { produksiHasilTangkapanHandler } from '../handlers/produksi-hasil-tangkapan.handler';
 
 export const produksiHasilTangkapanRoute = new Elysia({ prefix: '/produksi-hasil-tangkapan' })
-  .get('/', produksiHasilTangkapanHandler.getAll, {
+  .get('/', async (context) => {
+    return await produksiHasilTangkapanHandler.getAll(context);
+  }, {
     query: t.Object({
       page: t.Optional(t.Numeric({ minimum: 1 })),
       limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100 })),
@@ -18,7 +20,9 @@ export const produksiHasilTangkapanRoute = new Elysia({ prefix: '/produksi-hasil
       description: 'Get all produksi hasil tangkapan with pagination and date filtering',
     },
   })
-  .get('/:id', produksiHasilTangkapanHandler.getById, {
+  .get('/:id', async (context) => {
+    return await produksiHasilTangkapanHandler.getById(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

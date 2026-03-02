@@ -2,7 +2,9 @@ import { Elysia, t } from 'elysia';
 import { jenisBantuanHandler } from '../handlers/jenis-bantuan.handler';
 
 export const jenisBantuanRoute = new Elysia({ prefix: '/jenis-bantuan' })
-  .get('/', jenisBantuanHandler.getAll, {
+  .get('/', async (context) => {
+    return await jenisBantuanHandler.getAll(context);
+  }, {
     query: t.Object({
       page: t.Optional(t.Numeric({ minimum: 1 })),
       limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100 })),
@@ -15,9 +17,11 @@ export const jenisBantuanRoute = new Elysia({ prefix: '/jenis-bantuan' })
       description: 'Get all jenis bantuan with pagination and filters',
     },
   })
-  .get('/:id', jenisBantuanHandler.getById, {
+  .get('/:id', async (context) => {
+    return await jenisBantuanHandler.getById(context);
+  }, {
     params: t.Object({
-      id: t.Numeric()
+      id: t.String()
     }),
     detail: {
       tags: ['Jenis Bantuan'],
@@ -43,7 +47,7 @@ export const jenisBantuanRoute = new Elysia({ prefix: '/jenis-bantuan' })
     return await jenisBantuanHandler.update(context);
   }, {
     params: t.Object({
-      id: t.Numeric()
+      id: t.String()
     }),
     body: t.Object({
       nama_bantuan: t.Optional(t.String()),
@@ -60,7 +64,7 @@ export const jenisBantuanRoute = new Elysia({ prefix: '/jenis-bantuan' })
     return await jenisBantuanHandler.delete(context);
   }, {
     params: t.Object({
-      id: t.Numeric()
+      id: t.String()
     }),
     detail: {
       tags: ['Jenis Bantuan'],

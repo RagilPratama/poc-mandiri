@@ -3,7 +3,9 @@ import { kelompokNelayanHandler } from '../handlers/kelompok-nelayan.handler';
 import { KelompokNelayanQuerySchema } from '../types/kelompok-nelayan';
 
 export const kelompokNelayanRoute = new Elysia({ prefix: '/kelompok-nelayan' })
-  .get('/', kelompokNelayanHandler.getAll, {
+  .get('/', async (context) => {
+    return await kelompokNelayanHandler.getAll(context);
+  }, {
     query: KelompokNelayanQuerySchema,
     detail: {
       tags: ['Kelompok Nelayan'],
@@ -11,7 +13,9 @@ export const kelompokNelayanRoute = new Elysia({ prefix: '/kelompok-nelayan' })
       description: 'Get all kelompok nelayan with pagination, search, and filters',
     },
   })
-  .get('/:id', kelompokNelayanHandler.getById, {
+  .get('/:id', async (context) => {
+    return await kelompokNelayanHandler.getById(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

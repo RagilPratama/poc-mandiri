@@ -8,7 +8,7 @@ import type { CreateKegiatanPrioritasType, UpdateKegiatanPrioritasType, Kegiatan
 const kegiatanPrioritasRepo = new KegiatanPrioritasRepository();
 
 export const kegiatanPrioritasHandler = {
-  async getAll({ query }: Context<{ query: KegiatanPrioritasQueryType }>) {
+  async getAll({ query }: { query: KegiatanPrioritasQueryType }) {
     try {
       const result = await kegiatanPrioritasRepo.findAll(query);
       return successResponseWithPagination(
@@ -22,7 +22,7 @@ export const kegiatanPrioritasHandler = {
     }
   },
 
-  async getById({ params }: Context<{ params: { id: number } }>) {
+  async getById({ params }: { params: { id: number } }) {
     try {
       const kegiatan = await kegiatanPrioritasRepo.findById(params.id);
       if (!kegiatan) {
@@ -38,7 +38,7 @@ export const kegiatanPrioritasHandler = {
     }
   },
 
-  async getKegiatanByMonth({ query }: Context<{ query: { pegawai_id: number; year: number; month: number } }>) {
+  async getKegiatanByMonth({ query }: { query: { pegawai_id: number; year: number; month: number } }) {
     try {
       const result = await kegiatanPrioritasRepo.getKegiatanByMonth(query.pegawai_id, query.year, query.month);
       return successResponse('Data kegiatan prioritas per bulan berhasil diambil', result);
@@ -203,7 +203,7 @@ export const kegiatanPrioritasHandler = {
     }
   },
 
-  async delete({ params, headers, request, path }: Context<{ params: { id: number } }>) {
+  async delete({ params, headers, request, path }: { params: { id: number } }) {
     try {
       const existing = await kegiatanPrioritasRepo.findById(params.id);
       if (!existing) {

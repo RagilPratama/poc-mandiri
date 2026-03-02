@@ -7,7 +7,7 @@ import type { CreatePenyuluhType, UpdatePenyuluhType, PenyuluhQueryType } from '
 const penyuluhRepo = new PenyuluhRepository();
 
 export const penyuluhHandler = {
-  async getAll({ query }: Context<{ query: PenyuluhQueryType }>) {
+  async getAll({ query }: { query: PenyuluhQueryType }) {
     try {
       const result = await penyuluhRepo.findAll(query);
       return successResponseWithPagination(
@@ -21,7 +21,7 @@ export const penyuluhHandler = {
     }
   },
 
-  async getById({ params }: Context<{ params: { id: string } }>) {
+  async getById({ params }: { params: { id: string } }) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {
@@ -135,7 +135,7 @@ export const penyuluhHandler = {
     }
   },
 
-  async delete({ params, headers, request, path }: Context<{ params: { id: string } }>) {
+  async delete({ params, headers, request, path }: { params: { id: string } }) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {

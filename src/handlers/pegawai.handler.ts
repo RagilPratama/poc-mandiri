@@ -7,7 +7,7 @@ import type { CreatePegawaiType, UpdatePegawaiType, PegawaiQueryType } from '../
 const pegawaiRepo = new PegawaiRepository();
 
 export const pegawaiHandler = {
-  async getAll({ query }: Context<{ query: PegawaiQueryType }>) {
+  async getAll({ query }: { query: PegawaiQueryType }) {
     try {
       const result = await pegawaiRepo.findAll(query);
       return successResponseWithPagination(
@@ -21,7 +21,7 @@ export const pegawaiHandler = {
     }
   },
 
-  async getById({ params }: Context<{ params: { id: string } }>) {
+  async getById({ params }: { params: { id: string } }) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {
@@ -44,7 +44,7 @@ export const pegawaiHandler = {
     }
   },
 
-  async getByEmail({ params }: Context<{ params: { email: string } }>) {
+  async getByEmail({ params }: { params: { email: string } }) {
     try {
       const { email } = params;
       
@@ -166,7 +166,7 @@ export const pegawaiHandler = {
     }
   },
 
-  async delete({ params, headers, request, path }: Context<{ params: { id: string } }>) {
+  async delete({ params, headers, request, path }: { params: { id: string } }) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {

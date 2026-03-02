@@ -2,7 +2,9 @@ import { Elysia, t } from 'elysia';
 import { alatTangkapHandler } from '../handlers/alat-tangkap.handler';
 
 export const alatTangkapRoute = new Elysia({ prefix: '/alat-tangkap' })
-  .get('/', alatTangkapHandler.getAll, {
+  .get('/', async (context) => {
+    return await alatTangkapHandler.getAll(context);
+  }, {
     query: t.Object({
       page: t.Optional(t.Numeric({ minimum: 1 })),
       limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100 })),
@@ -15,7 +17,9 @@ export const alatTangkapRoute = new Elysia({ prefix: '/alat-tangkap' })
       description: 'Get all alat tangkap with pagination and filters',
     },
   })
-  .get('/:id', alatTangkapHandler.getById, {
+  .get('/:id', async (context) => {
+    return await alatTangkapHandler.getById(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

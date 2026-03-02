@@ -30,7 +30,7 @@ export const logAktivitasHandler = {
     }
   },
 
-  async getById({ params }: Context<{ params: { id: number } }>) {
+  async getById({ params }: { params: { id: number } }) {
     try {
       const id = params.id;
 
@@ -48,7 +48,7 @@ export const logAktivitasHandler = {
     }
   },
 
-  async getStatistics({ query }: Context<{ query: any }>) {
+  async getStatistics({ query }: { query: any }) {
     try {
       const stats = await logAktivitasRepo.getStatistics(query);
       return successResponse('Statistik log aktivitas berhasil diambil', stats);

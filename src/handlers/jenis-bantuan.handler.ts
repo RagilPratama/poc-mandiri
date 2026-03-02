@@ -6,7 +6,7 @@ import { logActivitySimple } from '../utils/activity-logger';
 const jenisBantuanRepo = new JenisBantuanRepository();
 
 export const jenisBantuanHandler = {
-  async getAll({ query }: Context<{ query: any }>) {
+  async getAll({ query }: { query: any }) {
     try {
       const result = await jenisBantuanRepo.findAll(query);
       return successResponseWithPagination(

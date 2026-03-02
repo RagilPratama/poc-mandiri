@@ -2,7 +2,9 @@ import { Elysia, t } from 'elysia';
 import { komoditasHandler } from '../handlers/komoditas.handler';
 
 export const komoditasRoute = new Elysia({ prefix: '/komoditas' })
-  .get('/', komoditasHandler.getAll, {
+  .get('/', async (context) => {
+    return await komoditasHandler.getAll(context);
+  }, {
     query: t.Object({
       page: t.Optional(t.Numeric({ minimum: 1 })),
       limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100 })),
@@ -15,7 +17,9 @@ export const komoditasRoute = new Elysia({ prefix: '/komoditas' })
       description: 'Get all komoditas with pagination and filters',
     },
   })
-  .get('/:id', komoditasHandler.getById, {
+  .get('/:id', async (context) => {
+    return await komoditasHandler.getById(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),

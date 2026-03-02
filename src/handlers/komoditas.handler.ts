@@ -6,7 +6,7 @@ import { logActivitySimple } from '../utils/activity-logger';
 const komoditasRepo = new KomoditasRepository();
 
 export const komoditasHandler = {
-  async getAll({ query }: Context<{ query: { page?: number; limit?: number; search?: string; kategori?: string } }>) {
+  async getAll({ query }: { query: { page?: number; limit?: number; search?: string; kategori?: string } }) {
     try {
       const result = await komoditasRepo.findAll(query);
       return successResponseWithPagination(
@@ -20,7 +20,7 @@ export const komoditasHandler = {
     }
   },
 
-  async getById({ params }: Context<{ params: { id: number } }>) {
+  async getById({ params }: { params: { id: number } }) {
     try {
       const id = params.id;
 
@@ -111,7 +111,7 @@ export const komoditasHandler = {
     }
   },
 
-  async delete({ params, headers, request, path }: Context<{ params: { id: number } }>) {
+  async delete({ params, headers, request, path }: { params: { id: number } }) {
     try {
       const id = params.id;
 

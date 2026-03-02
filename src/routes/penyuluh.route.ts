@@ -7,7 +7,9 @@ import {
 } from '../types/penyuluh';
 
 export const penyuluhRoute = new Elysia({ prefix: '/penyuluh' })
-  .get('/', penyuluhHandler.getAll, {
+  .get('/', async (context) => {
+    return await penyuluhHandler.getAll(context);
+  }, {
     query: PenyuluhQuerySchema,
     detail: {
       tags: ['Penyuluh'],
@@ -15,7 +17,9 @@ export const penyuluhRoute = new Elysia({ prefix: '/penyuluh' })
       description: 'Get all penyuluh with pagination, search, and filters',
     },
   })
-  .get('/:id', penyuluhHandler.getById, {
+  .get('/:id', async (context) => {
+    return await penyuluhHandler.getById(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

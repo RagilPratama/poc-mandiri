@@ -8,7 +8,9 @@ import {
 } from '../types/absensi';
 
 export const absensiRoute = new Elysia({ prefix: '/absensi' })
-  .get('/', absensiHandler.getAll, {
+  .get('/', async (context) => {
+    return await absensiHandler.getAll(context);
+  }, {
     query: AbsensiQuerySchema,
     detail: {
       tags: ['Absensi'],
@@ -32,7 +34,9 @@ GET /absensi?search=siti&date_from=2026-02-10
 \`\`\``,
     },
   })
-  .get('/:id', absensiHandler.getById, {
+  .get('/:id', async (context) => {
+    return await absensiHandler.getById(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

@@ -2,7 +2,9 @@ import { Elysia, t } from 'elysia';
 import { bantuanHandler } from '../handlers/bantuan.handler';
 
 export const bantuanRoute = new Elysia({ prefix: '/bantuan' })
-  .get('/', bantuanHandler.getAll, {
+  .get('/', async (context) => {
+    return await bantuanHandler.getAll(context);
+  }, {
     query: t.Object({
       page: t.Optional(t.Numeric({ minimum: 1 })),
       limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100 })),
@@ -17,7 +19,9 @@ export const bantuanRoute = new Elysia({ prefix: '/bantuan' })
       description: 'Get all bantuan with pagination and status filtering',
     },
   })
-  .get('/:id', bantuanHandler.getById, {
+  .get('/:id', async (context) => {
+    return await bantuanHandler.getById(context);
+  }, {
     params: t.Object({
       id: t.String()
     }),

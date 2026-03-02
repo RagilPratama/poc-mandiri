@@ -2,7 +2,9 @@ import { Elysia, t } from 'elysia';
 import { kegiatanHarianHandler } from '../handlers/kegiatan-harian.handler';
 
 export const kegiatanHarianRoute = new Elysia({ prefix: '/kegiatan-harian' })
-  .get('/', kegiatanHarianHandler.getAll, {
+  .get('/', async (context) => {
+    return await kegiatanHarianHandler.getAll(context);
+  }, {
     query: t.Object({
       page: t.Optional(t.Numeric({ minimum: 1 })),
       limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100 })),
@@ -19,7 +21,9 @@ export const kegiatanHarianRoute = new Elysia({ prefix: '/kegiatan-harian' })
       description: 'Get all kegiatan harian with pagination and filters',
     },
   })
-  .get('/by-month', kegiatanHarianHandler.getKegiatanByMonth, {
+  .get('/by-month', async (context) => {
+    return await kegiatanHarianHandler.getKegiatanByMonth(context);
+  }, {
     query: t.Object({
       pegawai_id: t.Numeric(),
       year: t.Numeric(),
@@ -31,7 +35,9 @@ export const kegiatanHarianRoute = new Elysia({ prefix: '/kegiatan-harian' })
       description: 'Get kegiatan harian count per day for calendar view',
     },
   })
-  .get('/:id', kegiatanHarianHandler.getById, {
+  .get('/:id', async (context) => {
+    return await kegiatanHarianHandler.getById(context);
+  }, {
     params: t.Object({
       id: t.Numeric()
     }),

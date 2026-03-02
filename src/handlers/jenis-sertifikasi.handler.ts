@@ -6,7 +6,7 @@ import { logActivitySimple } from '../utils/activity-logger';
 const jenisSertifikasiRepo = new JenisSertifikasiRepository();
 
 export const jenisSertifikasiHandler = {
-  async getAll({ query }: Context<{ query: any }>) {
+  async getAll({ query }: { query: any }) {
     try {
       const result = await jenisSertifikasiRepo.findAll(query);
       return successResponseWithPagination(
@@ -20,7 +20,7 @@ export const jenisSertifikasiHandler = {
     }
   },
 
-  async getById({ params }: Context<{ params: { id: string } }>) {
+  async getById({ params }: { params: { id: string } }) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {
@@ -123,7 +123,7 @@ export const jenisSertifikasiHandler = {
     }
   },
 
-  async delete({ params, headers, request, path }: Context<{ params: { id: string } }>) {
+  async delete({ params, headers, request, path }: { params: { id: string } }) {
     try {
       const id = parseInt(params.id);
       if (isNaN(id)) {
